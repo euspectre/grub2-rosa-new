@@ -1,11 +1,8 @@
 %define		libdir32	%{_exec_prefix}/lib
-%define		unifont		%(echo %{_datadir}/fonts/TTF/unifont/unifont-*.ttf)
-
-%bcond_with	talpo
 
 Name:           grub2
 Version:        1.99
-Release:        4
+Release:        2
 Summary:        GNU GRUB is a Multiboot boot loader
 
 Group:          System/Kernel and hardware
@@ -14,41 +11,21 @@ URL:            http://www.gnu.org/software/grub/
 Source0:        http://alpha.gnu.org/pub/gnu/grub/grub-%{version}.tar.xz
 Source1:        90_persistent
 Source2:        grub.default
-
-# basic test
-Source3:	theme.txt
-Source4:	background.jpg
-Source5:	star_w.jpg
-
-Source6:	grub.melt
-
-# documentation and simple test script for testing grub2 themes
-Source7:	mandriva-grub2-theme-test.sh
-# www.4shared.com/archive/lFCl6wxL/grub_guidetar.html
-Source8:	grub_guide.tar.gz
-
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
 BuildRequires:	bison
 BuildRequires:  flex
-BuildRequires:	fonts-ttf-unifont
 BuildRequires:	freetype2-devel
 BuildRequires:	glibc-static-devel
 BuildRequires:	help2man
-BuildRequires:	liblzma-devel
 BuildRequires:	liblzo-devel
 BuildRequires:	libusb-devel
 BuildRequires:	ncurses-devel
 BuildRequires:	texinfo
-BuildRequires:	texlive
-%if %{with talpo}
-BuildRequires:	talpo
-%endif
+BuildRequires:	liblzma-devel
 
 Requires(preun):drakxtools-backend
 Requires(post): drakxtools-backend
-
-Requires:	xorriso
 
 %description
 GNU GRUB is a Multiboot boot loader. It was derived from GRUB, the
@@ -60,49 +37,25 @@ computer starts. It is responsible for loading and transferring control
 to the operating system kernel software (such as the Hurd or Linux).
 The kernel, in turn, initializes the rest of the operating system (e.g. GNU).
 
-#-----------------------------------------------------------------------
-
-#-----------------------------------------------------------------------
 %prep
 %setup -q -n grub-%{version}
-perl -pi -e 's/(\@image\{font_char_metrics,,,,)\.(png\})/$1$2/;'	\
-	docs/grub-dev.texi
 
-perl -pi -e "s|(^FONT_SOURCE=)|\$1%{unifont}|;" configure configure.ac
-
-sed -ri -e 's/-g"/"/g' -e "s/-Werror//g" configure.ac
-
-perl -pi -e 's/-Werror//;' grub-core/Makefile.am
-
-#-----------------------------------------------------------------------
 %build
 %configure						\
-%if %{with talpo}
-	CC=talpo					\
-	CFLAGS=-fplugin-arg-melt-option=talpo-arg-file:%{SOURCE6} \
-%else
-	CFLAGS=""                                       \
-%endif
+	CFLAGS=""					\
 	TARGET_LDFLAGS=-static				\
 	--with-platform=pc				\
-    %ifarch x86_64
+%ifarch x86_64
 	--enable-efiemu					\
-    %endif
+%endif
+	--enable-grub-emu-usb				\
 	--program-transform-name=s,grub,%{name},	\
 	--libdir=%{libdir32}				\
-	--libexecdir=%{libdir32}			\
-	--disable-werror
-%make all
+	--libexecdir=%{libdir32}
+%make
 
-make html pdf
-
-#-----------------------------------------------------------------------
 %install
 %makeinstall_std
-%makeinstall_std -C docs install-pdf install-html
-mv -f %{buildroot}%{_docdir}/grub %{buildroot}%{_docdir}/%{name}
-install -m644 COPYING INSTALL NEWS README THANKS TODO ChangeLog	\
-	%{buildroot}%{_docdir}/%{name}
 
 # (bor) grub.info is harcoded in sources
 mv %{buildroot}%{_infodir}/grub.info %{buildroot}%{_infodir}/grub2.info
@@ -147,10 +100,6 @@ EOF
 	popd
 }
 
-%__mkdir_p %{buildroot}/boot/grub2/themes/mandriva
-install -m644 %{SOURCE3} %{SOURCE4} %{SOURCE5}		\
-    %{buildroot}/boot/grub2/themes/mandriva
-
 %find_lang grub
 
 %clean
@@ -184,25 +133,22 @@ if [ $1 = 0 ]; then
     rm -f /boot/%{name}/device.map
 fi
 
-#-----------------------------------------------------------------------
 %files -f grub.lang
 %defattr(-,root,root,-)
 %{libdir32}/%{name}
 %{libdir32}/grub
 %{_sbindir}/%{name}-*
 %{_bindir}/%{name}-*
-%{_datadir}/%{name}
 %{_sysconfdir}/grub.d
 %{_sysconfdir}/%{name}.cfg
 %{_sysconfdir}/default/grub
 %{_sysconfdir}/bash_completion.d/grub
 %dir /boot/%{name}
 %dir /boot/%{name}/locale
-/boot/%{name}/themes
 # Actually, this is replaced by update-grub from scriptlets,
 # but it takes care of modified persistent part
 %config(noreplace) /boot/%{name}/grub.cfg
-%doc %{_docdir}/%{name}
+%doc COPYING INSTALL NEWS README THANKS TODO ChangeLog
 %{_infodir}/%{name}.info*
 %{_infodir}/grub-dev.info*
 %{_mandir}/man1/%{name}-*.1*
@@ -212,17 +158,6 @@ fi
 
 
 %changelog
-* Tue Jan 03 2012 Paulo Andrade <pcpa@mandriva.com.br> 1.99-4
-+ Revision: 750375
-- Rework sample theme test script to work on a fresh svn checkout.
-- Add documentation and script to test grub2 themes
-- Add talpo build and melt config file for debug build (thanks to alissy)
-
-* Thu Aug 25 2011 Paulo Andrade <pcpa@mandriva.com.br> 1.99-3
-+ Revision: 696543
-- Add a very simple sample grub2 mandriva theme
-- Build and install pdf and html documentation.
-
 * Thu Jul 07 2011 Per Øyvind Karlsen <peroyvind@mandriva.org> 1.99-2
 + Revision: 689083
 - build with xz support
@@ -272,7 +207,7 @@ fi
 + Revision: 246647
 - rebuild
 
-* Wed Jan 02 2008 Olivier Blin <blino@mandriva.org> 0:1.95-1mdv2008.1
+* Wed Jan 02 2008 Olivier Blin <oblin@mandriva.com> 0:1.95-1mdv2008.1
 + Revision: 140742
 - restore BuildRoot
 
