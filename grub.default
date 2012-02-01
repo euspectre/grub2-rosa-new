@@ -1,0 +1,4 @@
+GRUB_DISTRIBUTOR="Mandriva"
+GRUB_CMDLINE_LINUX_DEFAULT="splash=silent"
+GRUB_DISABLE_LINUX_RECOVERY=true
+GRUB_THEME="/boot/grub2/themes/mandriva/theme.txt"
