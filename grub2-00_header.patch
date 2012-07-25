@@ -1,0 +1,13 @@
+diff -Naur grub-2.00//util/grub.d/00_header.in grub-new//util/grub.d/00_header.in
+--- grub-2.00//util/grub.d/00_header.in	2012-05-04 03:04:39.000000000 +0400
++++ grub-new//util/grub.d/00_header.in	2012-07-23 19:03:27.096019656 +0400
+@@ -253,7 +253,8 @@
+ set theme=(\$root)`make_system_path_relative_to_its_root $GRUB_THEME`
+ export theme
+ EOF
+-    elif [ "x$GRUB_BACKGROUND" != x ] && [ -f "$GRUB_BACKGROUND" ] \
++    fi
++    if [ "x$GRUB_BACKGROUND" != x ] && [ -f "$GRUB_BACKGROUND" ] \
+ 	    && is_path_readable_by_grub "$GRUB_BACKGROUND"; then
+ 	gettext_printf "Found background: %s\n" "$GRUB_BACKGROUND" >&2
+ 	case "$GRUB_BACKGROUND" in 

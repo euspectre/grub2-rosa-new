@@ -1,0 +1,14 @@
+diff -Naur grub-2.00//util/grub-mkconfig.in grub-new//util/grub-mkconfig.in
+--- grub-2.00//util/grub-mkconfig.in	2012-04-05 21:41:07.000000000 +0400
++++ grub-new//util/grub-mkconfig.in	2012-07-23 18:27:18.577102974 +0400
+@@ -253,6 +253,10 @@
+   esac
+ done
+ 
++if [ "x${grub_cfg}" != "x" ] && ! grep "^password " ${grub_cfg}.new >/dev/null; then
++  chmod 444 ${grub_cfg}.new || true
++fi
++
+ if test "x${grub_cfg}" != "x" ; then
+   if ! ${grub_script_check} ${grub_cfg}.new; then
+     # TRANSLATORS: %s is replaced by filename

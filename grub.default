@@ -1,3 +1,8 @@
-GRUB_DISTRIBUTOR="Mandriva"
-GRUB_CMDLINE_LINUX_DEFAULT="splash=silent"
-GRUB_DISABLE_LINUX_RECOVERY=true
+GRUB_GFXPAYLOAD_LINUX=keep
+GRUB_DISABLE_RECOVERY=true
+GRUB_DISTRIBUTOR="ROSA"
+GRUB_GFXMODE=800x600x32
+GRUB_DEFAULT=saved
+GRUB_CMDLINE_LINUX_DEFAULT='splash=silent quiet logo.nologo'
+GRUB_THEME="/boot/grub2/themes/rosa/theme.txt"
+GRUB_BACKGROUND="/boot/grub2/themes/rosa/term_background.jpg"

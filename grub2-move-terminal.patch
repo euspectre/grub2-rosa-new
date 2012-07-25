@@ -1,0 +1,18 @@
+diff -Naur grub-1.99//grub-core/gfxmenu/view.c grub-new//grub-core/gfxmenu/view.c
+--- grub-1.99//grub-core/gfxmenu/view.c	2010-12-01 17:45:43.000000000 +0300
++++ grub-new//grub-core/gfxmenu/view.c	2012-07-05 14:25:41.693052378 +0400
+@@ -360,11 +360,11 @@
+ static void
+ init_terminal (grub_gfxmenu_view_t view)
+ {
+-  term_rect.width = view->screen.width * 7 / 10;
++  term_rect.width = view->screen.width * 19 / 20;
+   term_rect.height = view->screen.height * 7 / 10;
+ 
+-  term_rect.x = view->screen.x + view->screen.width * (10 - 7) / 10 / 2;
+-  term_rect.y = view->screen.y + view->screen.height * (10 - 7) / 10 / 2;
++  term_rect.x = view->screen.x + view->screen.width * (20 - 19) / 20 / 2;
++  term_rect.y = view->screen.y + view->screen.height * (10 - 4) / 10 / 2;
+ 
+   term_view = view;
+ 
