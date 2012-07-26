@@ -42,7 +42,7 @@ BuildRequires:	liblzma-devel
 BuildRequires:	liblzo-devel
 BuildRequires:	libusb-devel
 BuildRequires:	ncurses-devel
-BuildRequires:	texinfo
+#BuildRequires:	texinfo
 #BuildRequires:	texlive
 %if %{with talpo}
 BuildRequires:	talpo
@@ -73,13 +73,13 @@ The kernel, in turn, initializes the rest of the operating system (e.g. GNU).
 perl -pi -e 's/(\@image\{font_char_metrics,,,,)\.(png\})/$1$2/;'	\
 	docs/grub-dev.texi
 
-perl -pi -e "s|(^FONT_SOURCE=)|\$1%{SOURCE7}|;" configure configure.ac
+perl -pi -e "s|(^FONT_SOURCE=)|\$1%{SOURCE6}|;" configure configure.ac
 
 sed -ri -e 's/-g"/"/g' -e "s/-Werror//g" configure.ac
 
 perl -pi -e 's/-Werror//;' grub-core/Makefile.am
 
-tar -xf %{SOURCE9}
+tar -xf %{SOURCE8}
 pushd po-update; sh ./update.sh; popd
 
 #-----------------------------------------------------------------------
@@ -157,7 +157,7 @@ EOF
 }
 
 %__mkdir_p %{buildroot}/boot/%{name}/themes/
-tar -xf %{SOURCE8} -C %{buildroot}/boot/%{name}/themes
+tar -xf %{SOURCE7} -C %{buildroot}/boot/%{name}/themes
 
 #mv -f %{buildroot}/%{libdir32}/grub %{buildroot}/%{libdir32}/%{name}
 #mv -f %{buildroot}/%{_datadir}/grub %{buildroot}/%{_datadir}/%{name}
