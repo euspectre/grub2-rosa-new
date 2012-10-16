@@ -295,6 +295,7 @@ fi
 %{libdir32}/grub/*-%{platform}
 #%{_sbindir}/%{name}-*
 #%{_bindir}/%{name}-*
+%{_sbindir}/update-grub2
 %{_bindir}/%{name}-editenv
 %{_bindir}/%{name}-fstest
 %{_bindir}/%{name}-kbdcomp
