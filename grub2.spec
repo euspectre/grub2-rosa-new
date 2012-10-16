@@ -9,7 +9,7 @@
 
 Name:           grub2
 Version:        2.00
-Release:        2
+Release:        3
 Summary:        GNU GRUB is a Multiboot boot loader
 
 Group:          System/Kernel and hardware
@@ -26,7 +26,7 @@ Source6:	DroidSansMono.ttf
 Source7:	rosa-theme.tar.gz
 Source8:	grub2-po-update.tar.gz
 Source9:	update-grub2
-
+Source10:	README.urpmi
 Patch0:		grub2-locales.patch
 Patch1:		grub2-00_header.patch
 Patch2:		grub2-custom-color.patch
@@ -161,6 +161,7 @@ cd grub-%{version}
 make html pdf
 #-----------------------------------------------------------------------
 %install
+cp %{SOURCE10} .
 %ifarch %{efi}
 cd ..
 cd grub-efi-%{version}

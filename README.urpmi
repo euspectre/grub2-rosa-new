@@ -1,0 +1,9 @@
+Grub config in /boot/grub2/grub.cfg generates only on initial install.
+Please check yous /etc/defaults/grub config files, merge with
+initial config and then run manually
+    
+    update-grub2 
+    
+for implement all incoming with package changes for you system.
+WARNING! In this case All yous grub2 settings  will be destroying by newest!
+
