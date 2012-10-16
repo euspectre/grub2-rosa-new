@@ -1,0 +1,11 @@
+--- a/util/grub.d/10_linux.in	2012-04-19 01:24:38.000000000 +0400
++++ b/util/grub.d/10_linux.in	2012-10-16 18:54:20.809871694 +0400
+@@ -135,7 +135,7 @@
+   message="$(gettext_printf "Loading Linux %s ..." ${version})"
+   sed "s/^/$submenu_indentation/" << EOF
+ 	echo	'$message'
+-	linux	${rel_dirname}/${basename} root=${linux_root_device_thisversion} ro ${args}
++	linux  ${rel_dirname}/${basename} root=${linux_root_device_thisversion} ro ${args} resume=`swapon -s | grep '/dev/sd.[0-9]' -o` init=/lib/systemd/systemd
+ EOF
+   if test -n "${initrd}" ; then
+     # TRANSLATORS: ramdisk isn't identifier. Should be translated.

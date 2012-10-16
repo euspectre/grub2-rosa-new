@@ -9,7 +9,7 @@
 
 Name:           grub2
 Version:        2.00
-Release:        1
+Release:        2
 Summary:        GNU GRUB is a Multiboot boot loader
 
 Group:          System/Kernel and hardware
@@ -25,6 +25,7 @@ Source5:	DroidSansMonoLicense.txt
 Source6:	DroidSansMono.ttf
 Source7:	rosa-theme.tar.gz
 Source8:	grub2-po-update.tar.gz
+Source9:	update-grub2
 
 Patch0:		grub2-locales.patch
 Patch1:		grub2-00_header.patch
@@ -33,6 +34,7 @@ Patch3:		grub2-move-terminal.patch
 Patch4:		grub2-read-cfg.patch
 Patch5:		grub2-symlink-is-garbage.patch
 Patch6:		grub2-name-corrections.patch
+Patch7:		grub2-10_linux.patch
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
@@ -232,6 +234,9 @@ do
 done
 # Defaults
 install -m 644 -D %{SOURCE2} %{buildroot}%{_sysconfdir}/default/grub
+
+#Add more useful update-grub2 script
+install -m 644 -D %{SOURCE9} %{buildroot}%{_sbindir}
 
 # Install filetriggers to update grub.cfg on kernel add or remove
 install -d %{buildroot}%{_filetriggers_dir}
