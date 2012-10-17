@@ -124,8 +124,6 @@ cd grub-efi-%{version}
 	--libexecdir=%{libdir32}			\
 	--with-grubdir=grub2				\
 	--disable-werror
-
-sed -i -e 's! -shared ! -Wl,--as-needed\0!g' libtool
 %make all
 
 make html pdf
@@ -158,7 +156,6 @@ cd grub-%{version}
         --libexecdir=%{libdir32}                        \
         --with-grubdir=grub2                            \
         --disable-werror
-sed -i -e 's! -shared ! -Wl,--as-needed\0!g' libtool
 %make all
 
 make html pdf
