@@ -9,7 +9,7 @@
 
 Name:           grub2
 Version:        2.00
-Release:        3
+Release:        4
 Summary:        GNU GRUB is a Multiboot boot loader
 
 Group:          System/Kernel and hardware
@@ -237,7 +237,7 @@ done
 install -m 644 -D %{SOURCE2} %{buildroot}%{_sysconfdir}/default/grub
 
 #Add more useful update-grub2 script
-install -m 644 -D %{SOURCE9} %{buildroot}%{_sbindir}
+install -m 755 -D %{SOURCE9} %{buildroot}%{_sbindir}
 
 # Install filetriggers to update grub.cfg on kernel add or remove
 install -d %{buildroot}%{_filetriggers_dir}
@@ -363,4 +363,3 @@ fi
 - Rework sample theme test script to work on a fresh svn checkout.
 - Add documentation and script to test grub2 themes
 - Add talpo build and melt config file for debug build (thanks to alissy)
-
