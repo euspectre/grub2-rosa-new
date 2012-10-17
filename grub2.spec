@@ -267,7 +267,7 @@ tar -xf %{SOURCE7} -C %{buildroot}/boot/%{name}/themes
 %find_lang grub
 
 #drop all zero-length file
-find %{buildroot} -size 0 -delete
+#find %{buildroot} -size 0 -delete
 
 %post
 exec >/dev/null 2>&1
