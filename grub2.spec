@@ -27,6 +27,7 @@ Source7:	rosa-theme.tar.gz
 Source8:	grub2-po-update.tar.gz
 Source9:	update-grub2
 Source10:	README.urpmi
+Source11:	grub2.rpmlintrc
 Patch0:		grub2-locales.patch
 Patch1:		grub2-00_header.patch
 Patch2:		grub2-custom-color.patch
