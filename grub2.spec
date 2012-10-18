@@ -57,6 +57,8 @@ BuildRequires:	talpo
 
 Requires:	xorriso
 Requires(post):	os-prober
+Requires(post): info
+Requires(preun): info
 
 Provides:   bootloader
 
@@ -72,8 +74,8 @@ The kernel, in turn, initializes the rest of the operating system (e.g. GNU).
 
 %ifarch %{efi}
 %package efi
-Summary:        GRUB for EFI systems.
-Group:          System Environment/Base
+Summary:        GRUB for EFI systems
+Group:          System/Kernel and hardware
 
 %description efi
 The GRand Unified Bootloader (GRUB) is a highly configurable and customizable
@@ -262,8 +264,8 @@ tar -xf %{SOURCE7} -C %{buildroot}/boot/%{name}/themes
 
 %find_lang grub
 
-%clean
-rm -rf %{buildroot}
+#drop all zero-length file
+find %{buildroot} -size 0 -delete
 
 %post
 exec >/dev/null 2>&1
@@ -278,6 +280,9 @@ BOOT_PARTITION=$(df -h /boot |(read; awk '{print $1; exit}'|sed 's/[[:digit:]]*$
 if [ $1 = 1 ]; then
     %{_sbindir}/%{name}-mkconfig -o /boot/%{name}/grub.cfg
 fi
+#register new info files
+/sbin/install-info %{_infodir}/%{name}.info* %{_infodir}/grub-dev.info* || :
+
 
 %preun
 exec >/dev/null
@@ -289,6 +294,11 @@ if [ $1 = 0 ]; then
     rm -f /boot/%{name}/*.o
     rm -f /boot/%{name}/device.map
 fi
+#remove info files
+if [ $1 = 0 ] ; then
+  /sbin/install-info --delete %{_infodir}/%{name}.info* %{_infodir}/grub-dev.info* || :
+fi
+
 
 #-----------------------------------------------------------------------
 %files -f grub.lang
