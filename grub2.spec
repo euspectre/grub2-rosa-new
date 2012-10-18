@@ -57,8 +57,6 @@ BuildRequires:	talpo
 
 Requires:	xorriso
 Requires(post):	os-prober
-Requires(post): info
-Requires(preun): info
 
 Provides:   bootloader
 
@@ -282,8 +280,6 @@ BOOT_PARTITION=$(df -h /boot |(read; awk '{print $1; exit}'|sed 's/[[:digit:]]*$
 if [ $1 = 1 ]; then
     %{_sbindir}/%{name}-mkconfig -o /boot/%{name}/grub.cfg
 fi
-#register new info files
-/sbin/install-info %{_infodir}/%{name}.info* %{_infodir}/grub-dev.info* || :
 
 
 %preun
@@ -295,10 +291,6 @@ if [ $1 = 0 ]; then
     rm -f /boot/%{name}/*.lst
     rm -f /boot/%{name}/*.o
     rm -f /boot/%{name}/device.map
-fi
-#remove info files
-if [ $1 = 0 ] ; then
-  /sbin/install-info --delete %{_infodir}/%{name}.info* %{_infodir}/grub-dev.info* || :
 fi
 
 

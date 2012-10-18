@@ -1,2 +1,4 @@
 # many,many binary files without +x
 addFilter("E: unstripped-binary-or-object")
+addFilter("E: info-files-with-install-info-postun")
+addFilter("E: info-files-with-install-info-postin")
