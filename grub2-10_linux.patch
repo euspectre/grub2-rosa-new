@@ -5,7 +5,7 @@
    sed "s/^/$submenu_indentation/" << EOF
  	echo	'$message'
 -	linux	${rel_dirname}/${basename} root=${linux_root_device_thisversion} ro ${args}
-+	linux  ${rel_dirname}/${basename} root=${linux_root_device_thisversion} ro ${args} resume=`swapon -s | grep '/dev/sd.[0-9]' -o` init=/lib/systemd/systemd
++	linux  ${rel_dirname}/${basename} root=${linux_root_device_thisversion} ro ${args} resume=`swapon -s | grep '/dev/sd.[0-9]\{1,\}' -o | if read line; then echo "$line"; fi` init=/lib/systemd/systemd
  EOF
    if test -n "${initrd}" ; then
      # TRANSLATORS: ramdisk isn't identifier. Should be translated.
