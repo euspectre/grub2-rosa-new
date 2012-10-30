@@ -325,9 +325,10 @@ fi
 %{_sbindir}/%{name}-sparc64-setup
 #%{_datadir}/%{name}
 %{_datadir}/grub
-%{_sysconfdir}/grub.d
+%attr(0700,root,root) %dir %{_sysconfdif}/grub.d
+%config %{_sysconfdir}/grub.d/??_*
 %{_sysconfdir}/%{name}.cfg
-%{_sysconfdir}/default/grub
+%attr(0644,root,root) %ghost %config(noreplace) %{_sysconfdir}/default/grub
 %{_sysconfdir}/bash_completion.d/grub
 %dir /boot/%{name}
 %dir /boot/%{name}/locale
@@ -347,13 +348,14 @@ fi
 %files efi 
 %defattr(-,root,root,-)
 %attr(0755,root,root)/boot/efi/EFI/rosa
+%ghost %config(noreplace) /boot/efi/EFI/rosa/grub2-efi/grub.cfg
 /etc/bash_completion.d/grub-efi
 %{libdir32}/grub/%{_arch}-efi/
 %{_sbindir}/%{name}-efi*
 %{_bindir}/%{name}-efi*
 #%{_datadir}/grub
 #%{_sysconfdir}/grub.d
-%{_sysconfdir}/%{name}-efi.cfg
+%config(noreplace) %{_sysconfdir}/%{name}-efi.cfg
 
 # Actually, this is replaced by update-grub from scriptlets,
 # but it takes care of modified persistent part
