@@ -325,7 +325,7 @@ fi
 %{_sbindir}/%{name}-sparc64-setup
 #%{_datadir}/%{name}
 %{_datadir}/grub
-%attr(0700,root,root) %dir %{_sysconfdif}/grub.d
+%attr(0700,root,root) %dir %{_sysconfdir}/grub.d
 %config %{_sysconfdir}/grub.d/??_*
 %{_sysconfdir}/%{name}.cfg
 %attr(0644,root,root) %ghost %config(noreplace) %{_sysconfdir}/default/grub
