@@ -326,6 +326,7 @@ fi
 #%{_datadir}/%{name}
 %{_datadir}/grub
 %attr(0700,root,root) %dir %{_sysconfdir}/grub.d
+%{_sysconfdir}/grub.d/README
 %config %{_sysconfdir}/grub.d/??_*
 %{_sysconfdir}/%{name}.cfg
 %attr(0644,root,root) %ghost %config(noreplace) %{_sysconfdir}/default/grub
@@ -347,6 +348,9 @@ fi
 
 %files efi 
 %defattr(-,root,root,-)
+%attr(0755,root,root) %dir /boot/
+%attr(0755,root,root) %dir /boot/efi/
+%attr(0755,root,root) %dir /boot/efi/EFI
 %attr(0755,root,root) %dir /boot/efi/EFI/rosa
 %attr(0755,root,root) /boot/efi/EFI/rosa/grub2-efi/grub.efi
 %attr(0755,root,rott) %ghost %config(noreplace) /boot/efi/EFI/rosa/grub2-efi/grub.cfg
