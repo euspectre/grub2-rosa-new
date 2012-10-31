@@ -267,6 +267,8 @@ tar -xf %{SOURCE7} -C %{buildroot}/boot/%{name}/themes
 #drop all zero-length file
 #find %{buildroot} -size 0 -delete
 
+cp -f %{buildroot}/boot/grub2/locale/en@quot.mo %{buildroot}/boot/grub2/locale/en.mo
+
 %post
 exec >/dev/null 2>&1
 # Create device.map or reuse one from GRUB Legacy
