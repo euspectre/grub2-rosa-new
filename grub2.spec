@@ -102,6 +102,8 @@ perl -pi -e 's/-Werror//;' grub-core/Makefile.am
 
 tar -xf %{SOURCE8}
 pushd po-update; sh ./update.sh; popd
+#bugfix: error message before loading of grub2 menu on boot
+cp -f po/en@quot.po po/en.po
 cd ..
 %ifarch %{efi}
 cp -r grub-%{version} grub-efi-%{version}
@@ -266,8 +268,6 @@ tar -xf %{SOURCE7} -C %{buildroot}/boot/%{name}/themes
 
 #drop all zero-length file
 #find %{buildroot} -size 0 -delete
-
-cp -f %{buildroot}/boot/grub2/locale/en@quot.mo %{buildroot}/boot/grub2/locale/en.mo
 
 %post
 exec >/dev/null 2>&1
