@@ -102,8 +102,6 @@ perl -pi -e 's/-Werror//;' grub-core/Makefile.am
 
 tar -xf %{SOURCE8}
 pushd po-update; sh ./update.sh; popd
-#bugfix: error message before loading of grub2 menu on boot
-cp -f po/en@quot.po po/en.po
 cd ..
 %ifarch %{efi}
 cp -r grub-%{version} grub-efi-%{version}
@@ -282,7 +280,8 @@ BOOT_PARTITION=$(df -h /boot |(read; awk '{print $1; exit}'|sed 's/[[:digit:]]*$
 if [ $1 = 1 ]; then
     %{_sbindir}/%{name}-mkconfig -o /boot/%{name}/grub.cfg
 fi
-
+#bugfix: error message before loading of grub2 menu on boot
+cp -f /boot/grub2/locale/en@quot.mo /boot/grub2/locale/en.mo
 
 %preun
 exec >/dev/null
