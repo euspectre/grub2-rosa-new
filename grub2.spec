@@ -347,8 +347,9 @@ fi
 
 %files efi 
 %defattr(-,root,root,-)
-%attr(0755,root,root)/boot/efi/EFI/rosa
-%ghost %config(noreplace) /boot/efi/EFI/rosa/grub2-efi/grub.cfg
+%attr(0755,root,root) %dir /boot/efi/EFI/rosa
+%attr(0755,root,root) /boot/efi/EFI/rosa/grub2-efi/grub.efi
+%attr(0755,root,rott) %ghost %config(noreplace) /boot/efi/EFI/rosa/grub2-efi/grub.cfg
 /etc/bash_completion.d/grub-efi
 %{libdir32}/grub/%{_arch}-efi/
 %{_sbindir}/%{name}-efi*
