@@ -51,6 +51,7 @@ BuildRequires:	libusb-devel
 BuildRequires:	ncurses-devel
 BuildRequires:	texinfo
 BuildRequires:	texlive
+BuildRequires:  pkgconfig(devmapper)
 %if %{with talpo}
 BuildRequires:	talpo
 %endif
@@ -113,20 +114,21 @@ ls
 cd ..
 %ifarch %{efi}
 cd grub-efi-%{version}
-%configure						\
+%configure                                          \
 %if %{with talpo}
-	CC=talpo					\
+	CC=talpo                                        \
 	CFLAGS=-fplugin-arg-melt-option=talpo-arg-file:%{SOURCE3} \
 %else
 	CFLAGS=""                                       \
 %endif
-	TARGET_LDFLAGS=-static				\
-	--with-platform=efi				\
-	--program-transform-name=s,grub,%{name}-efi,	\
-	--libdir=%{libdir32}				\
-	--libexecdir=%{libdir32}			\
-	--with-grubdir=grub2				\
-	--disable-werror
+	TARGET_LDFLAGS=-static                          \
+	--with-platform=efi                             \
+	--program-transform-name=s,grub,%{name}-efi,    \
+	--libdir=%{libdir32}                            \
+	--libexecdir=%{libdir32}                        \
+	--with-grubdir=grub2                            \
+	--disable-werror                                \
+    --enable-grub-mkfont
 %make all
 
 make html pdf
@@ -150,7 +152,7 @@ cd grub-%{version}
         CFLAGS=""                                       \
 %endif
         TARGET_LDFLAGS=-static                          \
-        --with-platform=pc                             \
+        --with-platform=pc                              \
     %ifarch x86_64
         --enable-efiemu                                 \
     %endif
@@ -158,7 +160,8 @@ cd grub-%{version}
         --libdir=%{libdir32}                            \
         --libexecdir=%{libdir32}                        \
         --with-grubdir=grub2                            \
-        --disable-werror
+        --disable-werror                                \
+        --enable-grub-mkfont
 %make all
 
 make html pdf
