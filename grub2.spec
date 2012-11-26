@@ -114,6 +114,7 @@ ls
 cd ..
 %ifarch %{efi}
 cd grub-efi-%{version}
+./autogen.sh
 %configure                                          \
 %if %{with talpo}
 	CC=talpo                                        \
@@ -144,6 +145,7 @@ cd ..
 %endif
 
 cd grub-%{version}
+./autogen.sh
 %configure                                              \
 %if %{with talpo}
         CC=talpo                                        \
