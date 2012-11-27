@@ -52,6 +52,7 @@ BuildRequires:	ncurses-devel
 BuildRequires:	texinfo
 BuildRequires:	texlive
 BuildRequires:  pkgconfig(devmapper)
+BuildRequires:  autogen
 %if %{with talpo}
 BuildRequires:	talpo
 %endif
