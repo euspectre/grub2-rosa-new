@@ -1,0 +1,112 @@
+diff -Naur grub-2.00/grub-core/gfxmenu/gui_list.c grub-new/grub-core/gfxmenu/gui_list.c
+--- grub-2.00/grub-core/gfxmenu/gui_list.c	2011-12-14 14:36:07.000000000 +0400
++++ grub-new/grub-core/gfxmenu/gui_list.c	2012-11-29 16:00:36.642209919 +0400
+@@ -58,8 +58,10 @@
+   int need_to_recreate_boxes;
+   char *theme_dir;
+   char *menu_box_pattern;
++  char *item_box_pattern;
+   char *selected_item_box_pattern;
+   grub_gfxmenu_box_t menu_box;
++  grub_gfxmenu_box_t item_box;
+   grub_gfxmenu_box_t selected_item_box;
+ 
+   grub_gfxmenu_icon_manager_t icon_manager;
+@@ -76,11 +78,14 @@
+ 
+   grub_free (self->theme_dir);
+   grub_free (self->menu_box_pattern);
++  grub_free (self->item_box_pattern);
+   grub_free (self->selected_item_box_pattern);
+   if (self->menu_box)
+     self->menu_box->destroy (self->menu_box);
+   if (self->selected_item_box)
+     self->selected_item_box->destroy (self->selected_item_box);
++  if (self->item_box)
++    self->item_box->destroy (self->item_box);
+   if (self->icon_manager)
+     grub_gfxmenu_icon_manager_destroy (self->icon_manager);
+ 
+@@ -115,10 +120,14 @@
+                              self->selected_item_box_pattern,
+                              self->theme_dir);
+ 
++      grub_gui_recreate_box (&self->item_box,
++                             self->item_box_pattern,
++                             self->theme_dir);
++
+       self->need_to_recreate_boxes = 0;
+     }
+ 
+-  return (self->menu_box != 0 && self->selected_item_box != 0);
++  return (self->menu_box != 0 && self->selected_item_box != 0 && self->item_box != 0);
+ }
+ 
+ static int
+@@ -212,7 +221,7 @@
+ static void
+ draw_menu (list_impl_t self, int num_shown_items)
+ {
+-  if (! self->menu_box || ! self->selected_item_box)
++  if (! self->menu_box || ! self->selected_item_box || !self->item_box)
+     return;
+ 
+   int boxpad = self->item_padding;
+@@ -225,6 +234,7 @@
+ 
+   make_selected_item_visible (self);
+ 
++  grub_gfxmenu_box_t itbox = self->item_box;
+   grub_gfxmenu_box_t selbox = self->selected_item_box;
+   int sel_leftpad = selbox->get_left_pad (selbox);
+   int sel_toppad = selbox->get_top_pad (selbox);
+@@ -256,7 +266,15 @@
+           selbox->draw (selbox, 0,
+                         item_top - sel_toppad);
+         }
+-
++      else
++        {
++          int cwidth = oviewport.width - 2 * boxpad - 2;
++          if (itbox->get_border_width)
++            cwidth -= itbox->get_border_width (itbox);
++          itbox->set_content_size (itbox, cwidth, item_height - 1);
++          itbox->draw (itbox, 0,
++                       item_top - sel_toppad);
++        }
+       icon = get_item_icon (self, menu_index);
+       if (icon != 0)
+         grub_video_blit_bitmap (icon, GRUB_VIDEO_BLIT_BLEND,
+@@ -302,7 +320,7 @@
+ 
+   check_boxes (self);
+ 
+-  if (! self->menu_box || ! self->selected_item_box)
++  if (! self->menu_box || ! self->selected_item_box || ! self->item_box)
+     return;
+ 
+   grub_gui_set_viewport (&self->bounds, &vpsave);
+@@ -487,6 +505,12 @@
+       grub_free (self->menu_box_pattern);
+       self->menu_box_pattern = value ? grub_strdup (value) : 0;
+     }
++  else if (grub_strcmp (name, "item_pixmap_style") == 0)
++    {
++      self->need_to_recreate_boxes = 1;
++      grub_free (self->item_box_pattern);
++      self->item_box_pattern = value ? grub_strdup (value) : 0;
++    }
+   else if (grub_strcmp (name, "selected_item_pixmap_style") == 0)
+     {
+       self->need_to_recreate_boxes = 1;
+@@ -604,8 +628,10 @@
+   self->need_to_recreate_boxes = 0;
+   self->theme_dir = 0;
+   self->menu_box_pattern = 0;
++  self->item_box_pattern = 0;
+   self->selected_item_box_pattern = 0;
+   self->menu_box = grub_gfxmenu_create_box (0, 0);
++  self->item_box = grub_gfxmenu_create_box (0, 0);
+   self->selected_item_box = grub_gfxmenu_create_box (0, 0);
+ 
+   self->icon_manager = grub_gfxmenu_icon_manager_new ();

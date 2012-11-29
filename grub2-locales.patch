@@ -1,19 +1,19 @@
-diff -Naur grub-2.00//grub-core/gfxmenu/gui_label.c grub-new//grub-core/gfxmenu/gui_label.c
---- grub-2.00//grub-core/gfxmenu/gui_label.c	2012-03-03 16:00:50.000000000 +0400
-+++ grub-new//grub-core/gfxmenu/gui_label.c	2012-07-24 16:31:14.725158375 +0400
+diff -Naur grub-2.00/grub-core/gfxmenu/gui_label.c grub-new/grub-core/gfxmenu/gui_label.c
+--- grub-2.00/grub-core/gfxmenu/gui_label.c	2012-03-03 16:00:50.000000000 +0400
++++ grub-new/grub-core/gfxmenu/gui_label.c	2012-11-27 19:34:28.551058755 +0400
 @@ -24,6 +24,11 @@
  #include <grub/gui_string_util.h>
  #include <grub/i18n.h>
  
 +#define LABEL_ENTER "Boot Selection     "
 +#define LABEL_E     "Edit Selection     "
-+#define LABEL_C     "GRUB Commandline"
-+
++#define LABEL_C     "GRUB Commandline     "
++#define LABEL_ESC   "Return to main menu"
 +
  static const char *align_options[] =
  {
    "left",
-@@ -189,7 +194,12 @@
+@@ -189,7 +194,14 @@
  	       "or `c' for a command-line.");
  	   else if (grub_strcmp (value, "@KEYMAP_SHORT@") == 0)
  	    value = _("enter: boot, `e': options, `c': cmd-line");
@@ -24,6 +24,8 @@ diff -Naur grub-2.00//grub-core/gfxmenu/gui_label.c grub-new//grub-core/gfxmenu/
 +	    value = _(LABEL_E);
 +	   else if (grub_strcmp (value, LABEL_C) == 0)
 +	    value = _(LABEL_C);
++	   else if (grub_strcmp (value, LABEL_ESC) == 0)
++	    value = _(LABEL_ESC);
  	  self->template = grub_strdup (value);
  	  self->text = grub_xasprintf (value, self->value);
  	}

@@ -7,17 +7,17 @@
 
 %bcond_with	talpo
 
-Name:           grub2
-Version:        2.00
-Release:        7
-Summary:        GNU GRUB is a Multiboot boot loader
+Name:		grub2
+Version:	2.00
+Release:	7
+Summary:	GNU GRUB is a Multiboot boot loader
 
-Group:          System/Kernel and hardware
-License:        GPLv3+
-URL:            http://www.gnu.org/software/grub/
-Source0:        grub-%{version}.tar.gz
-Source1:        90_persistent
-Source2:        grub.default
+Group:		System/Kernel and hardware
+License:	GPLv3+
+URL:		http://www.gnu.org/software/grub/
+Source0:	grub-%{version}.tar.gz
+Source1:	90_persistent
+Source2:	grub.default
 Source3:	grub.melt
 # www.4shared.com/archive/lFCl6wxL/grub_guidetar.html
 Source4:	grub_guide.tar.gz
@@ -30,17 +30,18 @@ Source10:	README.urpmi
 Source11:	grub2.rpmlintrc
 Patch0:		grub2-locales.patch
 Patch1:		grub2-00_header.patch
-Patch2:		grub2-custom-color.patch
+#Patch2:		grub2-custom-color.patch
 Patch3:		grub2-move-terminal.patch
 Patch4:		grub2-read-cfg.patch
 Patch5:		grub2-symlink-is-garbage.patch
 Patch6:		grub2-name-corrections.patch
 Patch7:		grub2-10_linux.patch
+Patch8:		grub2-theme-not_selected_item_box.patch
 
-BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-buildroot
+BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
 BuildRequires:	bison
-BuildRequires:  flex
+BuildRequires:	flex
 #BuildRequires:	fonts-ttf-unifont
 BuildRequires:	freetype2-devel
 BuildRequires:	glibc-static-devel
@@ -51,8 +52,8 @@ BuildRequires:	libusb-devel
 BuildRequires:	ncurses-devel
 BuildRequires:	texinfo
 BuildRequires:	texlive
-BuildRequires:  pkgconfig(devmapper)
-BuildRequires:  autogen
+BuildRequires:	pkgconfig(devmapper)
+BuildRequires:	autogen
 %if %{with talpo}
 BuildRequires:	talpo
 %endif
@@ -60,7 +61,7 @@ BuildRequires:	talpo
 Requires:	xorriso
 Requires(post):	os-prober
 
-Provides:   bootloader
+Provides:	bootloader
 
 %description
 GNU GRUB is a Multiboot boot loader. It was derived from GRUB, the
@@ -116,7 +117,7 @@ cd ..
 %ifarch %{efi}
 cd grub-efi-%{version}
 ./autogen.sh
-%configure                                          \
+%configure                                              \
 %if %{with talpo}
 	CC=talpo                                        \
 	CFLAGS=-fplugin-arg-melt-option=talpo-arg-file:%{SOURCE3} \
@@ -130,7 +131,7 @@ cd grub-efi-%{version}
 	--libexecdir=%{libdir32}                        \
 	--with-grubdir=grub2                            \
 	--disable-werror                                \
-    --enable-grub-mkfont
+	--enable-grub-mkfont
 %make all
 
 make html pdf
@@ -149,22 +150,22 @@ cd grub-%{version}
 ./autogen.sh
 %configure                                              \
 %if %{with talpo}
-        CC=talpo                                        \
-        CFLAGS=-fplugin-arg-melt-option=talpo-arg-file:%{SOURCE3} \
+	CC=talpo                                        \
+	CFLAGS=-fplugin-arg-melt-option=talpo-arg-file:%{SOURCE3} \
 %else
-        CFLAGS=""                                       \
+	CFLAGS=""                                       \
 %endif
-        TARGET_LDFLAGS=-static                          \
-        --with-platform=pc                              \
+	TARGET_LDFLAGS=-static                          \
+	--with-platform=pc                              \
     %ifarch x86_64
-        --enable-efiemu                                 \
+	--enable-efiemu                                 \
     %endif
-        --program-transform-name=s,grub,%{name},        \
-        --libdir=%{libdir32}                            \
-        --libexecdir=%{libdir32}                        \
-        --with-grubdir=grub2                            \
-        --disable-werror                                \
-        --enable-grub-mkfont
+	--program-transform-name=s,grub,%{name},        \
+	--libdir=%{libdir32}                            \
+	--libexecdir=%{libdir32}                        \
+	--with-grubdir=grub2                            \
+	--disable-werror                                \
+	--enable-grub-mkfont
 %make all
 
 make html pdf
@@ -300,7 +301,6 @@ if [ $1 = 0 ]; then
     rm -f /boot/%{name}/device.map
 fi
 
-
 #-----------------------------------------------------------------------
 %files -f grub.lang
 %defattr(-,root,root,-)
@@ -336,7 +336,7 @@ fi
 %{_sysconfdir}/grub.d/README
 %config %{_sysconfdir}/grub.d/??_*
 %{_sysconfdir}/%{name}.cfg
-%attr(0644,root,root) %ghost %config(noreplace) %{_sysconfdir}/default/grub
+%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/default/grub
 %{_sysconfdir}/bash_completion.d/grub
 %dir /boot/%{name}
 %dir /boot/%{name}/locale
