@@ -1,19 +1,29 @@
 diff -Naur grub-2.00/grub-core/gfxmenu/view.c grub-new/grub-core/gfxmenu/view.c
 --- grub-2.00/grub-core/gfxmenu/view.c	2012-02-24 14:19:45.000000000 +0400
-+++ grub-new/grub-core/gfxmenu/view.c	2012-11-27 17:13:01.739255431 +0400
-@@ -361,11 +361,11 @@
++++ grub-new/grub-core/gfxmenu/view.c	2012-11-30 17:10:51.554194628 +0400
+@@ -361,11 +361,21 @@
  static void
  init_terminal (grub_gfxmenu_view_t view)
  {
 -  term_rect.width = view->screen.width * 7 / 10;
 -  term_rect.height = view->screen.height * 7 / 10;
-+  term_rect.width = view->screen.width * 19 / 20;
-+  term_rect.height = view->screen.height * 7 / 10 - 50;
++  term_rect.width = 731;
++  term_rect.height = 334;
  
 -  term_rect.x = view->screen.x + view->screen.width * (10 - 7) / 10 / 2;
 -  term_rect.y = view->screen.y + view->screen.height * (10 - 7) / 10 / 2;
-+  term_rect.x = view->screen.x + view->screen.width * (20 - 19) / 20 / 2;
-+  term_rect.y = view->screen.y + view->screen.height * (10 - 4) / 10 / 2;
++  term_rect.x = view->screen.x + view->screen.width / 2 - 365;
++  term_rect.y = view->screen.y + view->screen.height / 2 - 128;
++
++  if (term_rect.width > view->screen.width)
++  {
++    term_rect.x = 0;
++    term_rect.width = view->screen.width;
++  }
++  if ((term_rect.height - 128) * 2 > view->screen.height)
++  {
++    term_rect.height = view->screen.height - term_rect.y - 8;
++  }
  
    term_view = view;
  

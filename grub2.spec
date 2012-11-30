@@ -9,7 +9,7 @@
 
 Name:		grub2
 Version:	2.00
-Release:	7
+Release:	8
 Summary:	GNU GRUB is a Multiboot boot loader
 
 Group:		System/Kernel and hardware
@@ -30,7 +30,7 @@ Source10:	README.urpmi
 Source11:	grub2.rpmlintrc
 Patch0:		grub2-locales.patch
 Patch1:		grub2-00_header.patch
-#Patch2:		grub2-custom-color.patch
+Patch2:		grub2-custom-color.patch
 Patch3:		grub2-move-terminal.patch
 Patch4:		grub2-read-cfg.patch
 Patch5:		grub2-symlink-is-garbage.patch

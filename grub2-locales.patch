@@ -5,10 +5,10 @@ diff -Naur grub-2.00/grub-core/gfxmenu/gui_label.c grub-new/grub-core/gfxmenu/gu
  #include <grub/gui_string_util.h>
  #include <grub/i18n.h>
  
-+#define LABEL_ENTER "Boot Selection     "
-+#define LABEL_E     "Edit Selection     "
-+#define LABEL_C     "GRUB Commandline     "
-+#define LABEL_ESC   "Return to main menu"
++#define LABEL_ENTER "Boot entry     "
++#define LABEL_E     "Edit entry     "
++#define LABEL_C     "Console     "
++#define LABEL_ESC   "Back"
 +
  static const char *align_options[] =
  {
