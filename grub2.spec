@@ -9,7 +9,7 @@
 
 Name:		grub2
 Version:	2.00
-Release:	10
+Release:	11
 Summary:	GNU GRUB is a Multiboot boot loader
 
 Group:		System/Kernel and hardware
@@ -61,6 +61,7 @@ BuildRequires:	talpo
 %endif
 
 Requires:	xorriso
+Requires:	rosa-release-common
 Requires(post):	os-prober
 
 Provides:	bootloader
@@ -285,10 +286,8 @@ cp -u /boot/grub/device.map /boot/%{name}/device.map 2>/dev/null ||
 BOOT_PARTITION=$(df -h /boot |(read; awk '{print $1; exit}'|sed 's/[[:digit:]]*$//'))
 # (Re-)Generate core.img, but don't let it be installed in boot sector
 %{_sbindir}/%{name}-install $BOOT_PARTITION
-# Generate grub.cfg and add GRUB2 chainloader to menu on initial install
-if [ $1 = 1 ]; then
-    %{_sbindir}/%{name}-mkconfig -o /boot/%{name}/grub.cfg
-fi
+# Regenerate configure on install or update
+%{_sbindir}/update-grub2
 #bugfix: error message before loading of grub2 menu on boot
 cp -f /boot/grub2/locale/en@quot.mo /boot/grub2/locale/en.mo
 
