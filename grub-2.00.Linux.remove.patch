@@ -8,7 +8,7 @@ diff -Nur grub-2.00.old/util/grub.d/10_linux.in grub-2.00/util/grub.d/10_linux.i
 -if [ "x${GRUB_DISTRIBUTOR}" = "x" ] ; then
 -  OS="$(sed 's, release .*$,,g' /etc/system-release) Linux"
 +if [ "x${GRUB_DISTRIBUTOR}" = "xROSA" ] ; then
-+  OS="$(sed 's, release .*$,,g' /etc/system-release)"
++  OS="$(sed 's, release .*$,,g' /etc/system-release) 2012"
  else
 -  OS="${GRUB_DISTRIBUTOR} Linux"
 +  OS="${GRUB_DISTRIBUTOR}"
