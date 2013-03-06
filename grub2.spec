@@ -9,7 +9,7 @@
 
 Name:		grub2
 Version:	2.00
-Release:	15
+Release:	16
 Summary:	GNU GRUB is a Multiboot boot loader
 
 Group:		System/Kernel and hardware
@@ -39,7 +39,6 @@ Patch7:		grub2-10_linux.patch
 Patch8:		grub2-theme-not_selected_item_box.patch
 Patch9:         grub-2.00.Linux.remove.patch
 Patch10:	grub2-mkfont-fix.patch
-Patch11:	grub2-2.00-class-via-os-prober.patch
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
