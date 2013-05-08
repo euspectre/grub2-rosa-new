@@ -376,6 +376,10 @@ fi
 
 
 %changelog
+* Wed May 08 2013 Aleksandr Kazantcev <akdengi>
+- Deletw quiet from default grub menu
+- Add acpi_backlight=vendor and acpi_osi=Linux for properly support notebooks
+
 * Tue Jan 03 2012 Paulo Andrade <pcpa@mandriva.com.br> 1.99-4
 + Revision: 750375
 - Rework sample theme test script to work on a fresh svn checkout.
