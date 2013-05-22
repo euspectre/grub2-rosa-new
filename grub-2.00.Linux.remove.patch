@@ -6,7 +6,7 @@ diff -Naur grub-new/util/grub.d/10_linux.in grub-new2/util/grub.d/10_linux.in
    OS="$(sed 's, release .*$,,g' /etc/system-release) Linux"
  else
 -  OS="${GRUB_DISTRIBUTOR} Linux"
-+  OS="$(sed 's, release .*$,,g' /etc/system-release) 2012"
++  OS="$(sed 's, release .*$,,g' /etc/system-release)"
    CLASS="--class $(echo ${GRUB_DISTRIBUTOR} | tr 'A-Z' 'a-z' | cut -d' ' -f1) ${CLASS}"
  fi
  
