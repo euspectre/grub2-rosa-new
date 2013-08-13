@@ -97,6 +97,7 @@ for EFI systems.
 %prep
 %setup -q -n grub-%{version}
 %apply_patches
+./autogen.sh
 
 perl -pi -e 's/(\@image\{font_char_metrics,,,,)\.(png\})/$1$2/;'	\
 	docs/grub-dev.texi
@@ -120,7 +121,6 @@ ls
 cd ..
 %ifarch %{efi}
 cd grub-efi-%{version}
-./autogen.sh
 %configure                                              \
 %if %{with talpo}
 	CC=talpo                                        \
@@ -151,7 +151,6 @@ cd ..
 %endif
 
 cd grub-%{version}
-./autogen.sh
 %configure                                              \
 %if %{with talpo}
 	CC=talpo                                        \
