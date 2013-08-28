@@ -88,7 +88,8 @@ BuildRequires:	liblzma-devel
 BuildRequires:	liblzo-devel
 BuildRequires:	libusb-devel
 BuildRequires:	ncurses-devel
-BuildRequires:	texlive
+#BuildRequires:	texlive
+BuildRequires:	texlive-texinfo
 BuildRequires:	texinfo
 BuildRequires:	pkgconfig(devmapper)
 BuildRequires:	autogen
@@ -341,6 +342,9 @@ install -m 755 %{SOURCE16} %{buildroot}%{_sysconfdir}/grub.d
 
 #drop all zero-length file
 #find %{buildroot} -size 0 -delete
+
+#Copy font to properly place
+cp -f %{buildroot}%{_datadir}/grub/unicode.pf2 %{buildroot}/boot/%{name}/fonts/
 
 %post
 exec >/dev/null 2>&1
