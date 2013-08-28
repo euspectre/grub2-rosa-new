@@ -69,7 +69,7 @@ Patch110:	grub2-2.00-fda-use-linuxefi.patch
 # Fix parallel build
 Patch111:	grub2-2.00-parallel-build.patch
 # Add new command lsefi
-Patch112:	grub2-2.00-fda-new-command-lsefi.patch
+# Patch112:	grub2-2.00-fda-new-command-lsefi.patch
 
 #Mageia patches
 # Fix autoreconf warnings
