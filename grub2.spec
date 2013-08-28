@@ -9,7 +9,7 @@
 
 Name:		grub2
 Version:	2.00
-Release:	20
+Release:	21
 Summary:	GNU GRUB is a Multiboot boot loader
 
 Group:		System/Kernel and hardware
@@ -45,29 +45,29 @@ Patch11:	grub2-2.00-class-via-os-prober.patch
 
 # Fedora patches:
 # https://bugzilla.redhat.com/show_bug.cgi?id=857936
-Patch100:		grub2-2.00-fda-add-fw_path-search_v2.patch
+# Patch100:		grub2-2.00-fda-add-fw_path-search_v2.patch
 # Add support for entering the firmware setup screen.
-Patch101:		grub2-2.00-fda-Add-fwsetup.patch
+# Patch101:		grub2-2.00-fda-Add-fwsetup.patch
 # Don't decrease efi memory map size
-Patch102:		grub2-2.00-fda-dont-decrease-mmap-size.patch
+# Patch102:		grub2-2.00-fda-dont-decrease-mmap-size.patch
 # IBM client architecture (CAS) reboot support
-Patch103:		grub2-2.00-fda-cas-reboot-support.patch
+# Patch103:		grub2-2.00-fda-cas-reboot-support.patch
 # Read chunks in smaller blocks
-Patch104:		grub2-2.00-fda-efidisk-ahci-workaround.patch
+# Patch104:		grub2-2.00-fda-efidisk-ahci-workaround.patch
 # Fix crash on http: https://bugzilla.redhat.com/show_bug.cgi?id=860834
-Patch105:		grub2-2.00-fda-fix-http-crash.patch
+# Patch105:		grub2-2.00-fda-fix-http-crash.patch
 # Issue separate DNS queries for ipv4 and ipv6
-Patch106:		grub2-2.00-fda-Issue-separate-DNS-queries-for-ipv4-and-ipv6.patch
+# Patch106:		grub2-2.00-fda-Issue-separate-DNS-queries-for-ipv4-and-ipv6.patch
 # Don't allow insmod when secure boot is enabled
-Patch107:		grub2-2.00-fda-no-insmod-on-sb.patch
+# Patch107:		grub2-2.00-fda-no-insmod-on-sb.patch
 # Add support for crappy cd craparino
-Patch108:		grub2-2.00-fda-cdpath.patch
+# Patch108:		grub2-2.00-fda-cdpath.patch
 # Add support for linuxefi
-Patch109:	grub2-2.00-fda-linuxefi.patch
+# Patch109:	grub2-2.00-fda-linuxefi.patch
 # Use "linuxefi" and "initrdefi" where appropriate
-Patch110:	grub2-2.00-fda-use-linuxefi.patch
+# Patch110:	grub2-2.00-fda-use-linuxefi.patch
 # Fix parallel build
-Patch111:	grub2-2.00-parallel-build.patch
+# Patch111:	grub2-2.00-parallel-build.patch
 # Add new command lsefi
 # Patch112:	grub2-2.00-fda-new-command-lsefi.patch
 
@@ -356,6 +356,10 @@ BOOT_PARTITION=$(df -h /boot |(read; awk '{print $1; exit}'|sed 's/[[:digit:]]*$
 %{_sbindir}/update-grub2
 #bugfix: error message before loading of grub2 menu on boot
 cp -f /boot/grub2/locale/en@quot.mo /boot/grub2/locale/en.mo
+
+#delete non-needing doubling rpmsave and rpmnew files
+rm -f /etc/grub.d/*.rpmsave
+rm -f /etc/grub.d/*.rpmnew
 
 %preun
 exec >/dev/null
