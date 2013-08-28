@@ -143,7 +143,6 @@ Group:		System/Kernel and hardware
 
 Requires:	grub2bootloader
 Provides:	grub2theme
-Conflicts:	grub2theme
 BuildArch:	noarch
 
 %description rosa-theme
