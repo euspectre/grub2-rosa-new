@@ -88,8 +88,8 @@ BuildRequires:	liblzma-devel
 BuildRequires:	liblzo-devel
 BuildRequires:	libusb-devel
 BuildRequires:	ncurses-devel
-#BuildRequires:	texlive
-BuildRequires:	texlive-texinfo
+BuildRequires:	texlive
+#BuildRequires:	texlive-texinfo
 BuildRequires:	texinfo
 BuildRequires:	pkgconfig(devmapper)
 BuildRequires:	autogen
