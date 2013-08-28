@@ -68,6 +68,8 @@ Patch109:	grub2-2.00-fda-linuxefi.patch
 Patch110:	grub2-2.00-fda-use-linuxefi.patch
 # Fix parallel build
 Patch111:	grub2-2.00-parallel-build.patch
+# Add new command lsefi
+Patch112:	grub2-2.00-fda-new-command-lsefi.patch
 
 #Mageia patches
 # Fix autoreconf warnings
@@ -77,6 +79,7 @@ BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
 BuildRequires:	bison
 BuildRequires:	flex
+BuildRequires:	ruby
 #BuildRequires:	fonts-ttf-unifont
 BuildRequires:	freetype2-devel
 BuildRequires:	glibc-static-devel
@@ -85,6 +88,7 @@ BuildRequires:	liblzma-devel
 BuildRequires:	liblzo-devel
 BuildRequires:	libusb-devel
 BuildRequires:	ncurses-devel
+BuildRequires:	texlive
 BuildRequires:	texinfo
 BuildRequires:	pkgconfig(devmapper)
 BuildRequires:	autogen
@@ -188,6 +192,7 @@ cd grub-efi-%{version}
 	--libexecdir=%{libdir32}                        \
 	--with-grubdir=grub2                            \
 	--disable-werror                                \
+	--enable-grub-emu-usb							\
 	--enable-grub-mkfont
 %make all
 
@@ -221,6 +226,7 @@ cd grub-%{version}
 	--libexecdir=%{libdir32}                        \
 	--with-grubdir=grub2                            \
 	--disable-werror                                \
+	--enable-grub-emu-usb							\
 	--enable-grub-mkfont
 %make all
 
