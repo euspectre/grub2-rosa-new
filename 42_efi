@@ -5,7 +5,7 @@ if [ -d /boot/efi/EFI/Microsoft ]; then
 EFI_UUID="$(/usr/sbin/grub2-probe --target=fs_uuid /boot/efi/EFI/Microsoft/Boot/bootmgfw.efi)"
 
 cat << EOF
-menuentry "Microsoft Windows Vista/7/8 x86_64 UEFI-GPT" {
+menuentry "Microsoft Windows Vista/7/8 UEFI-GPT" {
   insmod part_gpt
   insmod fat
   insmod search_fs_uuid
