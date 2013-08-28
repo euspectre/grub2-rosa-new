@@ -29,7 +29,7 @@ Source9:	update-grub2
 Source10:	README.urpmi
 Source11:	grub2.rpmlintrc
 Source12:	42_efi
-Source16:	93_memtest
+
 Patch0:		grub2-locales.patch
 Patch1:		grub2-00_header.patch
 Patch2:		grub2-custom-color.patch
@@ -333,9 +333,6 @@ tar -xf %{SOURCE7} -C %{buildroot}/boot/%{name}/themes
 
 # Windows EFI entry
 install -m 755 %{SOURCE12} %{buildroot}%{_sysconfdir}/grub.d
-
-# Memtest
-install -m 755 %{SOURCE16} %{buildroot}%{_sysconfdir}/grub.d
 
 %find_lang grub
 
