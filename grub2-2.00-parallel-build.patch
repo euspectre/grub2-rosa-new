@@ -1,0 +1,11 @@
+--- grub-2.00/gentpl.py.ori	2012-05-28 15:52:37.000000000 +0000
++++ grub-2.00/gentpl.py	2013-02-10 01:01:33.619886606 +0000
+@@ -487,7 +487,7 @@
+ def manpage():
+     r  = "if COND_MAN_PAGES\n"
+     r += gvar_add("man_MANS", "[+ name +].[+ mansection +]\n")
+-    r += rule("[+ name +].[+ mansection +]", "[+ name +]", """
++    r += rule("[+ name +].[+ mansection +]", "[+ name +] grub-mkconfig_lib", """
+ chmod a+x [+ name +]
+ PATH=$(builddir):$$PATH pkgdatadir=$(builddir) $(HELP2MAN) --section=[+ mansection +] -i $(top_srcdir)/docs/man/[+ name +].h2m -o $@ [+ name +]
+ """)

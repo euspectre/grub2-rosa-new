@@ -9,7 +9,7 @@
 
 Name:		grub2
 Version:	2.00
-Release:	19
+Release:	20
 Summary:	GNU GRUB is a Multiboot boot loader
 
 Group:		System/Kernel and hardware
@@ -28,6 +28,8 @@ Source8:	grub2-po-update.tar.gz
 Source9:	update-grub2
 Source10:	README.urpmi
 Source11:	grub2.rpmlintrc
+Source12:	42_efi
+Source16:	93_memtest
 Patch0:		grub2-locales.patch
 Patch1:		grub2-00_header.patch
 Patch2:		grub2-custom-color.patch
@@ -40,6 +42,36 @@ Patch8:		grub2-theme-not_selected_item_box.patch
 Patch9:         grub-2.00.Linux.remove.patch
 Patch10:	grub2-mkfont-fix.patch
 Patch11:	grub2-2.00-class-via-os-prober.patch
+
+# Fedora patches:
+# https://bugzilla.redhat.com/show_bug.cgi?id=857936
+Patch100:		grub2-2.00-fda-add-fw_path-search_v2.patch
+# Add support for entering the firmware setup screen.
+Patch101:		grub2-2.00-fda-Add-fwsetup.patch
+# Don't decrease efi memory map size
+Patch102:		grub2-2.00-fda-dont-decrease-mmap-size.patch
+# IBM client architecture (CAS) reboot support
+Patch103:		grub2-2.00-fda-cas-reboot-support.patch
+# Read chunks in smaller blocks
+Patch104:		grub2-2.00-fda-efidisk-ahci-workaround.patch
+# Fix crash on http: https://bugzilla.redhat.com/show_bug.cgi?id=860834
+Patch105:		grub2-2.00-fda-fix-http-crash.patch
+# Issue separate DNS queries for ipv4 and ipv6
+Patch106:		grub2-2.00-fda-Issue-separate-DNS-queries-for-ipv4-and-ipv6.patch
+# Don't allow insmod when secure boot is enabled
+Patch107:		grub2-2.00-fda-no-insmod-on-sb.patch
+# Add support for crappy cd craparino
+Patch108:		grub2-2.00-fda-cdpath.patch
+# Add support for linuxefi
+Patch109:	grub2-2.00-fda-linuxefi.patch
+# Use "linuxefi" and "initrdefi" where appropriate
+Patch110:	grub2-2.00-fda-use-linuxefi.patch
+# Fix parallel build
+Patch111:	grub2-2.00-parallel-build.patch
+
+#Mageia patches
+# Fix autoreconf warnings
+Patch200:	grub2-2.00-mga-fix_AM_PROG_MKDIR_P-configure.ac.patch
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
@@ -54,18 +86,22 @@ BuildRequires:	liblzo-devel
 BuildRequires:	libusb-devel
 BuildRequires:	ncurses-devel
 BuildRequires:	texinfo
-BuildRequires:	texlive
 BuildRequires:	pkgconfig(devmapper)
 BuildRequires:	autogen
 %if %{with talpo}
 BuildRequires:	talpo
 %endif
+# For updating Makefile template after patch 12
+BuildRequires:	autogen
 
 Requires:	xorriso
 Requires:	rosa-release-common
 Requires(post):	os-prober
 
 Provides:	bootloader
+Provides:	grub2bootloader
+
+Suggests:	%{name}-rosa-theme = %{version}-%{release}
 
 %description
 GNU GRUB is a Multiboot boot loader. It was derived from GRUB, the
@@ -77,10 +113,13 @@ computer starts. It is responsible for loading and transferring control
 to the operating system kernel software (such as the Hurd or Linux).
 The kernel, in turn, initializes the rest of the operating system (e.g. GNU).
 
+#-----------------------------------------------------------------------
+
 %ifarch %{efi}
 %package efi
 Summary:        GRUB for EFI systems
 Group:          System/Kernel and hardware
+Suggests:	efibootmgr
 
 %description efi
 The GRand Unified Bootloader (GRUB) is a highly configurable and customizable
@@ -92,6 +131,20 @@ for EFI systems.
 %endif
 
 #-----------------------------------------------------------------------
+
+%package rosa-theme
+Summary:	Provides a graphical theme with a custom ROSA background for grub2
+Group:		System/Kernel and hardware
+
+Requires:	grub2bootloader
+Provides:	grub2theme
+Conflicts:	grub2theme
+BuildArch:	noarch
+
+%description rosa-theme
+This package provides a custom Mageia graphical theme.
+It is provided as a separate package so it may be easily excluded from
+minimal installations where a graphical theme is not required.
 
 #-----------------------------------------------------------------------
 %prep
@@ -272,6 +325,12 @@ tar -xf %{SOURCE7} -C %{buildroot}/boot/%{name}/themes
 #mv -f %{buildroot}/%{libdir32}/grub %{buildroot}/%{libdir32}/%{name}
 #mv -f %{buildroot}/%{_datadir}/grub %{buildroot}/%{_datadir}/%{name}
 
+# Windows EFI entry
+install -m 755 %{SOURCE12} %{buildroot}%{_sysconfdir}/grub.d
+
+# Memtest
+install -m 755 %{SOURCE16} %{buildroot}%{_sysconfdir}/grub.d
+
 %find_lang grub
 
 #drop all zero-length file
@@ -300,6 +359,26 @@ if [ $1 = 0 ]; then
     rm -f /boot/%{name}/*.lst
     rm -f /boot/%{name}/*.o
     rm -f /boot/%{name}/device.map
+fi
+
+%post rosa-theme
+# Don't install if updating
+if [ $1 -eq 1 ] ; then
+# Remove trailing blank lines from /etc/default/grub
+sed -i -e :a -e '/^\n*$/{$d;N;};/\n$/ba' %{_sysconfdir}/default/grub
+# Check that /etc/default/grub ends in a linefeed
+[ "$(tail -n 1 %{_sysconfdir}/default/grub | wc --lines)" = "1" ] || echo >> %{_sysconfdir}/default/grub
+# Add theme
+echo "GRUB_THEME=\"/boot/grub2/themes/rosa/theme.txt\"" >> %{_sysconfdir}/default/grub
+echo "GRUB_BACKGROUND=\"/boot/grub2/themes/rosa/terminal_background.png\"" >> %{_sysconfdir}/default/grub
+fi
+
+%postun rosa-theme
+exec > /var/log/%{name}_theme_postun.log 2>&1
+# Only if uninstalling theme
+if [ $1 -eq 0 ]; then
+# Remove theme from config
+sed -i '/GRUB_THEME=\/boot\/grub2\/themes\/rosa\/theme.txt/d' %{_sysconfdir}/default/grub
 fi
 
 #-----------------------------------------------------------------------
@@ -337,11 +416,11 @@ fi
 %{_sysconfdir}/grub.d/README
 %config %{_sysconfdir}/grub.d/??_*
 %{_sysconfdir}/%{name}.cfg
-%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/default/grub
+%attr(0644,root,root) %config %{_sysconfdir}/default/grub
+#attr(0644,root,root) %config(noreplace) %{_sysconfdir}/default/grub
 %{_sysconfdir}/bash_completion.d/grub
 %dir /boot/%{name}
 %dir /boot/%{name}/locale
-/boot/%{name}/themes
 # Actually, this is replaced by update-grub from scriptlets,
 # but it takes care of modified persistent part
 %config(noreplace) /boot/%{name}/grub.cfg
@@ -352,6 +431,7 @@ fi
 %{_mandir}/man8/%{name}-*.8*
 # RPM filetriggers
 %{_filetriggers_dir}/%{name}.*
+%exclude /boot/%{name}/fonts/unicode.pf2
 
 
 %files efi 
@@ -373,8 +453,17 @@ fi
 # RPM filetriggers
 #%{_filetriggers_dir}/%{name}.*
 
+%files rosa-theme
+/boot/%{name}/fonts/unicode.pf2
+%dir /boot/%{name}/themes/rosa
+/boot/%{name}/themes/rosa/*
+
 
 %changelog
+* Wed Aug 29 2013 akdengi <akdengi> - 2.00-20
+- add EFI patches from Fedora and generate properly menu items for Windows efi if it found in system
+- split common package and theme package
+
 * Wed May 08 2013 Aleksandr Kazantcev <akdengi>
 - Deletw quiet from default grub menu
 - Add acpi_backlight=vendor and acpi_osi=Linux for properly support notebooks
