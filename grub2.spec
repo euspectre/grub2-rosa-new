@@ -344,6 +344,7 @@ install -m 755 %{SOURCE16} %{buildroot}%{_sysconfdir}/grub.d
 #find %{buildroot} -size 0 -delete
 
 #Copy font to properly place
+%__mkdir_p %{buildroot}/boot/%{name}/fonts/
 cp -f %{buildroot}%{_datadir}/grub/unicode.pf2 %{buildroot}/boot/%{name}/fonts/
 
 %post
