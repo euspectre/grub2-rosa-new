@@ -9,7 +9,7 @@
 
 Name:		grub2
 Version:	2.00
-Release:	21
+Release:	22
 Summary:	GNU GRUB is a Multiboot boot loader
 
 Group:		System/Kernel and hardware
@@ -373,8 +373,9 @@ if [ $1 = 0 ]; then
 fi
 
 %post rosa-theme
-# Don't install if updating
-if [ $1 -eq 1 ] ; then
+# Remove all previous theme from config
+sed -i '/GRUB_THEME=*/d' %{_sysconfdir}/default/grub
+sed -i '/GRUB_BACKGROUND=*/d' %{_sysconfdir}/default/grub
 # Remove trailing blank lines from /etc/default/grub
 sed -i -e :a -e '/^\n*$/{$d;N;};/\n$/ba' %{_sysconfdir}/default/grub
 # Check that /etc/default/grub ends in a linefeed
@@ -382,15 +383,14 @@ sed -i -e :a -e '/^\n*$/{$d;N;};/\n$/ba' %{_sysconfdir}/default/grub
 # Add theme
 echo "GRUB_THEME=\"/boot/grub2/themes/rosa/theme.txt\"" >> %{_sysconfdir}/default/grub
 echo "GRUB_BACKGROUND=\"/boot/grub2/themes/rosa/terminal_background.png\"" >> %{_sysconfdir}/default/grub
-fi
 
-%postun rosa-theme
-exec > /var/log/%{name}_theme_postun.log 2>&1
+#ostun rosa-theme
+#exec > /var/log/%{name}_theme_postun.log 2>&1
 # Only if uninstalling theme
-if [ $1 -eq 0 ]; then
+#if [ $1 -eq 0 ]; then
 # Remove theme from config
-sed -i '/GRUB_THEME=\/boot\/grub2\/themes\/rosa\/theme.txt/d' %{_sysconfdir}/default/grub
-fi
+#sed -i '/GRUB_THEME=\/boot\/grub2\/themes\/rosa\/theme.txt/d' %{_sysconfdir}/default/grub
+#fi
 
 #-----------------------------------------------------------------------
 %files -f grub.lang
