@@ -11,4 +11,7 @@ if [ -d /sys/firmware/efi ]; then
 	    then
 	    cp /boot/grub2/grub.cfg /boot/efi/EFI/grub2/
 	fi
+	
+	#Umount EFI partitions for safety and secure reason
+	umount /boot/efi
 fi
