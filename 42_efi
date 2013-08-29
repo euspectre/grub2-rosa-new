@@ -1,7 +1,21 @@
 #!/bin/sh
-# If EFI present we need add probing for Windows
+
+#See for EFI present
 if [ -d /sys/firmware/efi ]; then
+
+#Try mount EFI partitions
+EFI_DISK=$(/sbin/blkid | grep EFI | cut -b1-9)
+
+if [ $EFI_DISK ]
+	then
+		mount $EFI_DISK /boot/efi
+	else
+		exit 0
+fi
+
+#See for Windows EFI
 if [ -d /boot/efi/EFI/Microsoft ]; then
+
 EFI_UUID="$(/usr/sbin/grub2-probe --target=fs_uuid /boot/efi/EFI/Microsoft/Boot/bootmgfw.efi)"
 
 cat << EOF
