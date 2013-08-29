@@ -1,0 +1,20 @@
+#!/bin/sh
+if [ -f  /boot/resque.iso -o -f  /boot/sgb.iso ]; then
+submenu 'Repair tools' {
+if [ -f  /boot/resque.iso ]; then
+menuentry "Boot rescue CD" {
+loopback loop /boot/resque.iso
+linux (loop)/isolinux/vmlinuz0 boot=live iso_filename=/boot/resque.iso root=live:/dev/sr0 rootfstype=auto ro rd.live.image  rhgb splash=silent logo.nologo rd.luks=0 rd.md=0 rd.dm=0
+initrd (loop)/isolinux/initrd0.img
+}
+fi
+if [ -f  /boot/sgb.iso ]; then
+menuentry "Run Grub2 repair" {
+loopback loop /boot/sgb.iso
+linux16 /boot/memdisk iso
+initrd16 /boot/sgb.iso
+}
+fi
+}
+fi
+

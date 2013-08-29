@@ -9,7 +9,7 @@
 
 Name:		grub2
 Version:	2.00
-Release:	23
+Release:	24
 Summary:	GNU GRUB is a Multiboot boot loader
 
 Group:		System/Kernel and hardware
@@ -29,6 +29,7 @@ Source9:	update-grub2
 Source10:	README.urpmi
 Source11:	grub2.rpmlintrc
 Source12:	42_efi
+Source13:       43_resque
 
 Patch0:		grub2-locales.patch
 Patch1:		grub2-00_header.patch
@@ -42,6 +43,7 @@ Patch8:		grub2-theme-not_selected_item_box.patch
 Patch9:         grub-2.00.Linux.remove.patch
 Patch10:	grub2-mkfont-fix.patch
 Patch11:	grub2-2.00-class-via-os-prober.patch
+Patch12:        grub-2.00.safe.patch
 
 # Fedora patches:
 # https://bugzilla.redhat.com/show_bug.cgi?id=857936
@@ -332,6 +334,9 @@ tar -xf %{SOURCE7} -C %{buildroot}/boot/%{name}/themes
 #mv -f %{buildroot}/%{_datadir}/grub %{buildroot}/%{_datadir}/%{name}
 
 # Windows EFI entry
+install -m 755 %{SOURCE12} %{buildroot}%{_sysconfdir}/grub.d
+
+# repair section
 install -m 755 %{SOURCE12} %{buildroot}%{_sysconfdir}/grub.d
 
 %find_lang grub
