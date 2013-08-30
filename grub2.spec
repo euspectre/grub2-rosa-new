@@ -337,7 +337,7 @@ tar -xf %{SOURCE7} -C %{buildroot}/boot/%{name}/themes
 install -m 755 %{SOURCE12} %{buildroot}%{_sysconfdir}/grub.d
 
 # repair section
-install -m 755 %{SOURCE12} %{buildroot}%{_sysconfdir}/grub.d
+install -m 755 %{SOURCE13} %{buildroot}%{_sysconfdir}/grub.d
 
 %find_lang grub
 
