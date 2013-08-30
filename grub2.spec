@@ -388,14 +388,16 @@ sed -i -e :a -e '/^\n*$/{$d;N;};/\n$/ba' %{_sysconfdir}/default/grub
 # Add theme
 echo "GRUB_THEME=\"/boot/grub2/themes/rosa/theme.txt\"" >> %{_sysconfdir}/default/grub
 echo "GRUB_BACKGROUND=\"/boot/grub2/themes/rosa/terminal_background.png\"" >> %{_sysconfdir}/default/grub
+# Regenerate configure on install or update
+%{_sbindir}/update-grub2
 
-#ostun rosa-theme
-#exec > /var/log/%{name}_theme_postun.log 2>&1
+postun rosa-theme
+exec > /var/log/%{name}_theme_postun.log 2>&1
 # Only if uninstalling theme
-#if [ $1 -eq 0 ]; then
+if [ $1 -eq 0 ]; then
 # Remove theme from config
-#sed -i '/GRUB_THEME=\/boot\/grub2\/themes\/rosa\/theme.txt/d' %{_sysconfdir}/default/grub
-#fi
+sed -i '/GRUB_THEME=\/boot\/grub2\/themes\/rosa\/theme.txt/d' %{_sysconfdir}/default/grub
+fi
 
 #-----------------------------------------------------------------------
 %files -f grub.lang
