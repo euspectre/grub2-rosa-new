@@ -170,16 +170,13 @@ perl -pi -e 's/-Werror//;' grub-core/Makefile.am
 tar -xf %{SOURCE8}
 pushd po-update; sh ./update.sh; popd
 cd ..
-%ifarch %{efi}
-cp -r grub-%{version} grub-efi-%{version}
-ls
-%endif
 
 #-----------------------------------------------------------------------
 %build
-cd ..
+export CONFIGURE_TOP="$PWD"
 %ifarch %{efi}
-cd grub-efi-%{version}
+mkdir -p efi
+pushd efi
 %configure                                              \
 %if %{with talpo}
 	CC=talpo                                        \
@@ -207,10 +204,11 @@ make html pdf
 ./grub-mkimage -O %{grubefiarch} -p /EFI/rosa/%{name}-efi -o grub.efi -d grub-core part_gpt hfsplus fat \
         ext2 btrfs normal chain boot configfile linux appleldr minicmd \
         loadbios reboot halt search font gfxterm echo video efi_gop efi_uga
-cd ..
+popd
 %endif
 
-cd grub-%{version}
+mkdir -p pc
+cd pc
 %configure                                              \
 %if %{with talpo}
 	CC=talpo                                        \
@@ -237,13 +235,12 @@ make html pdf
 %install
 cp %{SOURCE10} .
 %ifarch %{efi}
-cd ..
-cd grub-efi-%{version}
+cd efi
 %makeinstall_std
 %makeinstall_std -C docs install-pdf install-html
 mv -f %{buildroot}%{_docdir}/grub %{buildroot}%{_docdir}/%{name}
-install -m644 COPYING INSTALL NEWS README THANKS TODO ChangeLog	\
-	%{buildroot}%{_docdir}/%{name}
+#install -m644 COPYING INSTALL NEWS README THANKS TODO ChangeLog	\
+#	%{buildroot}%{_docdir}/%{name}
 mv $RPM_BUILD_ROOT/etc/bash_completion.d/grub $RPM_BUILD_ROOT/etc/bash_completion.d/grub-efi
 
 # (bor) grub.info is harcoded in sources
@@ -274,13 +271,13 @@ done
 install -m 755 grub.efi %{buildroot}/boot/efi/EFI/rosa/%{name}-efi/grub.efi
 cd ..
 %endif
-cd grub-%{version}
+cd pc
 ######EFI
 %makeinstall_std
 %makeinstall_std -C docs install-pdf install-html
 mv -f %{buildroot}%{_docdir}/grub %{buildroot}%{_docdir}/%{name}
-install -m644 COPYING INSTALL NEWS README THANKS TODO ChangeLog	\
-	%{buildroot}%{_docdir}/%{name}
+#install -m644 COPYING INSTALL NEWS README THANKS TODO ChangeLog	\
+#	%{buildroot}%{_docdir}/%{name}
 
 # (bor) grub.info is harcoded in sources
 mv %{buildroot}%{_infodir}/grub.info %{buildroot}%{_infodir}/grub2.info
@@ -400,7 +397,7 @@ sed -i '/GRUB_THEME=\/boot\/grub2\/themes\/rosa\/theme.txt/d' %{_sysconfdir}/def
 fi
 
 #-----------------------------------------------------------------------
-%files -f grub.lang
+%files -f pc/grub.lang
 %defattr(-,root,root,-)
 #%{libdir32}/%{name}
 %{libdir32}/grub/*-%{platform}
@@ -411,6 +408,7 @@ fi
 %{_bindir}/%{name}-fstest
 %{_bindir}/%{name}-kbdcomp
 %{_bindir}/%{name}-menulst2cfg
+%{_bindir}/%{name}-mount
 %{_bindir}/%{name}-mkfont
 %{_bindir}/%{name}-mkimage
 %{_bindir}/%{name}-mklayout
