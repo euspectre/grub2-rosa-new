@@ -408,7 +408,6 @@ fi
 %{_bindir}/%{name}-fstest
 %{_bindir}/%{name}-kbdcomp
 %{_bindir}/%{name}-menulst2cfg
-%{_bindir}/%{name}-mount
 %{_bindir}/%{name}-mkfont
 %{_bindir}/%{name}-mkimage
 %{_bindir}/%{name}-mklayout
