@@ -9,7 +9,7 @@
 
 Name:		grub2
 Version:	2.00
-Release:	25
+Release:	26
 Summary:	GNU GRUB is a Multiboot boot loader
 
 Group:		System/Kernel and hardware
@@ -387,7 +387,7 @@ echo "GRUB_BACKGROUND=\"/boot/grub2/themes/rosa/terminal_background.png\"" >> %{
 # Regenerate configure on install or update
 %{_sbindir}/update-grub2
 
-postun rosa-theme
+%postun rosa-theme
 exec > /var/log/%{name}_theme_postun.log 2>&1
 # Only if uninstalling theme
 if [ $1 -eq 0 ]; then
