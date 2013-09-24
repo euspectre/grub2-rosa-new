@@ -9,7 +9,7 @@
 
 Name:		grub2
 Version:	2.00
-Release:	24
+Release:	25
 Summary:	GNU GRUB is a Multiboot boot loader
 
 Group:		System/Kernel and hardware
@@ -29,7 +29,7 @@ Source9:	update-grub2
 Source10:	README.urpmi
 Source11:	grub2.rpmlintrc
 Source12:	42_efi
-Source13:       43_resque
+Source13:   43_resque
 
 Patch0:		grub2-locales.patch
 Patch1:		grub2-00_header.patch
@@ -47,31 +47,31 @@ Patch12:        grub-2.00.safe.patch
 
 # Fedora patches:
 # https://bugzilla.redhat.com/show_bug.cgi?id=857936
-# Patch100:		grub2-2.00-fda-add-fw_path-search_v2.patch
+Patch100:		grub2-2.00-fda-add-fw_path-search_v2.patch
 # Add support for entering the firmware setup screen.
-# Patch101:		grub2-2.00-fda-Add-fwsetup.patch
+Patch101:		grub2-2.00-fda-Add-fwsetup.patch
 # Don't decrease efi memory map size
-# Patch102:		grub2-2.00-fda-dont-decrease-mmap-size.patch
+Patch102:		grub2-2.00-fda-dont-decrease-mmap-size.patch
 # IBM client architecture (CAS) reboot support
-# Patch103:		grub2-2.00-fda-cas-reboot-support.patch
+Patch103:		grub2-2.00-fda-cas-reboot-support.patch
 # Read chunks in smaller blocks
-# Patch104:		grub2-2.00-fda-efidisk-ahci-workaround.patch
+Patch104:		grub2-2.00-fda-efidisk-ahci-workaround.patch
 # Fix crash on http: https://bugzilla.redhat.com/show_bug.cgi?id=860834
-# Patch105:		grub2-2.00-fda-fix-http-crash.patch
+Patch105:		grub2-2.00-fda-fix-http-crash.patch
 # Issue separate DNS queries for ipv4 and ipv6
-# Patch106:		grub2-2.00-fda-Issue-separate-DNS-queries-for-ipv4-and-ipv6.patch
+Patch106:		grub2-2.00-fda-Issue-separate-DNS-queries-for-ipv4-and-ipv6.patch
 # Don't allow insmod when secure boot is enabled
-# Patch107:		grub2-2.00-fda-no-insmod-on-sb.patch
+Patch107:		grub2-2.00-fda-no-insmod-on-sb.patch
 # Add support for crappy cd craparino
-# Patch108:		grub2-2.00-fda-cdpath.patch
+Patch108:		grub2-2.00-fda-cdpath.patch
 # Add support for linuxefi
-# Patch109:	grub2-2.00-fda-linuxefi.patch
+Patch109:	grub2-2.00-fda-linuxefi.patch
 # Use "linuxefi" and "initrdefi" where appropriate
-# Patch110:	grub2-2.00-fda-use-linuxefi.patch
+Patch110:	grub2-2.00-fda-use-linuxefi.patch
 # Fix parallel build
-# Patch111:	grub2-2.00-parallel-build.patch
+Patch111:	grub2-2.00-parallel-build.patch
 # Add new command lsefi
-# Patch112:	grub2-2.00-fda-new-command-lsefi.patch
+Patch112:	grub2-2.00-fda-new-command-lsefi.patch
 
 #Mageia patches
 # Fix autoreconf warnings
@@ -91,7 +91,6 @@ BuildRequires:	liblzo-devel
 BuildRequires:	libusb-devel
 BuildRequires:	ncurses-devel
 BuildRequires:	texlive
-#BuildRequires:	texlive-texinfo
 BuildRequires:	texinfo
 BuildRequires:	pkgconfig(devmapper)
 BuildRequires:	autogen

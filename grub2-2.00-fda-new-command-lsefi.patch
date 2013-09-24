@@ -14,41 +14,6 @@ Subject: [PATCH 015/482] 	New command `lsefi'.
  4 files changed, 308 insertions(+), 1 deletion(-)
  create mode 100644 grub-core/commands/efi/lsefi.c
 
-diff --git a/ChangeLog b/ChangeLog
-index f514465..a21708c 100644
---- a/ChangeLog
-+++ b/ChangeLog
-@@ -1,5 +1,13 @@
- 2012-07-22  Vladimir Serbinenko  <phcoder@gmail.com>
- 
-+	New command `lsefi'.
-+
-+	* grub-core/Makefile.core.def (lsefi): New module.
-+	* grub-core/commands/efi/lsefi.c: New file.
-+	* include/grub/efi/api.h: Add more GUIDs.
-+
-+2012-07-22  Vladimir Serbinenko  <phcoder@gmail.com>
-+
- 	* grub-core/loader/i386/bsd.c (grub_bsd_elf32_size_hook): Fix mask.
- 	(grub_bsd_elf32_hook): Likewise.
- 	(grub_bsd_elf64_size_hook): Likewise.
-diff --git a/grub-core/Makefile.core.def b/grub-core/Makefile.core.def
-index 5c2fcc2..de702d6 100644
---- a/grub-core/Makefile.core.def
-+++ b/grub-core/Makefile.core.def
-@@ -569,6 +569,12 @@ module = {
- };
- 
- module = {
-+  name = lsefi;
-+  common = commands/efi/lsefi.c;
-+  enable = efi;
-+};
-+
-+module = {
-   name = blocklist;
-   common = commands/blocklist.c;
- };
 diff --git a/grub-core/commands/efi/lsefi.c b/grub-core/commands/efi/lsefi.c
 new file mode 100644
 index 0000000..8dffbdc
@@ -366,3 +331,33 @@ index 26127de..9e7a8d8 100644
 -- 
 1.8.2.1
 
+--- a/ChangeLog	2012-06-28 04:06:26.000000000 +0400
++++ b/ChangeLog	2013-09-05 15:32:07.710602345 +0400
+@@ -1,3 +1,12 @@
++2012-07-22  Vladimir Serbinenko  <phcoder@gmail.com>
++
++	New command `lsefi'.
++
++	* grub-core/Makefile.core.def (lsefi): New module.
++	* grub-core/commands/efi/lsefi.c: New file.
++	* include/grub/efi/api.h: Add more GUIDs.
++
++
+ 2012-06-27  Vladimir Serbinenko  <phcoder@gmail.com>
+ 
+ 	* configure.ac: Bump version to 2.00.
+--- a/grub-core/Makefile.core.def	2013-09-05 15:21:09.000000000 +0400
++++ b/grub-core/Makefile.core.def	2013-09-05 15:34:24.962941883 +0400
+@@ -579,6 +579,12 @@
+ };
+ 
+ module = {
++  name = lsefi;
++  common = commands/efi/lsefi.c;
++  enable = efi;
++};
++
++module = {
+   name = blocklist;
+   common = commands/blocklist.c;
+ };
