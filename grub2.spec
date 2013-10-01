@@ -89,7 +89,8 @@ BuildRequires:	liblzo-devel
 BuildRequires:	libusb-devel
 BuildRequires:	ncurses-devel
 BuildRequires:	texlive
-BuildRequires:	texinfo
+BuildRequires:	texlive-latex
+BuildRequires:	texlive-epsf
 BuildRequires:	pkgconfig(devmapper)
 BuildRequires:	autogen
 %if %{with talpo}
