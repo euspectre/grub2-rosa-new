@@ -1,7 +1,6 @@
 %define		libdir32	%{_exec_prefix}/lib
 %define platform pc
 %define efi 1
-#%define		unifont		%(echo %{_datadir}/fonts/TTF/unifont/unifont-*.ttf)
 
 %global efi %{ix86} x86_64
 
@@ -9,7 +8,7 @@
 
 Name:		grub2
 Version:	2.00
-Release:	27
+Release:	28
 Summary:	GNU GRUB is a Multiboot boot loader
 
 Group:		System/Kernel and hardware
@@ -21,9 +20,6 @@ Source2:	grub.default
 Source3:	grub.melt
 # www.4shared.com/archive/lFCl6wxL/grub_guidetar.html
 Source4:	grub_guide.tar.gz
-Source5:	DroidSansMonoLicense.txt
-Source6:	DroidSansMono.ttf
-Source7:	rosa-theme.tar.gz
 Source8:	grub2-po-update.tar.gz
 Source9:	update-grub2
 Source10:	README.urpmi
@@ -44,6 +40,8 @@ Patch9:         grub-2.00.Linux.remove.patch
 Patch10:	grub2-mkfont-fix.patch
 Patch11:	grub2-2.00-class-via-os-prober.patch
 Patch12:        grub-2.00.safe.patch
+Patch13:	grub-2.00-unifont-path.patch
+Patch14:	grub-2.00-proportional-scale.patch
 
 # Fedora patches:
 # https://bugzilla.redhat.com/show_bug.cgi?id=857936
@@ -82,7 +80,7 @@ BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 BuildRequires:	bison
 BuildRequires:	flex
 BuildRequires:	ruby
-#BuildRequires:	fonts-ttf-unifont
+BuildRequires:	fonts-ttf-unifont
 BuildRequires:	freetype2-devel
 BuildRequires:	glibc-static-devel
 BuildRequires:	help2man
@@ -102,6 +100,7 @@ BuildRequires:	autogen
 
 Requires:	xorriso
 Requires:	rosa-release-common
+Requires(post):	grub2-theme
 Requires(post):	os-prober
 
 Provides:	bootloader
@@ -138,20 +137,6 @@ for EFI systems.
 
 #-----------------------------------------------------------------------
 
-%package rosa-theme
-Summary:	Provides a graphical theme with a custom ROSA background for grub2
-Group:		System/Kernel and hardware
-
-Requires:	grub2bootloader
-Provides:	grub2theme
-BuildArch:	noarch
-
-%description rosa-theme
-This package provides a custom Mageia graphical theme.
-It is provided as a separate package so it may be easily excluded from
-minimal installations where a graphical theme is not required.
-
-#-----------------------------------------------------------------------
 %prep
 %setup -q -n grub-%{version}
 %apply_patches
@@ -159,8 +144,6 @@ minimal installations where a graphical theme is not required.
 
 perl -pi -e 's/(\@image\{font_char_metrics,,,,)\.(png\})/$1$2/;'	\
 	docs/grub-dev.texi
-
-perl -pi -e "s|(^FONT_SOURCE=)|\$1%{SOURCE6}|;" configure configure.ac
 
 sed -ri -e 's/-g"/"/g' -e "s/-Werror//g" configure.ac
 
@@ -323,9 +306,6 @@ EOF
 	popd
 }
 
-%__mkdir_p %{buildroot}/boot/%{name}/themes/
-tar -xf %{SOURCE7} -C %{buildroot}/boot/%{name}/themes
-
 #mv -f %{buildroot}/%{libdir32}/grub %{buildroot}/%{libdir32}/%{name}
 #mv -f %{buildroot}/%{_datadir}/grub %{buildroot}/%{_datadir}/%{name}
 
@@ -371,28 +351,6 @@ if [ $1 = 0 ]; then
     rm -f /boot/%{name}/*.lst
     rm -f /boot/%{name}/*.o
     rm -f /boot/%{name}/device.map
-fi
-
-%post rosa-theme
-# Remove all previous theme from config
-sed -i '/GRUB_THEME=*/d' %{_sysconfdir}/default/grub
-sed -i '/GRUB_BACKGROUND=*/d' %{_sysconfdir}/default/grub
-# Remove trailing blank lines from /etc/default/grub
-sed -i -e :a -e '/^\n*$/{$d;N;};/\n$/ba' %{_sysconfdir}/default/grub
-# Check that /etc/default/grub ends in a linefeed
-[ "$(tail -n 1 %{_sysconfdir}/default/grub | wc --lines)" = "1" ] || echo >> %{_sysconfdir}/default/grub
-# Add theme
-echo "GRUB_THEME=\"/boot/grub2/themes/rosa/theme.txt\"" >> %{_sysconfdir}/default/grub
-echo "GRUB_BACKGROUND=\"/boot/grub2/themes/rosa/terminal_background.png\"" >> %{_sysconfdir}/default/grub
-# Regenerate configure on install or update
-%{_sbindir}/update-grub2
-
-%postun rosa-theme
-exec > /var/log/%{name}_theme_postun.log 2>&1
-# Only if uninstalling theme
-if [ $1 -eq 0 ]; then
-# Remove theme from config
-sed -i '/GRUB_THEME=\/boot\/grub2\/themes\/rosa\/theme.txt/d' %{_sysconfdir}/default/grub
 fi
 
 #-----------------------------------------------------------------------
@@ -445,7 +403,8 @@ fi
 %{_mandir}/man8/%{name}-*.8*
 # RPM filetriggers
 %{_filetriggers_dir}/%{name}.*
-%exclude /boot/%{name}/fonts/unicode.pf2
+%dir /boot/%{name}/fonts
+/boot/%{name}/fonts/unicode.pf2
 
 
 %files efi 
@@ -466,12 +425,6 @@ fi
 #%config(noreplace) /boot/efi/EFI/rosa/%{name}-efi/grub.cfg
 # RPM filetriggers
 #%{_filetriggers_dir}/%{name}.*
-
-%files rosa-theme
-/boot/%{name}/fonts/unicode.pf2
-%dir /boot/%{name}/themes/rosa
-/boot/%{name}/themes/rosa/*
-
 
 %changelog
 * Wed Aug 29 2013 akdengi <akdengi> - 2.00-20
