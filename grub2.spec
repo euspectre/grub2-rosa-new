@@ -80,7 +80,7 @@ BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 BuildRequires:	bison
 BuildRequires:	flex
 BuildRequires:	ruby
-BuildRequires:	fonts-ttf-unifont
+BuildRequires:	fonts-ttf-unifont >= 6.2
 BuildRequires:	freetype2-devel
 BuildRequires:	glibc-static-devel
 BuildRequires:	help2man
