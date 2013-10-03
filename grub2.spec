@@ -101,7 +101,7 @@ BuildRequires:	autogen
 
 Requires:	xorriso
 Requires:	rosa-release-common
-Requires(post):	grub2-theme
+Requires:	grub2-theme
 Requires(post):	os-prober
 
 Provides:	bootloader
