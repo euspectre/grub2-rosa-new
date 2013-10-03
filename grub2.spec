@@ -389,8 +389,8 @@ fi
 %{_sysconfdir}/grub.d/README
 %config %{_sysconfdir}/grub.d/??_*
 %{_sysconfdir}/%{name}.cfg
-%attr(0644,root,root) %config %{_sysconfdir}/default/grub
-#attr(0644,root,root) %config(noreplace) %{_sysconfdir}/default/grub
+#%attr(0644,root,root) %config %{_sysconfdir}/default/grub
+%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/default/grub
 %{_sysconfdir}/bash_completion.d/grub
 %dir /boot/%{name}
 %dir /boot/%{name}/locale
