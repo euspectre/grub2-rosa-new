@@ -65,7 +65,7 @@ Patch108:		grub2-2.00-fda-cdpath.patch
 # Add support for linuxefi
 Patch109:	grub2-2.00-fda-linuxefi.patch
 # Use "linuxefi" and "initrdefi" where appropriate
-# Patch110:	grub2-2.00-fda-use-linuxefi.patch
+Patch110:	grub2-2.00-fda-use-linuxefi.patch
 # Fix parallel build
 Patch111:	grub2-2.00-parallel-build.patch
 
