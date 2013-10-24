@@ -1,17 +1,2 @@
 #!/bin/sh
 grub2-mkconfig -o /boot/grub2/grub.cfg
-
-#Add initial EFI support. EFI partition need mount to /boot/efi
-#First try check EFI support
-
-if [ -d /sys/firmware/efi ]; then
-
-	#Then see if EFI partition is mount, copy grub2.cfg to EFI
-	if df | grep /boot/efi > /dev/null
-	    then
-	    cp /boot/grub2/grub.cfg /boot/efi/EFI/grub2/
-	fi
-	
-	#Umount EFI partitions for safety and secure reason
-	umount /boot/efi
-fi
