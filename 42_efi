@@ -3,20 +3,17 @@
 #See for EFI present
 if [ -d /sys/firmware/efi ]; then
 
-#Try mount EFI partitions
-EFI_DISK=$(/sbin/blkid | grep EFI | cut -b1-9)
+#See for Windows EFI string in EFI BIOS
+WINDOWS_EFI=$(efibootmgr -v | grep WINDOWS | sed 's/.*HD/HD/;s/WINDOWS.*/WINDOWS/')
+WIN_EFI_PATH=$(echo $WINDOWS_EFI | sed 's/.*\\EFI/\\EFI/;s/efi.*/efi/')
+WIN_EFI_PATH_LINUX=$(echo $WIN_EFI_PATH | sed 's/\\/\//g')
 
-if [ $EFI_DISK ]
-	then
-		mount $EFI_DISK /boot/efi
-	else
-		exit 0
-fi
+ls /boot/efi$WIN_EFI_PATH_LINUX -al
 
-#See for Windows EFI
-if [ -d /boot/efi/EFI/Microsoft ]; then
+if [ -x "/boot/efi$WIN_EFI_PATH_LINUX" ]; then
 
-EFI_UUID="$(/usr/sbin/grub2-probe --target=fs_uuid /boot/efi/EFI/Microsoft/Boot/bootmgfw.efi)"
+#Determine EFI UUID
+EFI_UUID="$(/usr/sbin/grub2-probe --target=fs_uuid /boot/efi$WIN_EFI_PATH_LINUX)"
 
 cat << EOF
 menuentry "Microsoft Windows Vista/7/8 UEFI-GPT" {
@@ -25,7 +22,7 @@ menuentry "Microsoft Windows Vista/7/8 UEFI-GPT" {
   insmod search_fs_uuid
   insmod chain
   search --fs-uuid --set=root --hint-bios=hd0,gpt1 --hint-efi=hd0,gpt1 --hint-baremetal=ahci0,gpt1 ${EFI_UUID}
-  chainloader /efi/Microsoft/Boot/bootmgfw.efi
+  chainloader $WIN_EFI_PATH_LINUX
 }
 EOF
 fi
