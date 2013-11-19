@@ -8,7 +8,7 @@
 
 Name:		grub2
 Version:	2.00
-Release:	30
+Release:	31
 Summary:	GNU GRUB is a Multiboot boot loader
 
 Group:		System/Kernel and hardware
@@ -26,6 +26,7 @@ Source10:	README.urpmi
 Source11:	grub2.rpmlintrc
 Source12:	42_efi
 Source13:   43_resque
+Source14:	grub2-cfg-mod
 
 Patch0:		grub2-locales.patch
 Patch1:		grub2-00_header.patch
@@ -222,7 +223,7 @@ cd efi
 mv -f %{buildroot}%{_docdir}/grub %{buildroot}%{_docdir}/%{name}
 #install -m644 COPYING INSTALL NEWS README THANKS TODO ChangeLog	\
 #	%{buildroot}%{_docdir}/%{name}
-mv $RPM_BUILD_ROOT/etc/bash_completion.d/grub $RPM_BUILD_ROOT/etc/bash_completion.d/grub-efi
+mv %{buildroot}/etc/bash_completion.d/grub %{buildroot}/etc/bash_completion.d/grub-efi
 
 # (bor) grub.info is harcoded in sources
 mv %{buildroot}%{_infodir}/grub.info %{buildroot}%{_infodir}/grub2.info
@@ -231,10 +232,10 @@ mv %{buildroot}%{_infodir}/grub.info %{buildroot}%{_infodir}/grub2.info
 install -m 755 %{SOURCE1} %{buildroot}%{_sysconfdir}/grub.d/
 
 # Ghost config file
-install -m 755 -d $RPM_BUILD_ROOT/boot/efi/EFI/rosa/
-install -d $RPM_BUILD_ROOT/boot/efi/EFI/rosa/%{name}-efi
-touch $RPM_BUILD_ROOT/boot/efi/EFI/rosa/%{name}-efi/grub.cfg
-ln -s ../boot/efi/EFI/rosa/%{name}-efi/grub.cfg $RPM_BUILD_ROOT%{_sysconfdir}/%{name}-efi.cfg
+install -m 755 -d %{buildroot}/boot/efi/EFI/rosa/
+install -d %{buildroot}/boot/efi/EFI/rosa/%{name}-efi
+touch %{buildroot}/boot/efi/EFI/rosa/%{name}-efi/grub.cfg
+ln -s ../boot/efi/EFI/rosa/%{name}-efi/grub.cfg %{buildroot}%{_sysconfdir}/%{name}-efi.cfg
 
 # Install ELF files modules and images were created from into
 # the shadow root, where debuginfo generator will grab them from
@@ -314,6 +315,10 @@ install -m 755 %{SOURCE12} %{buildroot}%{_sysconfdir}/grub.d
 # repair section
 install -m 755 %{SOURCE13} %{buildroot}%{_sysconfdir}/grub.d
 
+# <akdengi> install programm to change option in /etc/default/grub
+install -m 755 %{SOURCE14} %{buildroot}%{_sbindir}/grub2-cfg-mod
+
+
 %find_lang grub
 
 #drop all zero-length file
@@ -381,6 +386,7 @@ fi
 %{_sbindir}/%{name}-reboot
 %{_sbindir}/%{name}-set-default
 %{_sbindir}/%{name}-sparc64-setup
+%{_sbindir}/grub2-cfg-mod
 #%{_datadir}/%{name}
 %{_datadir}/grub
 %attr(0700,root,root) %dir %{_sysconfdir}/grub.d
