@@ -8,7 +8,7 @@
 
 Name:		grub2
 Version:	2.00
-Release:	31
+Release:	32
 Summary:	GNU GRUB is a Multiboot boot loader
 
 Group:		System/Kernel and hardware
@@ -232,10 +232,10 @@ mv %{buildroot}%{_infodir}/grub.info %{buildroot}%{_infodir}/grub2.info
 install -m 755 %{SOURCE1} %{buildroot}%{_sysconfdir}/grub.d/
 
 # Ghost config file
-install -m 755 -d %{buildroot}/boot/efi/EFI/rosa/
-install -d %{buildroot}/boot/efi/EFI/rosa/%{name}-efi
-touch %{buildroot}/boot/efi/EFI/rosa/%{name}-efi/grub.cfg
-ln -s ../boot/efi/EFI/rosa/%{name}-efi/grub.cfg %{buildroot}%{_sysconfdir}/%{name}-efi.cfg
+# install -m 755 -d %{buildroot}/boot/efi/EFI/rosa/
+# install -d %{buildroot}/boot/efi/EFI/rosa/%{name}-efi
+# touch %{buildroot}/boot/efi/EFI/rosa/%{name}-efi/grub.cfg
+# ln -s ../boot/efi/EFI/rosa/%{name}-efi/grub.cfg %{buildroot}%{_sysconfdir}/%{name}-efi.cfg
 
 # Install ELF files modules and images were created from into
 # the shadow root, where debuginfo generator will grab them from
@@ -250,7 +250,7 @@ do
         TGT=$(echo $MODULE |sed "s,%{buildroot},.debugroot,")
 #        install -m 755 -D $BASE$EXT $TGT
 done
-install -m 755 grub.efi %{buildroot}/boot/efi/EFI/rosa/%{name}-efi/grub.efi
+# install -m 755 grub.efi %{buildroot}/boot/efi/EFI/rosa/%{name}-efi/grub.efi
 cd ..
 %endif
 cd pc
@@ -414,9 +414,9 @@ fi
 
 %files efi 
 %defattr(-,root,root,-)
-%attr(0755,root,root) %dir /boot/efi/EFI/rosa/grub2-efi
-%attr(0755,root,root) /boot/efi/EFI/rosa/grub2-efi/grub.efi
-%attr(0755,root,rott) %ghost %config(noreplace) /boot/efi/EFI/rosa/grub2-efi/grub.cfg
+#attr(0755,root,root) %dir /boot/efi/EFI/rosa/grub2-efi
+#attr(0755,root,root) /boot/efi/EFI/rosa/grub2-efi/grub.efi
+#attr(0755,root,rott) %ghost %config(noreplace) /boot/efi/EFI/rosa/grub2-efi/grub.cfg
 /etc/bash_completion.d/grub-efi
 %{libdir32}/grub/%{_arch}-efi/
 %{_sbindir}/%{name}-efi*
