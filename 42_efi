@@ -8,8 +8,6 @@ WINDOWS_EFI=$(efibootmgr -v | grep WINDOWS | sed 's/.*HD/HD/;s/WINDOWS.*/WINDOWS
 WIN_EFI_PATH=$(echo $WINDOWS_EFI | sed 's/.*\\EFI/\\EFI/;s/efi.*/efi/')
 WIN_EFI_PATH_LINUX=$(echo $WIN_EFI_PATH | sed 's/\\/\//g')
 
-ls /boot/efi$WIN_EFI_PATH_LINUX -al
-
 if [ -x "/boot/efi$WIN_EFI_PATH_LINUX" ]; then
 
 #Determine EFI UUID
