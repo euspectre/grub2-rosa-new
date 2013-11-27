@@ -423,7 +423,7 @@ fi
 %{_bindir}/%{name}-efi*
 #%{_datadir}/grub
 #%{_sysconfdir}/grub.d
-%config(noreplace) %{_sysconfdir}/%{name}-efi.cfg
+#config(noreplace) %{_sysconfdir}/%{name}-efi.cfg
 
 # Actually, this is replaced by update-grub from scriptlets,
 # but it takes care of modified persistent part
