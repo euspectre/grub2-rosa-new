@@ -8,7 +8,7 @@
 
 Name:		grub2
 Version:	2.00
-Release:	31
+Release:	34
 Summary:	GNU GRUB is a Multiboot boot loader
 
 Group:		System/Kernel and hardware
@@ -74,8 +74,6 @@ Patch111:	grub2-2.00-parallel-build.patch
 # Fix autoreconf warnings
 Patch200:	grub2-2.00-mga-fix_AM_PROG_MKDIR_P-configure.ac.patch
 
-BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
-
 BuildRequires:	bison
 BuildRequires:	flex
 BuildRequires:	ruby
@@ -106,7 +104,7 @@ Requires(post):	os-prober
 Provides:	bootloader
 Provides:	grub2bootloader
 
-Suggests:	%{name}-rosa-theme = %{version}-%{release}
+Suggests:	%{name}-rosa-theme
 
 %description
 GNU GRUB is a Multiboot boot loader. It was derived from GRUB, the
@@ -171,7 +169,7 @@ pushd efi
 	--program-transform-name=s,grub,%{name}-efi,    \
 	--libdir=%{libdir32}                            \
 	--libexecdir=%{libdir32}                        \
-	--with-grubdir=grub2                            \
+	--with-grubdir=grub2                           \
 	--disable-werror                                \
 	--enable-grub-emu-usb							\
 	--enable-grub-mkfont
@@ -232,10 +230,10 @@ mv %{buildroot}%{_infodir}/grub.info %{buildroot}%{_infodir}/grub2.info
 install -m 755 %{SOURCE1} %{buildroot}%{_sysconfdir}/grub.d/
 
 # Ghost config file
-install -m 755 -d %{buildroot}/boot/efi/EFI/rosa/
-install -d %{buildroot}/boot/efi/EFI/rosa/%{name}-efi
-touch %{buildroot}/boot/efi/EFI/rosa/%{name}-efi/grub.cfg
-ln -s ../boot/efi/EFI/rosa/%{name}-efi/grub.cfg %{buildroot}%{_sysconfdir}/%{name}-efi.cfg
+ install -m 755 -d %{buildroot}/boot/efi/EFI/rosa/
+ install -d %{buildroot}/boot/efi/EFI/rosa/%{name}-efi
+ touch %{buildroot}/boot/efi/EFI/rosa/%{name}-efi/grub.cfg
+ ln -s ../boot/efi/EFI/rosa/%{name}-efi/grub.cfg %{buildroot}%{_sysconfdir}/%{name}-efi.cfg
 
 # Install ELF files modules and images were created from into
 # the shadow root, where debuginfo generator will grab them from
@@ -250,7 +248,7 @@ do
         TGT=$(echo $MODULE |sed "s,%{buildroot},.debugroot,")
 #        install -m 755 -D $BASE$EXT $TGT
 done
-install -m 755 grub.efi %{buildroot}/boot/efi/EFI/rosa/%{name}-efi/grub.efi
+ install -m 755 grub.efi %{buildroot}/boot/efi/EFI/rosa/%{name}-efi/grub.efi
 cd ..
 %endif
 cd pc
