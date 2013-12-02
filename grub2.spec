@@ -104,7 +104,7 @@ Requires(post):	os-prober
 Provides:	bootloader
 Provides:	grub2bootloader
 
-Suggests:	%{name}-rosa-theme
+Suggests:	%{name}-theme-rosa
 
 %description
 GNU GRUB is a Multiboot boot loader. It was derived from GRUB, the
