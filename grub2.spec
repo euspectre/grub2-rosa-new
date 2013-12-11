@@ -8,7 +8,7 @@
 
 Name:		grub2
 Version:	2.00
-Release:	34
+Release:	35
 Summary:	GNU GRUB is a Multiboot boot loader
 
 Group:		System/Kernel and hardware
@@ -103,8 +103,6 @@ Requires(post):	os-prober
 
 Provides:	bootloader
 Provides:	grub2bootloader
-
-Suggests:	%{name}-rosa-theme
 
 %description
 GNU GRUB is a Multiboot boot loader. It was derived from GRUB, the
@@ -422,24 +420,3 @@ fi
 #%{_datadir}/grub
 #%{_sysconfdir}/grub.d
 %config(noreplace) %{_sysconfdir}/%{name}-efi.cfg
-
-# Actually, this is replaced by update-grub from scriptlets,
-# but it takes care of modified persistent part
-#%config(noreplace) /boot/efi/EFI/rosa/%{name}-efi/grub.cfg
-# RPM filetriggers
-#%{_filetriggers_dir}/%{name}.*
-
-%changelog
-* Wed Aug 29 2013 akdengi <akdengi> - 2.00-20
-- add EFI patches from Fedora and generate properly menu items for Windows efi if it found in system
-- split common package and theme package
-
-* Wed May 08 2013 Aleksandr Kazantcev <akdengi>
-- Deletw quiet from default grub menu
-- Add acpi_backlight=vendor and acpi_osi=Linux for properly support notebooks
-
-* Tue Jan 03 2012 Paulo Andrade <pcpa@mandriva.com.br> 1.99-4
-+ Revision: 750375
-- Rework sample theme test script to work on a fresh svn checkout.
-- Add documentation and script to test grub2 themes
-- Add talpo build and melt config file for debug build (thanks to alissy)
