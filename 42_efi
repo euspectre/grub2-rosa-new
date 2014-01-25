@@ -7,11 +7,11 @@ if [ -d /sys/firmware/efi ]; then
 WINDOWS_EFI=$(efibootmgr -v | grep WINDOWS | sed 's/.*HD/HD/;s/WINDOWS.*/WINDOWS/')
 WIN_EFI_PATH=$(echo $WINDOWS_EFI | sed 's/.*\\EFI/\\EFI/;s/efi.*/efi/')
 WIN_EFI_PATH_LINUX=$(echo $WIN_EFI_PATH | sed 's/\\/\//g')
-
-#if [ -x "/boot/efi$WIN_EFI_PATH_LINUX" ]; then
+WIN_EFI_PARTUUID=$(echo $WINDOWS_EFI | sed 's/.*,//;s/).*//')
 
 #Determine EFI UUID
-EFI_UUID="$(/usr/sbin/grub2-probe --target=fs_uuid /boot/efi$WIN_EFI_PATH_LINUX)"
+WIN_EFI_DRIVE=$(blkid -s PARTUUID | grep $WIN_EFI_PARTUUID | awk '{print $1}' | sed 's/://')
+WIN_EFI_UUID=$(blkid -s UUID $WIN_EFI_DRIVE | sed 's/.*="//;s/".*//')
 
 cat << EOF
 menuentry "Microsoft Windows Vista/7/8 UEFI-GPT" {
@@ -19,9 +19,9 @@ menuentry "Microsoft Windows Vista/7/8 UEFI-GPT" {
   insmod fat
   insmod search_fs_uuid
   insmod chain
-  search --fs-uuid --set=root --hint-bios=hd0,gpt1 --hint-efi=hd0,gpt1 --hint-baremetal=ahci0,gpt1 ${EFI_UUID}
+  search --fs-uuid --set=root --hint-bios=hd0,gpt1 --hint-efi=hd0,gpt1 --hint-baremetal=ahci0,gpt1 ${WIN_EFI_UUID}
   chainloader $WIN_EFI_PATH_LINUX
 }
 EOF
-#fi
+
 fi
