@@ -8,7 +8,7 @@
 
 Name:		grub2
 Version:	2.00
-Release:	37
+Release:	39
 Summary:	GNU GRUB is a Multiboot boot loader
 
 Group:		System/Kernel and hardware
@@ -43,6 +43,7 @@ Patch11:	grub2-2.00-class-via-os-prober.patch
 Patch12:        grub-2.00.safe.patch
 Patch13:	grub-2.00-unifont-path.patch
 Patch14:	grub-2.00-proportional-scale.patch
+Patch15:        grub-2.00.30_os-prober.options.patch
 
 # Fedora patches:
 # https://bugzilla.redhat.com/show_bug.cgi?id=857936
