@@ -1,0 +1,45 @@
+diff -Nur grub-2.00.old/util/grub.d/30_os-prober.in grub-2.00/util/grub.d/30_os-prober.in
+--- grub-2.00.old/util/grub.d/30_os-prober.in	2014-01-30 14:27:44.000000000 +0400
++++ grub-2.00/util/grub.d/30_os-prober.in	2014-01-30 14:36:26.637814963 +0400
+@@ -41,6 +41,25 @@
+   exit 0
+ fi
+ 
++add_options() {
++  # Use ELILO's generic "efifb" when it's known to be available.
++  # FIXME: We need an interface to select vesafb in case efifb can't be used.
++  if [ "x$GRUB_GFXPAYLOAD_LINUX" = x ]; then
++      echo "    load_video" | sed "s/^/$submenu_indentation/"
++      if grep -qx "CONFIG_FB_EFI=y" "${config}" 2> /dev/null \
++          && grep -qx "CONFIG_VT_HW_CONSOLE_BINDING=y" "${config}" 2> /dev/null; then
++          echo "        set gfxpayload=keep" | sed "s/^/$submenu_indentation/"
++      fi
++  else
++      if [ "x$GRUB_GFXPAYLOAD_LINUX" != xtext ]; then
++          echo "        load_video" | sed "s/^/$submenu_indentation/"
++      fi
++      echo "        set gfxpayload=$GRUB_GFXPAYLOAD_LINUX" | sed "s/^/$submenu_indentation/"
++  fi
++
++  echo "        insmod gzio" | sed "s/^/$submenu_indentation/"
++}
++
+ osx_entry() {
+     if [ x$2 = x32 ]; then
+         # TRANSLATORS: it refers to kernel architecture (32-bit)
+@@ -193,6 +212,7 @@
+ menuentry '$(echo "$OS" | grub_quote)' --class ${CLASS} --class gnu-linux --class gnu --class os \$menuentry_id_option 'osprober-gnulinux-simple-$boot_device_id' {
+ EOF
+ 	    save_default_entry | sed -e "s/^/\t/"
++	    add_options
+ 	    printf '%s\n' "${prepare_boot_cache}"
+ 	    cat <<  EOF
+ 	linux ${LKERNEL} ${LPARAMS}
+@@ -213,6 +233,7 @@
+ 	menuentry '$(echo "$title" | grub_quote)' --class ${CLASS} --class gnu-linux --class gnu --class os \$menuentry_id_option 'osprober-gnulinux-$LKERNEL-${recovery_params}-$boot_device_id' {
+ EOF
+ 	save_default_entry | sed -e "s/^/\t\t/"
++	add_options
+ 	printf '%s\n' "${prepare_boot_cache}" | sed -e "s/^/\t/"
+ 	cat <<  EOF
+ 		linux ${LKERNEL} ${LPARAMS}
