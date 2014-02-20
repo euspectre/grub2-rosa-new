@@ -8,7 +8,7 @@
 
 Name:		grub2
 Version:	2.00
-Release:	39
+Release:	40
 Summary:	GNU GRUB is a Multiboot boot loader
 
 Group:		System/Kernel and hardware
@@ -74,6 +74,9 @@ Patch111:	grub2-2.00-parallel-build.patch
 #Mageia patches
 # Fix autoreconf warnings
 Patch200:	grub2-2.00-mga-fix_AM_PROG_MKDIR_P-configure.ac.patch
+
+# ROSA quick fix. Need rediff previous patch
+Patch500:	grub2-10_linux_hibernate_fix.patch
 
 BuildRequires:	bison
 BuildRequires:	flex
