@@ -6,17 +6,17 @@
    message="$(gettext_printf "Loading Linux %s ..." ${version})"
 +
 +if swapon -s -p -1 | grep partition > /dev/null; then
-+	if swapon -s -p -1 | grep '/dev/sd' > /dev/null; then
-+		RESUME_DEV=$(swapon -s -p -1 | grep '/dev/sd.[0-9]\{1,\}' -o)
++	if swapon -s | head -n 2 | grep '/dev/sd' > /dev/null; then
++		RESUME_DEV=$(swapon -s | head -n 2 | grep '/dev/sd.[0-9]\{1,\}' -o)
 +		RESUME_STRING="resume=UUID=$(blkid -s UUID $RESUME_DEV | sed 's/.*="//;s/".*//')"
 +	else
-+		RESUME_DEV=$(swapon -s -p -1 | grep '/dev/dm.[0-9]\{1,\}' -o)
++		RESUME_DEV=$(swapon -s | head -n 2 | grep '/dev/dm.[0-9]\{1,\}' -o)
 +		RESUME_STRING="resume=UUID=$(blkid -s UUID $RESUME_DEV | sed 's/.*="//;s/".*//')"
 +	fi
 +fi
 +
 +if swapon -s -p -1 | grep file > /dev/null; then
-+	RESUME_FILE=$(swapon -s -p -1 | grep file | awk '{print $1}')
++	RESUME_FILE=$(swapon -s | head -n 2 | grep file | awk '{print $1}')
 +	RESUME_OFFSET=$(filefrag -v $RESUME_FILE| grep -E '^\s+0.*0' | awk '{print $3}')
 +	RESUME_STRING="resume=${linux_root_device_thisversion} resume_offset=$RESUME_OFFSET"
 +fi
