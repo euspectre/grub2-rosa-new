@@ -25,13 +25,13 @@
      sed "s/^/$submenu_indentation/" << EOF
  	echo	'$message'
 -	linuxefi ${rel_dirname}/${basename} root=${linux_root_device_thisversion} ro ${args}
-+	linuxefi ${rel_dirname}/${basename} root=${linux_root_device_thisversion} ro ${args} $RESUME_STRING init=/lib/systemd/systemd
++	linuxefi ${rel_dirname}/${basename} root=${linux_root_device_thisversion} ro ${args} $RESUME_STRING
  EOF
    else
      sed "s/^/$submenu_indentation/" << EOF
  	echo	'$message'
 -	linux  ${rel_dirname}/${basename} root=${linux_root_device_thisversion} ro ${args} resume=`swapon -s | grep '/dev/sd.[0-9]\{1,\}' -o | if read line; then echo "$line"; fi` init=/lib/systemd/systemd
-+	linux  ${rel_dirname}/${basename} root=${linux_root_device_thisversion} ro ${args} $RESUME_STRING init=/lib/systemd/systemd
++	linux  ${rel_dirname}/${basename} root=${linux_root_device_thisversion} ro ${args} $RESUME_STRING
  EOF
    fi
    if test -n "${initrd}" ; then
