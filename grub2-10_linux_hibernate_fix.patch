@@ -6,8 +6,8 @@
    message="$(gettext_printf "Loading Linux %s ..." ${version})"
 +
 +if swapon -s -p -1 | grep partition > /dev/null; then
-+	if swapon -s | head -n 2 | grep '/dev/sd' > /dev/null; then
-+		RESUME_DEV=$(swapon -s | head -n 2 | grep '/dev/sd.[0-9]\{1,\}' -o)
++	if swapon -s | head -n 2 | grep '/dev/[hsv]d' > /dev/null; then
++		RESUME_DEV=$(swapon -s | head -n 2 | grep '/dev/[hsv]d.[0-9]\{1,\}' -o)
 +		RESUME_STRING="resume=UUID=$(blkid -s UUID $RESUME_DEV | sed 's/.*="//;s/".*//')"
 +	else
 +		RESUME_DEV=$(swapon -s | head -n 2 | grep '/dev/dm.[0-9]\{1,\}' -o)

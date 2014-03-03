@@ -8,7 +8,7 @@
 
 Name:		grub2
 Version:	2.00
-Release:	43
+Release:	44
 Summary:	GNU GRUB is a Multiboot boot loader
 
 Group:		System/Kernel and hardware
