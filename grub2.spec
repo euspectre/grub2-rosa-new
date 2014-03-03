@@ -8,7 +8,7 @@
 
 Name:		grub2
 Version:	2.00
-Release:	44
+Release:	45
 Summary:	GNU GRUB is a Multiboot boot loader
 
 Group:		System/Kernel and hardware
@@ -91,6 +91,7 @@ BuildRequires:	libusb-devel
 BuildRequires:	ncurses-devel
 BuildRequires:	texinfo
 BuildRequires:	texlive-latex
+BuildRequires:  texlive-scheme-tetex
 BuildRequires:	texlive-epsf
 BuildRequires:	pkgconfig(devmapper)
 BuildRequires:	autogen
