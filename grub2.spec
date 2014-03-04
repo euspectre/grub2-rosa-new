@@ -91,7 +91,7 @@ BuildRequires:	libusb-devel
 BuildRequires:	ncurses-devel
 BuildRequires:	texinfo
 BuildRequires:	texlive-latex
-BuildRequires:  texlive-scheme-tetex
+# BuildRequires:  texlive-scheme-tetex
 BuildRequires:	texlive-epsf
 BuildRequires:	pkgconfig(devmapper)
 BuildRequires:	autogen
