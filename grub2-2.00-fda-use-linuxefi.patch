@@ -1,32 +1,20 @@
-From 151b1691fe0cf885df101c6e6a7cb1defc50428b Mon Sep 17 00:00:00 2001
-From: Peter Jones <pjones@redhat.com>
-Date: Mon, 16 Jul 2012 18:57:11 -0400
-Subject: [PATCH] Use "linuxefi" and "initrdefi" where appropriate.
-
-diff --git a/util/grub.d/10_linux.in b/util/grub.d/10_linux.in
-index cd543bd..e2b8ab3 100644
---- a/util/grub.d/10_linux.in
-+++ b/util/grub.d/10_linux.in
-@@ -1,4 +1,4 @@
--#! /bin/sh
-+	#! /bin/sh
- set -e
- 
- # grub-mkconfig helper script.
-@@ -133,17 +133,31 @@
+--- a/util/grub.d/10_linux.in.0110~	2014-05-13 21:49:50.000000000 +0400
++++ a/util/grub.d/10_linux.in	2014-05-13 22:33:09.000000000 +0400
+@@ -133,17 +133,32 @@
      printf '%s\n' "${prepare_boot_cache}" | sed "s/^/$submenu_indentation/"
    fi
    message="$(gettext_printf "Loading Linux %s ..." ${version})"
 -  sed "s/^/$submenu_indentation/" << EOF
 +  if [ -d /sys/firmware/efi ]; then
 +    sed "s/^/$submenu_indentation/" << EOF
-+	echo	'$message'
-+	linuxefi ${rel_dirname}/${basename} root=${linux_root_device_thisversion} ro ${args}
++       echo    '$message'
++       linuxefi ${rel_dirname}/${basename} root=${linux_root_device_thisversion} ro ${args}
 +EOF
 +  else
 +    sed "s/^/$submenu_indentation/" << EOF
++
  	echo	'$message'
- 	linux  ${rel_dirname}/${basename} root=${linux_root_device_thisversion} ro ${args} resume=`swapon -s | grep '/dev/sd.[0-9]\{1,\}' -o | if read line; then echo "$line"; fi` init=/lib/systemd/systemd
+ 	linux	${rel_dirname}/${basename} root=${linux_root_device_thisversion} ro ${args}
  EOF
 +  fi
    if test -n "${initrd}" ; then
@@ -35,15 +23,15 @@ index cd543bd..e2b8ab3 100644
 -    sed "s/^/$submenu_indentation/" << EOF
 +    if [ -d /sys/firmware/efi ]; then
 +      sed "s/^/$submenu_indentation/" << EOF
-+	echo	'$message'
-+	initrdefi ${rel_dirname}/${initrd}
++       echo    '$message'
++       initrdefi ${rel_dirname}/${initrd}
 +EOF
 +    else
 +      sed "s/^/$submenu_indentation/" << EOF
  	echo	'$message'
  	initrd	${rel_dirname}/${initrd}
  EOF
-+	fi
++    fi
    fi
    sed "s/^/$submenu_indentation/" << EOF
  }

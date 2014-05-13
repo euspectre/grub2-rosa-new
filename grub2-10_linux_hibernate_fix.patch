@@ -1,36 +1,37 @@
---- a/util/grub.d/10_linux.in	2014-02-19 15:06:30.000000000 +0400
-+++ b/util/grub.d/10_linux.in	2014-02-20 09:48:32.933072045 +0400
-@@ -133,15 +133,32 @@
+--- a/util/grub.d/10_linux.in.0500~	2014-05-13 22:37:32.000000000 +0400
++++ a/util/grub.d/10_linux.in	2014-05-13 22:40:55.000000000 +0400
+@@ -133,16 +133,33 @@
      printf '%s\n' "${prepare_boot_cache}" | sed "s/^/$submenu_indentation/"
    fi
    message="$(gettext_printf "Loading Linux %s ..." ${version})"
 +
-+if swapon -s -p -1 | grep partition > /dev/null; then
-+	if swapon -s | head -n 2 | grep '/dev/[hsv]d' > /dev/null; then
-+		RESUME_DEV=$(swapon -s | head -n 2 | grep '/dev/[hsv]d.[0-9]\{1,\}' -o)
-+		RESUME_STRING="resume=UUID=$(blkid -s UUID $RESUME_DEV | sed 's/.*="//;s/".*//')"
-+	else
-+		RESUME_DEV=$(swapon -s | head -n 2 | grep '/dev/dm.[0-9]\{1,\}' -o)
-+		RESUME_STRING="resume=UUID=$(blkid -s UUID $RESUME_DEV | sed 's/.*="//;s/".*//')"
-+	fi
-+fi
++  if /sbin/swapon -s -p -1 | grep partition > /dev/null; then
++      if /sbin/swapon -s | head -n 2 | grep '/dev/[hsv]d' > /dev/null; then
++          RESUME_DEV=$(/sbin/swapon -s | head -n 2 | grep '/dev/[hsv]d.[0-9]\{1,\}' -o)
++          RESUME_STRING="resume=UUID=$(blkid -s UUID $RESUME_DEV | sed 's/.*="//;s/".*//')"
++      else
++          RESUME_DEV=$(/sbin/swapon -s | head -n 2 | grep '/dev/dm.[0-9]\{1,\}' -o)
++          RESUME_STRING="resume=UUID=$(blkid -s UUID $RESUME_DEV | sed 's/.*="//;s/".*//')"
++      fi
++  fi
 +
-+if swapon -s -p -1 | grep file > /dev/null; then
-+	RESUME_FILE=$(swapon -s | head -n 2 | grep file | awk '{print $1}')
-+	RESUME_OFFSET=$(filefrag -v $RESUME_FILE| grep -E '^\s+0.*0' | awk '{print $3}')
-+	RESUME_STRING="resume=${linux_root_device_thisversion} resume_offset=$RESUME_OFFSET"
-+fi
++  if /sbin/swapon -s -p -1 | grep file > /dev/null; then
++      RESUME_FILE=$(/sbin/swapon -s | head -n 2 | grep file | awk '{print $1}')
++      RESUME_OFFSET=$(filefrag -v $RESUME_FILE| grep -E '^\s+0.*0' | awk '{print $3}')
++      RESUME_STRING="resume=${linux_root_device_thisversion} resume_offset=$RESUME_OFFSET"
++  fi
 +
    if [ -d /sys/firmware/efi ]; then
      sed "s/^/$submenu_indentation/" << EOF
- 	echo	'$message'
--	linuxefi ${rel_dirname}/${basename} root=${linux_root_device_thisversion} ro ${args}
-+	linuxefi ${rel_dirname}/${basename} root=${linux_root_device_thisversion} ro ${args} $RESUME_STRING
+        echo    '$message'
+-       linuxefi ${rel_dirname}/${basename} root=${linux_root_device_thisversion} ro ${args}
++       linuxefi ${rel_dirname}/${basename} root=${linux_root_device_thisversion} ro ${args} $RESUME_STRING
  EOF
    else
      sed "s/^/$submenu_indentation/" << EOF
+ 
  	echo	'$message'
--	linux  ${rel_dirname}/${basename} root=${linux_root_device_thisversion} ro ${args} resume=`swapon -s | grep '/dev/sd.[0-9]\{1,\}' -o | if read line; then echo "$line"; fi` init=/lib/systemd/systemd
+-	linux	${rel_dirname}/${basename} root=${linux_root_device_thisversion} ro ${args}
 +	linux  ${rel_dirname}/${basename} root=${linux_root_device_thisversion} ro ${args} $RESUME_STRING
  EOF
    fi
