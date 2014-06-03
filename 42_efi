@@ -5,12 +5,12 @@ if [ -d /sys/firmware/efi ]; then
 
 #See for Windows EFI string in EFI BIOS
 WINDOWS_EFI=$(efibootmgr -v | grep WINDOWS | sed 's/.*HD/HD/;s/WINDOWS.*/WINDOWS/')
-WIN_EFI_PATH=$(echo $WINDOWS_EFI | sed 's/.*\\EFI/\\EFI/;s/efi.*/efi/')
+WIN_EFI_PATH=$(echo $WINDOWS_EFI | sed 's/.*\(\\EFI\)/\1/i;s/\(\.efi\).*/\1/i')
 WIN_EFI_PATH_LINUX=$(echo $WIN_EFI_PATH | sed 's/\\/\//g')
 WIN_EFI_PARTUUID=$(echo $WINDOWS_EFI | sed 's/.*,//;s/).*//')
 
 #Determine EFI UUID
-WIN_EFI_DRIVE=$(blkid -s PARTUUID | grep $WIN_EFI_PARTUUID | awk '{print $1}' | sed 's/://')
+WIN_EFI_DRIVE=$(blkid -s PARTUUID | grep -i $WIN_EFI_PARTUUID | awk '{print $1}' | sed 's/://')
 WIN_EFI_UUID=$(blkid -s UUID $WIN_EFI_DRIVE | sed 's/.*="//;s/".*//')
 
 cat << EOF
