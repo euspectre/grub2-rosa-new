@@ -8,7 +8,7 @@
 
 Name:		grub2
 Version:	2.00
-Release:	47
+Release:	48
 Summary:	GNU GRUB is a Multiboot boot loader
 
 Group:		System/Kernel and hardware
@@ -76,6 +76,8 @@ Patch200:	grub2-2.00-mga-fix_AM_PROG_MKDIR_P-configure.ac.patch
 
 # ROSA quick fix. Need rediff previous patch
 Patch500:	grub2-10_linux_hibernate_fix.patch
+
+Patch501:	grub2-2.00-gnulib-compatibility.patch
 
 BuildRequires:	bison
 BuildRequires:	flex
