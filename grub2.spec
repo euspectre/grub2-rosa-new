@@ -8,7 +8,7 @@
 
 Name:		grub2
 Version:	2.00
-Release:	49
+Release:	50
 Summary:	GNU GRUB is a Multiboot boot loader
 
 Group:		System/Kernel and hardware
@@ -79,6 +79,8 @@ Patch500:	grub2-10_linux_hibernate_fix.patch
 
 Patch501:	grub2-2.00-gnulib-compatibility.patch
 Patch502:	grub2-2.00-os-prober-efi-support.patch
+Patch503:	grub2-2.00-improved-boot-menu.patch
+Patch504:	grub2-2.00-cut-long-menu-titles.patch
 
 BuildRequires:	bison
 BuildRequires:	flex

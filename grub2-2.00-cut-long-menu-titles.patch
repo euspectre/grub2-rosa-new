@@ -1,0 +1,87 @@
+diff --git a/grub-core/gfxmenu/gui_list.c b/grub-core/gfxmenu/gui_list.c
+index 6bd3ca7..e326a3b 100644
+--- a/grub-core/gfxmenu/gui_list.c
++++ b/grub-core/gfxmenu/gui_list.c
+@@ -217,6 +217,43 @@ draw_scrollbar (list_impl_t self,
+                thumby);
+ }
+ 
++/* Cuts several last characters replacing them with ellipsis, so that total
++   string length fit required width. */
++static void
++cut_string_to_width (grub_font_t font, char *str, int width)
++{
++  char *char_cut;
++  int len;
++
++  if ((str == NULL) || (*str == '\0'))
++    return;
++  if (grub_font_get_string_width(font, str) <= width)
++    return;
++
++  len = grub_strlen(str);
++  if (len < 4)
++    return;
++
++  /* Start with replacing the last 3 characters with ellispis.
++     In UTF-8 it takes 3 bytes, so we have no buffer overflow. */
++  char_cut = str + len - 3;
++  while (char_cut > str)
++  {
++    if ((*char_cut & 0xc0) == 0x80)
++      {
++        /* Skip non-first bytes from UTF-8 code sequences. */
++        --char_cut;
++        continue;
++      }
++    /* UTF-8 representation of U+2026 (Horizontal Ellipsis) is E2 80 A6. */
++    grub_strcpy(char_cut, "\xe2\x80\xa6");
++    if (grub_font_get_string_width(font, str) <= width)
++      return;
++    /* If still does not fit, cut one more character and repeat. */
++    --char_cut;
++  }
++}
++
+ /* Draw the list of items.  */
+ static void
+ draw_menu (list_impl_t self, int num_shown_items)
+@@ -256,10 +293,11 @@ draw_menu (list_impl_t self, int num_shown_items)
+     {
+       int is_selected = (menu_index == self->view->selected);
+       struct grub_video_bitmap *icon;
++      int cwidth;
+ 
+       if (is_selected)
+         {
+-	  int cwidth = oviewport.width - 2 * boxpad - 2;
++	  cwidth = oviewport.width - 2 * boxpad - 2;
+ 	  if (selbox->get_border_width)
+ 	    cwidth -= selbox->get_border_width (selbox);
+ 	  selbox->set_content_size (selbox, cwidth, item_height - 1);
+@@ -268,7 +306,7 @@ draw_menu (list_impl_t self, int num_shown_items)
+         }
+       else
+         {
+-          int cwidth = oviewport.width - 2 * boxpad - 2;
++          cwidth = oviewport.width - 2 * boxpad - 2;
+           if (itbox->get_border_width)
+             cwidth -= itbox->get_border_width (itbox);
+           itbox->set_content_size (itbox, cwidth, item_height - 1);
+@@ -292,12 +330,15 @@ draw_menu (list_impl_t self, int num_shown_items)
+         ((is_selected && self->selected_item_color_set)
+          ? self->selected_item_color
+          : self->item_color);
+-      grub_font_draw_string (item_title,
++      char* item_title_cut = grub_strdup(item_title);
++      cut_string_to_width(font, item_title_cut, cwidth - 8);
++      grub_font_draw_string (item_title_cut,
+                              font,
+                              grub_video_map_rgba_color (text_color),
+                              sel_leftpad + self->icon_width + icon_text_space,
+                              (item_top + (item_height - (ascent + descent))
+                               / 2 + ascent));
++      grub_free(item_title_cut);
+ 
+       item_top += item_height + item_vspace;
+     }

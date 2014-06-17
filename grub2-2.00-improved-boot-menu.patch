@@ -1,0 +1,79 @@
+diff --git a/util/grub.d/10_linux.in b/util/grub.d/10_linux.in
+index a2060b3..c409af3 100644
+--- a/util/grub.d/10_linux.in
++++ b/util/grub.d/10_linux.in
+@@ -86,9 +86,9 @@ linux_entry ()
+   if [ x$type != xsimple ] ; then
+       case $type in
+ 	  recovery)
+-	      title="$(gettext_printf "%s, with Linux %s (recovery mode)" "${os}" "${version}")" ;;
++	      title="$(gettext_printf "%s - Linux %s (recovery mode)" "${os}" "${version}")" ;;
+ 	  *)
+-	      title="$(gettext_printf "%s, with Linux %s" "${os}" "${version}")" ;;
++	      title="$(gettext_printf "%s - Linux %s" "${os}" "${version}")" ;;
+       esac
+       if [ x"$title" = x"$GRUB_ACTUAL_DEFAULT" ] || [ x"Previous Linux versions>$title" = x"$GRUB_ACTUAL_DEFAULT" ]; then
+ 	  replacement_title="$(echo "Advanced options for ${OS}" | sed 's,>,>>,g')>$(echo "$title" | sed 's,>,>>,g')"
+diff --git a/util/grub.d/30_os-prober.in b/util/grub.d/30_os-prober.in
+index 9294647..fdd3132 100644
+--- a/util/grub.d/30_os-prober.in
++++ b/util/grub.d/30_os-prober.in
+@@ -39,7 +39,8 @@ if [ -z "`which os-prober 2> /dev/null`" -o -z "`which linux-boot-prober 2> /dev
+   exit 0
+ fi
+ 
+-OSPROBED="`os-prober | tr ' ' '^' | paste -s -d ' '`"
++OSPROBED_RAW="`os-prober`"
++OSPROBED=`echo "$OSPROBED_RAW" | tr ' ' '^' | paste -s -d ' '`
+ if [ -z "${OSPROBED}" ] ; then
+   # empty os-prober output, nothing doing
+   exit 0
+@@ -172,12 +173,16 @@ EOF
+ EOF
+     ;;
+     linux)
+-      LINUXPROBED="`linux-boot-prober ${DEVICE} 2> /dev/null | tr ' ' '^' | paste -s -d ' '`"
++      LINUXPROBED="`linux-boot-prober ${DEVICE} 2> /dev/null | sort -rV | tr ' ' '^' | paste -s -d ' '`"
+       prepare_boot_cache=
+       boot_device_id=
+       is_first_entry=true
+       title_correction_code=
+       OS="${LONGNAME}"
++      onstr="$(gettext_printf "(on %s)" "${DEVICE#/dev/}")"
++      if ((`echo "$OSPROBED_RAW" | grep -Fo "$OS" | wc -l` > 1)); then
++        onstr_top=" $onstr"
++      fi
+ 
+       for LINUX in ${LINUXPROBED} ; do
+         LROOT="`echo ${LINUX} | cut -d ':' -f 1`"
+@@ -196,7 +201,6 @@ EOF
+ 	  LINITRD="${LINITRD#/boot}"
+ 	fi
+ 
+-	onstr="$(gettext_printf "(on %s)" "${DEVICE}")"
+ 	recovery_params="$(echo "${LPARAMS}" | grep single)" || true
+ 	counter=1
+ 	while echo "$used_osprober_linux_ids" | grep 'osprober-gnulinux-$LKERNEL-${recovery_params}-$counter-$boot_device_id' > /dev/null; do
+@@ -213,7 +217,7 @@ EOF
+ 
+ 	if [ "x$is_first_entry" = xtrue ]; then
+             cat << EOF
+-menuentry '$(echo "$OS" | grub_quote)' --class ${CLASS} --class gnu-linux --class gnu --class os \$menuentry_id_option 'osprober-gnulinux-simple-$boot_device_id' {
++menuentry '$(echo "$OS$onstr_top" | grub_quote)' --class ${CLASS} --class gnu-linux --class gnu --class os \$menuentry_id_option 'osprober-gnulinux-simple-$boot_device_id' {
+ EOF
+ 	    save_default_entry | sed -e "s/^/\t/"
+ 	    add_options
+@@ -229,10 +233,11 @@ EOF
+         cat << EOF
+ }
+ EOF
+-	    echo "submenu '$(gettext_printf "Advanced options for %s" "${OS}" | grub_quote)' \$menuentry_id_option 'osprober-gnulinux-advanced-$boot_device_id' {"
++	    echo "submenu '$(gettext_printf "Advanced options for %s%s" "${OS}" "${onstr_top}" | grub_quote)' \$menuentry_id_option 'osprober-gnulinux-advanced-$boot_device_id' {"
+ 	    is_first_entry=false
+ 	fi
+-	title="${LLABEL} $onstr"
++	VKERNEL=`echo $LKERNEL | sed -e 's,^\(/boot\)\?\(/vmlinuz-\|/vmlinux-\|/kernel-\),,'`
++	title="${LLABEL} $onstr - Linux ${VKERNEL}"
+         cat << EOF
+ 	menuentry '$(echo "$title" | grub_quote)' --class ${CLASS} --class gnu-linux --class gnu --class os \$menuentry_id_option 'osprober-gnulinux-$LKERNEL-${recovery_params}-$boot_device_id' {
+ EOF
