@@ -78,6 +78,7 @@ Patch200:	grub2-2.00-mga-fix_AM_PROG_MKDIR_P-configure.ac.patch
 Patch500:	grub2-10_linux_hibernate_fix.patch
 
 Patch501:	grub2-2.00-gnulib-compatibility.patch
+Patch502:	grub2-2.00-os-prober-efi-support.patch
 
 BuildRequires:	bison
 BuildRequires:	flex
