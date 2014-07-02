@@ -43,6 +43,8 @@ Patch12:        grub-2.00.safe.patch
 Patch13:	grub-2.00-unifont-path.patch
 Patch14:	grub-2.00-proportional-scale.patch
 Patch15:        grub-2.00.30_os-prober.options.patch
+# Build with freetype 2.5.1 and higher
+Patch16:	grub-2.00-freetype-2.5.1.patch
 
 # Fedora patches:
 # https://bugzilla.redhat.com/show_bug.cgi?id=857936
