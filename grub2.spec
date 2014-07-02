@@ -8,7 +8,7 @@
 
 Name:		grub2
 Version:	2.00
-Release:	50
+Release:	51
 Summary:	GNU GRUB is a Multiboot boot loader
 
 Group:		System/Kernel and hardware
@@ -191,6 +191,10 @@ make html pdf
 ./grub-mkimage -O %{grubefiarch} -p /EFI/rosa/%{name}-efi -o grub.efi -d grub-core part_gpt hfsplus fat \
         ext2 btrfs normal chain boot configfile linux appleldr minicmd \
         loadbios reboot halt search font gfxterm echo video efi_gop efi_uga
+./grub-mkimage -O %{grubefiarch} -p /BOOT/EFI -o grubcd.efi -d grub-core part_gpt hfsplus fat \
+        ext2 btrfs normal chain boot configfile linux appleldr minicmd \
+        loadbios reboot halt search font gfxterm echo video efi_gop efi_uga
+        
 popd
 %endif
 
@@ -256,6 +260,7 @@ do
 #        install -m 755 -D $BASE$EXT $TGT
 done
  install -m 755 grub.efi %{buildroot}/boot/efi/EFI/rosa/%{name}-efi/grub.efi
+ install -m 755 grubcd.efi %{buildroot}/boot/efi/EFI/rosa/%{name}-efi/grubcd.efi
 cd ..
 %endif
 cd pc
@@ -421,6 +426,7 @@ fi
 %defattr(-,root,root,-)
 %attr(0755,root,root) %dir /boot/efi/EFI/rosa/grub2-efi
 %attr(0755,root,root) /boot/efi/EFI/rosa/grub2-efi/grub.efi
+%attr(0755,root,root) /boot/efi/EFI/rosa/grub2-efi/grubcd.efi
 %attr(0755,root,rott) %ghost %config(noreplace) /boot/efi/EFI/rosa/grub2-efi/grub.cfg
 /etc/bash_completion.d/grub-efi
 %{libdir32}/grub/%{_arch}-efi/
