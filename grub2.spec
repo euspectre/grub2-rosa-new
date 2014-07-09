@@ -8,7 +8,7 @@
 
 Name:		grub2
 Version:	2.00
-Release:	50
+Release:	52
 Summary:	GNU GRUB is a Multiboot boot loader
 
 Group:		System/Kernel and hardware
@@ -45,6 +45,8 @@ Patch14:	grub-2.00-proportional-scale.patch
 Patch15:        grub-2.00.30_os-prober.options.patch
 # Build with freetype 2.5.1 and higher
 Patch16:	grub-2.00-freetype-2.5.1.patch
+Patch18:        grub-2.00.fix.build.flex.patch
+
 
 # Fedora patches:
 # https://bugzilla.redhat.com/show_bug.cgi?id=857936
@@ -83,6 +85,8 @@ Patch501:	grub2-2.00-gnulib-compatibility.patch
 Patch502:	grub2-2.00-os-prober-efi-support.patch
 Patch503:	grub2-2.00-improved-boot-menu.patch
 Patch504:	grub2-2.00-cut-long-menu-titles.patch
+Patch505:       grub-2.00.texi.diff
+Patch506:       grub-2.00.autoreconf.patch
 
 BuildRequires:	bison
 BuildRequires:	flex
@@ -147,20 +151,16 @@ for EFI systems.
 %prep
 %setup -q -n grub-%{version}
 %apply_patches
-./autogen.sh
-
-perl -pi -e 's/(\@image\{font_char_metrics,,,,)\.(png\})/$1$2/;'	\
-	docs/grub-dev.texi
+perl -pi -e 's/(\@image\{font_char_metrics,,,,)\.(png\})/$1$2/;' \
+        docs/grub-dev.texi
 
 sed -ri -e 's/-g"/"/g' -e "s/-Werror//g" configure.ac
 
 perl -pi -e 's/-Werror//;' grub-core/Makefile.am
+export GRUB_CONTRIB="$PWD/grub-extras"
+aclocal --force -Im4 -I/usr/share/aclocal --install
+./autogen.sh
 
-tar -xf %{SOURCE8}
-pushd po-update; sh ./update.sh; popd
-cd ..
-
-#-----------------------------------------------------------------------
 %build
 export CONFIGURE_TOP="$PWD"
 %ifarch %{efi}
@@ -227,13 +227,11 @@ cp %{SOURCE10} .
 cd efi
 %makeinstall_std
 %makeinstall_std -C docs install-pdf install-html
-mv -f %{buildroot}%{_docdir}/grub %{buildroot}%{_docdir}/%{name}
+mv %{buildroot}%{_infodir}/grub.info %{buildroot}%{_infodir}/grub2.info
 #install -m644 COPYING INSTALL NEWS README THANKS TODO ChangeLog	\
 #	%{buildroot}%{_docdir}/%{name}
 mv %{buildroot}/etc/bash_completion.d/grub %{buildroot}/etc/bash_completion.d/grub-efi
 
-# (bor) grub.info is harcoded in sources
-mv %{buildroot}%{_infodir}/grub.info %{buildroot}%{_infodir}/grub2.info
 
 # Script that makes part of grub.cfg persist across updates
 install -m 755 %{SOURCE1} %{buildroot}%{_sysconfdir}/grub.d/
