@@ -25,7 +25,7 @@ Source9:	update-grub2
 Source10:	README.urpmi
 Source11:	grub2.rpmlintrc
 Source12:	42_efi
-Source13:   43_resque
+Source13:	43_rescue
 Source14:	grub2-cfg-mod
 
 Patch0:		grub2-locales.patch
