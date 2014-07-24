@@ -2,7 +2,7 @@ diff --git a/util/grub.d/30_os-prober.in b/util/grub.d/30_os-prober.in
 index 98d9a34..9294647 100644
 --- a/util/grub.d/30_os-prober.in
 +++ b/util/grub.d/30_os-prober.in
-@@ -26,10 +26,14 @@ export TEXTDOMAINDIR="@localedir@"
+@@ -26,7 +26,7 @@ export TEXTDOMAINDIR="@localedir@"
  
  . "@datadir@/@PACKAGE@/grub-mkconfig_lib"
  
@@ -11,38 +11,3 @@ index 98d9a34..9294647 100644
    exit 0
  fi
  
-+if [ -d /sys/firmware/efi ]; then
-+  efisuffix="efi"
-+fi
-+
- if [ -z "`which os-prober 2> /dev/null`" -o -z "`which linux-boot-prober 2> /dev/null`" ] ; then
-   # missing os-prober and/or linux-boot-prober
-   exit 0
-@@ -215,11 +219,11 @@ EOF
- 	    add_options
- 	    printf '%s\n' "${prepare_boot_cache}"
- 	    cat <<  EOF
--	linux ${LKERNEL} ${LPARAMS}
-+	linux${efisuffix} ${LKERNEL} ${LPARAMS}
- EOF
-             if [ -n "${LINITRD}" ] ; then
-           cat << EOF
--	initrd ${LINITRD}
-+	initrd${efisuffix} ${LINITRD}
- EOF
-             fi
-         cat << EOF
-@@ -236,11 +240,11 @@ EOF
- 	add_options
- 	printf '%s\n' "${prepare_boot_cache}" | sed -e "s/^/\t/"
- 	cat <<  EOF
--		linux ${LKERNEL} ${LPARAMS}
-+		linux${efisuffix} ${LKERNEL} ${LPARAMS}
- EOF
-         if [ -n "${LINITRD}" ] ; then
-             cat << EOF
--		initrd ${LINITRD}
-+		initrd${efisuffix} ${LINITRD}
- EOF
-         fi
-         cat << EOF
