@@ -1,0 +1,48 @@
+diff --git a/util/grub.d/30_os-prober.in b/util/grub.d/30_os-prober.in
+index 7fb38f7..a430e36 100644
+--- a/util/grub.d/30_os-prober.in
++++ b/util/grub.d/30_os-prober.in
+@@ -230,6 +230,9 @@ EOF
+ 			;;
+ 	esac
+ 
++	VKERNEL=`echo $LKERNEL | sed -e 's,^\(/boot\)\?\(/vmlinuz-\|/vmlinux-\|/kernel-\),,'`
++	message_kernel="$(gettext_printf "Loading Linux %s ..." ${VKERNEL})"
++	message_initrd="$(gettext_printf "Loading initial ramdisk ...")"
+ 	if [ "x$is_first_entry" = xtrue ]; then
+             cat << EOF
+ menuentry '$(echo "$title $onstr" | grub_quote)' --class ${CLASS} --class gnu-linux --class gnu --class os \$menuentry_id_option 'osprober-gnulinux-simple-$boot_device_id' {
+@@ -238,10 +241,12 @@ EOF
+ 	    add_options
+ 	    printf '%s\n' "${prepare_boot_cache}"
+ 	    cat <<  EOF
++	echo '$message_kernel'
+ 	linux ${LKERNEL} ${LPARAMS}
+ EOF
+             if [ -n "${LINITRD}" ] ; then
+           cat << EOF
++	echo '$message_initrd'
+ 	initrd ${LINITRD}
+ EOF
+             fi
+@@ -261,7 +266,6 @@ EOF
+ 	    fi
+ 	fi
+ 	if [ "x$title_append_vkernel" = xtrue ]; then
+-		VKERNEL=`echo $LKERNEL | sed -e 's,^\(/boot\)\?\(/vmlinuz-\|/vmlinux-\|/kernel-\),,'`
+ 		title="${title} - Linux ${VKERNEL}"
+ 	fi
+         cat << EOF
+@@ -271,10 +275,12 @@ EOF
+ 	add_options
+ 	printf '%s\n' "${prepare_boot_cache}" | sed -e "s/^/\t/"
+ 	cat <<  EOF
++		echo '$message_kernel'
+ 		linux ${LKERNEL} ${LPARAMS}
+ EOF
+         if [ -n "${LINITRD}" ] ; then
+             cat << EOF
++		echo '$message_initrd'
+ 		initrd ${LINITRD}
+ EOF
+         fi
