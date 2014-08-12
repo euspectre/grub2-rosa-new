@@ -88,6 +88,7 @@ Patch504:	grub2-2.00-cut-long-menu-titles.patch
 Patch505:       grub-2.00.texi.diff
 Patch506:       grub-2.00.autoreconf.patch
 Patch507:       grub2-2.00.30_os-prober-loading-messages.patch
+Patch508:       grub2-linuxefi_non_sb_fallback.patch
 
 BuildRequires:	bison
 BuildRequires:	flex
