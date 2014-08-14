@@ -5,6 +5,9 @@ if [ -d /sys/firmware/efi ]; then
 
 #See for Windows EFI string in EFI BIOS
 WINDOWS_EFI=$(efibootmgr -v | grep WINDOWS | sed 's/.*HD/HD/;s/WINDOWS.*/WINDOWS/')
+if [ -z "$WINDOWS_EFI" ]; then
+        exit 0
+fi
 WIN_EFI_PATH=$(echo $WINDOWS_EFI | sed 's/.*\(\\EFI\)/\1/i;s/\(\.efi\).*/\1/i')
 WIN_EFI_PATH_LINUX=$(echo $WIN_EFI_PATH | sed 's/\\/\//g')
 WIN_EFI_PARTUUID=$(echo $WINDOWS_EFI | sed 's/.*,//;s/).*//')
