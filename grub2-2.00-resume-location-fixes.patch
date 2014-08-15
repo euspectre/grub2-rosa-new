@@ -1,0 +1,34 @@
+diff --git a/util/grub.d/10_linux.in b/util/grub.d/10_linux.in
+index c409af3..2ac20c8 100644
+--- a/util/grub.d/10_linux.in
++++ b/util/grub.d/10_linux.in
+@@ -134,20 +134,17 @@ linux_entry ()
+   fi
+   message="$(gettext_printf "Loading Linux %s ..." ${version})"
+ 
+-  if /sbin/swapon -s -p -1 | grep partition > /dev/null; then
+-      if /sbin/swapon -s | head -n 2 | grep '/dev/[hsv]d' > /dev/null; then
+-          RESUME_DEV=$(/sbin/swapon -s | head -n 2 | grep '/dev/[hsv]d.[0-9]\{1,\}' -o)
+-          RESUME_STRING="resume=UUID=$(/sbin/blkid -s UUID $RESUME_DEV | sed 's/.*="//;s/".*//')"
+-      else
+-          RESUME_DEV=$(/sbin/swapon -s | head -n 2 | grep '/dev/dm.[0-9]\{1,\}' -o)
+-          RESUME_STRING="resume=UUID=$(/sbin/blkid -s UUID $RESUME_DEV | sed 's/.*="//;s/".*//')"
+-      fi
++  PRIMARY_SWAP=$(/sbin/swapon --show="PRIO,NAME,TYPE" --noheading | sort -nr | head -n 1)
++  SWAP_TYPE=$(echo $PRIMARY_SWAP | awk '{print $3}')
++  SWAP_DEV=$(echo $PRIMARY_SWAP | awk '{print $2}')
++  if [ "x$SWAP_TYPE" = "xpartition" ]; then
++      RESUME_STRING="resume=UUID=$(/sbin/blkid -s UUID $SWAP_DEV | sed 's/.*="//;s/".*//')"
+   fi
+ 
+-  if /sbin/swapon -s -p -1 | grep file > /dev/null; then
+-      RESUME_FILE=$(/sbin/swapon -s | head -n 2 | grep file | awk '{print $1}')
+-      RESUME_OFFSET=$(filefrag -v $RESUME_FILE| grep -E '^\s+0.*0' | awk '{print $3}')
+-      RESUME_STRING="resume=${linux_root_device_thisversion} resume_offset=$RESUME_OFFSET"
++  if [ "x$SWAP_TYPE" = "xfile" ]; then
++      RESUME_OFFSET=$(filefrag -v $SWAP_DEV| grep -E '^\s+0.*0' | awk '{print $3}')
++      RESUME_DEV=$(/bin/df $SWAP_DEV | grep '/dev/\S*' -o)
++      RESUME_STRING="resume=UUID=$(/sbin/blkid -s UUID $RESUME_DEV | sed 's/.*="//;s/".*//') resume_offset=$RESUME_OFFSET"
+   fi
+ 
+   if [ -d /sys/firmware/efi ]; then
