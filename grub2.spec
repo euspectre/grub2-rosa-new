@@ -8,7 +8,7 @@
 
 Name:		grub2
 Version:	2.00
-Release:	58
+Release:	59
 Summary:	GNU GRUB is a Multiboot boot loader
 
 Group:		System/Kernel and hardware
@@ -163,6 +163,10 @@ perl -pi -e 's/-Werror//;' grub-core/Makefile.am
 export GRUB_CONTRIB="$PWD/grub-extras"
 aclocal --force -Im4 -I/usr/share/aclocal --install
 ./autogen.sh
+
+tar -xf %{SOURCE8}
+pushd po-update; sh ./update.sh; popd
+cd ..
 
 %build
 export CONFIGURE_TOP="$PWD"
