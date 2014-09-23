@@ -8,7 +8,7 @@
 
 Name:		grub2
 Version:	2.00
-Release:	59
+Release:	60
 Summary:	GNU GRUB is a Multiboot boot loader
 
 Group:		System/Kernel and hardware
@@ -199,10 +199,12 @@ make html pdf
 %endif
 ./grub-mkimage -O %{grubefiarch} -p /EFI/rosa/%{name}-efi -o grub.efi -d grub-core part_gpt hfsplus fat \
         ext2 btrfs normal chain boot configfile linux appleldr minicmd \
-        loadbios reboot halt search font gfxterm echo video efi_gop efi_uga
+        loadbios reboot halt search font gfxterm echo video efi_gop efi_uga \
+        part_msdos png gfxmenu linuxefi iso9660
 ./grub-mkimage -O %{grubefiarch} -p /BOOT/EFI -o grubcd.efi -d grub-core part_gpt hfsplus fat \
         ext2 btrfs normal chain boot configfile linux appleldr minicmd \
-        loadbios reboot halt search font gfxterm echo video efi_gop efi_uga
+        loadbios reboot halt search font gfxterm echo video efi_gop efi_uga \
+        part_msdos png gfxmenu linuxefi iso9660
         
 popd
 %endif
