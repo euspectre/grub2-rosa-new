@@ -195,15 +195,17 @@ make html pdf
 %else
 %define grubefiarch %{_arch}-efi
 %endif
-./grub-mkimage -O %{grubefiarch} -p /EFI/rosa/%{name}-efi -o grub.efi -d grub-core part_gpt hfsplus fat \
-        ext2 btrfs normal chain boot configfile linux appleldr minicmd \
-        loadbios reboot halt search font gfxterm echo video efi_gop efi_uga \
-        part_msdos png gfxmenu linuxefi iso9660
-./grub-mkimage -O %{grubefiarch} -p /BOOT/EFI -o grubcd.efi -d grub-core part_gpt hfsplus fat \
-        ext2 btrfs normal chain boot configfile linux appleldr minicmd \
-        loadbios reboot halt search font gfxterm echo video efi_gop efi_uga \
-        part_msdos png gfxmenu linuxefi iso9660
-        
+
+COMMON_MODULES="
+	appleldr boot chain configfile echo efi_gop efi_uga halt linux linuxefi loadbios loadenv minicmd normal reboot search test
+	all_video font gfxmenu gfxterm png
+	part_apple part_gpt part_msdos
+	btrfs ext2 fat hfsplus reiserfs xfs
+	lvm mdraid09 mdraid1x
+"
+./grub-mkimage -O %{grubefiarch} -p /EFI/rosa/%{name}-efi -o grub.efi -d grub-core ${COMMON_MODULES}
+./grub-mkimage -O %{grubefiarch} -p /BOOT/EFI -o grubcd.efi -d grub-core ${COMMON_MODULES} iso9660
+
 popd
 %endif
 
