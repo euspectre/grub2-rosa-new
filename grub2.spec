@@ -1,4 +1,4 @@
-%define		libdir32	%{_exec_prefix}/lib
+%define libdir32 %{_exec_prefix}/lib
 %define platform pc
 %define efi 1
 
@@ -8,7 +8,7 @@
 
 Name:		grub2
 Version:	2.00
-Release:	62
+Release:	63
 Summary:	GNU GRUB is a Multiboot boot loader
 
 Group:		System/Kernel and hardware
@@ -36,43 +36,41 @@ Patch4:		grub2-read-cfg.patch
 Patch5:		grub2-symlink-is-garbage.patch
 Patch6:		grub2-name-corrections.patch
 Patch8:		grub2-theme-not_selected_item_box.patch
-Patch9:         grub-2.00.Linux.remove.patch
+Patch9:		grub-2.00.Linux.remove.patch
 Patch10:	grub2-mkfont-fix.patch
 Patch11:	grub2-2.00-class-via-os-prober.patch
-Patch12:        grub-2.00.safe.patch
+Patch12:	grub-2.00.safe.patch
 Patch13:	grub-2.00-unifont-path.patch
 Patch14:	grub-2.00-proportional-scale.patch
-Patch15:        grub-2.00.30_os-prober.options.patch
+Patch15:	grub-2.00.30_os-prober.options.patch
 # Build with freetype 2.5.1 and higher
 Patch16:	grub-2.00-freetype-2.5.1.patch
-Patch18:        grub-2.00.fix.build.flex.patch
+Patch18:	grub-2.00.fix.build.flex.patch
 
 
 # Fedora patches:
 # https://bugzilla.redhat.com/show_bug.cgi?id=857936
-Patch100:		grub2-2.00-fda-add-fw_path-search_v2.patch
+Patch100:	grub2-2.00-fda-add-fw_path-search_v2.patch
 # Add support for entering the firmware setup screen.
-Patch101:		grub2-2.00-fda-Add-fwsetup.patch
+Patch101:	grub2-2.00-fda-Add-fwsetup.patch
 # Don't decrease efi memory map size
-Patch102:		grub2-2.00-fda-dont-decrease-mmap-size.patch
+Patch102:	grub2-2.00-fda-dont-decrease-mmap-size.patch
 # IBM client architecture (CAS) reboot support
-Patch103:		grub2-2.00-fda-cas-reboot-support.patch
+Patch103:	grub2-2.00-fda-cas-reboot-support.patch
 # Read chunks in smaller blocks
-Patch104:		grub2-2.00-fda-efidisk-ahci-workaround.patch
+Patch104:	grub2-2.00-fda-efidisk-ahci-workaround.patch
 # Fix crash on http: https://bugzilla.redhat.com/show_bug.cgi?id=860834
-Patch105:		grub2-2.00-fda-fix-http-crash.patch
+Patch105:	grub2-2.00-fda-fix-http-crash.patch
 # Issue separate DNS queries for ipv4 and ipv6
-Patch106:		grub2-2.00-fda-Issue-separate-DNS-queries-for-ipv4-and-ipv6.patch
+Patch106:	grub2-2.00-fda-Issue-separate-DNS-queries-for-ipv4-and-ipv6.patch
 # Don't allow insmod when secure boot is enabled
-Patch107:		grub2-2.00-fda-no-insmod-on-sb.patch
+Patch107:	grub2-2.00-fda-no-insmod-on-sb.patch
 # Add support for crappy cd craparino
-Patch108:		grub2-2.00-fda-cdpath.patch
+Patch108:	grub2-2.00-fda-cdpath.patch
 # Add support for linuxefi
 Patch109:	grub2-2.00-fda-linuxefi.patch
-# Use "linuxefi" and "initrdefi" where appropriate
-Patch110:	grub2-2.00-fda-use-linuxefi.patch
 # Fix parallel build
-Patch111:	grub2-2.00-parallel-build.patch
+Patch110:	grub2-2.00-parallel-build.patch
 
 #Mageia patches
 # Fix autoreconf warnings
@@ -85,12 +83,11 @@ Patch501:	grub2-2.00-gnulib-compatibility.patch
 Patch502:	grub2-2.00-os-prober-efi-support.patch
 Patch503:	grub2-2.00-improved-boot-menu.patch
 Patch504:	grub2-2.00-cut-long-menu-titles.patch
-Patch505:       grub-2.00.texi.diff
-Patch506:       grub-2.00.autoreconf.patch
-Patch507:       grub2-2.00.30_os-prober-loading-messages.patch
-Patch508:       grub2-linuxefi_non_sb_fallback.patch
-Patch509:       grub2-2.00-resume-location-fixes.patch
-Patch510:       grub2-2.00-btrfs-subvolumes-support.patch
+Patch505:	grub-2.00.texi.diff
+Patch506:	grub-2.00.autoreconf.patch
+Patch507:	grub2-2.00.30_os-prober-loading-messages.patch
+Patch508:	grub2-linuxefi_non_sb_fallback.patch
+Patch509:	grub2-2.00-btrfs-subvolumes-support.patch
 
 BuildRequires:	bison
 BuildRequires:	flex
@@ -105,7 +102,7 @@ BuildRequires:	libusb-devel
 BuildRequires:	ncurses-devel
 BuildRequires:	texinfo
 BuildRequires:	texlive-latex
-# BuildRequires:  texlive-scheme-tetex
+BuildRequires:	texlive-collection-texinfo
 BuildRequires:	texlive-epsf
 BuildRequires:	pkgconfig(devmapper)
 BuildRequires:	autogen
@@ -139,7 +136,7 @@ The kernel, in turn, initializes the rest of the operating system (e.g. GNU).
 %package efi
 Summary:        GRUB for EFI systems
 Group:          System/Kernel and hardware
-Suggests:	efibootmgr
+Suggests:       efibootmgr
 
 %description efi
 The GRand Unified Bootloader (GRUB) is a highly configurable and customizable
