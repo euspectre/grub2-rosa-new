@@ -423,8 +423,27 @@ fi
 %doc %{_docdir}/%{name}
 %{_infodir}/%{name}.info*
 %{_infodir}/grub-dev.info*
-%{_mandir}/man1/%{name}-*.1*
-%{_mandir}/man8/%{name}-*.8*
+%{_mandir}/man1/%{name}-editenv.1.xz
+%{_mandir}/man1/%{name}-fstest.1.xz
+%{_mandir}/man1/%{name}-kbdcomp.1.xz
+%{_mandir}/man1/%{name}-menulst2cfg.1.xz
+%{_mandir}/man1/%{name}-mkfont.1.xz
+%{_mandir}/man1/%{name}-mkimage.1.xz
+%{_mandir}/man1/%{name}-mklayout.1.xz
+%{_mandir}/man1/%{name}-mkpasswd-pbkdf2.1.xz
+%{_mandir}/man1/%{name}-mkrelpath.1.xz
+%{_mandir}/man1/%{name}-mkrescue.1.xz
+%{_mandir}/man1/%{name}-mkstandalone.1.xz
+%{_mandir}/man1/%{name}-script-check.1.xz
+%{_mandir}/man8/%{name}-bios-setup.8.xz
+%{_mandir}/man8/%{name}-install.8.xz
+%{_mandir}/man8/%{name}-mkconfig.8.xz
+%{_mandir}/man8/%{name}-mknetdir.8.xz
+%{_mandir}/man8/%{name}-ofpathname.8.xz
+%{_mandir}/man8/%{name}-probe.8.xz
+%{_mandir}/man8/%{name}-reboot.8.xz
+%{_mandir}/man8/%{name}-set-default.8.xz
+%{_mandir}/man8/%{name}-sparc64-setup.8.xz
 # RPM filetriggers
 %{_filetriggers_dir}/%{name}.*
 %dir /boot/%{name}/fonts
@@ -441,6 +460,8 @@ fi
 %{libdir32}/grub/%{_arch}-efi/
 %{_sbindir}/%{name}-efi*
 %{_bindir}/%{name}-efi*
+%{_mandir}/man1/%{name}-efi-*.1*
+%{_mandir}/man8/%{name}-efi-*.8*
 #%{_datadir}/grub
 #%{_sysconfdir}/grub.d
 %config(noreplace) %{_sysconfdir}/%{name}-efi.cfg
