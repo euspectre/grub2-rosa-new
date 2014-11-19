@@ -1,0 +1,33 @@
+diff --git a/util/grub-install.in b/util/grub-install.in
+index e19f1cd..37e195b 100644
+--- a/util/grub-install.in
++++ b/util/grub-install.in
+@@ -821,7 +821,8 @@ elif [ x"${grub_modinfo_target_cpu}-${grub_modinfo_platform}" = xmips-arc ]; the
+     gettext "You will have to set \`SystemPartition' and \`OSLoader' manually." 1>&2
+     echo 1>&2
+ elif [ x"$grub_modinfo_platform" = xefi ]; then
+-    cp "${grubdir}/${grub_modinfo_target_cpu}-$grub_modinfo_platform/core.${imgext}" "${efidir}/${efi_file}"
++    # Using pre-built and signed grub binary to support booting with SecureBoot enabled
++    cp "${efidir}/grub2-efi/grub.efi" "${efidir}/${efi_file}"
+     # For old macs. Suggested by Peter Jones.
+     if [ x$grub_modinfo_target_cpu = xi386 ]; then
+ 	cp "${grubdir}/${grub_modinfo_target_cpu}-$grub_modinfo_platform/core.${imgext}" "${efidir}/boot.efi"
+@@ -853,9 +854,17 @@ elif [ x"$grub_modinfo_platform" = xefi ]; then
+ 	if test -z "$efidir_drive" || test -z "$efidir_disk"; then
+ 	    gettext_printf "Can't find GRUB drive for %s; unable to create EFI Boot Manager entry.\n" "$efidir" >&2
+ 	else
++	    if ls /sys/firmware/efi/vars/SecureBoot* /boot/efi/EFI/$efi_distributor/BOOTX64.efi >/dev/null 2>&1 ; then
++		# SecureBoot can be turned on, and shim is present - using shim as bootloader.
++		efi_file_boot=BOOTX64.efi
++	    else
++		# If no shim is present, usign grub2 directly.
++		# If shim is present, but no SecureBoot detected, also using grub2 to avoid "insecure boot" warnings.
++		efi_file_boot="$efi_file"
++	    fi
+ 	    efidir_part="$(echo "$efidir_drive" | sed 's/^([^,]*,[^0-9]*//; s/[^0-9].*//')"
+ 	    efibootmgr $efi_quiet -c -d "$efidir_disk" -p "$efidir_part" -w \
+-		-L "$bootloader_id" -l "\\EFI\\$efi_distributor\\$efi_file"
++		-L "$bootloader_id" -l "\\EFI\\$efi_distributor\\$efi_file_boot"
+ 	fi
+     fi
+ else
