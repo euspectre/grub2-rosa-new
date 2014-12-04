@@ -4,16 +4,15 @@
 
 %global efi %{ix86} x86_64
 
-%bcond_with	talpo
+%bcond_with talpo
 
+Summary:	GNU GRUB is a Multiboot boot loader
 Name:		grub2
 Version:	2.00
-Release:	63
-Summary:	GNU GRUB is a Multiboot boot loader
-
-Group:		System/Kernel and hardware
+Release:	64
 License:	GPLv3+
-URL:		http://www.gnu.org/software/grub/
+Group:		System/Kernel and hardware
+Url:		http://www.gnu.org/software/grub/
 Source0:	grub-%{version}.tar.gz
 Source1:	90_persistent
 Source2:	grub.default
@@ -131,21 +130,136 @@ computer starts. It is responsible for loading and transferring control
 to the operating system kernel software (such as the Hurd or Linux).
 The kernel, in turn, initializes the rest of the operating system (e.g. GNU).
 
+%files -f pc/grub.lang
+#%{libdir32}/%{name}
+%{libdir32}/grub/*-%{platform}
+#%{_sbindir}/%{name}-*
+#%{_bindir}/%{name}-*
+%{_sbindir}/update-grub2
+%{_bindir}/%{name}-editenv
+%{_bindir}/%{name}-fstest
+%{_bindir}/%{name}-kbdcomp
+%{_bindir}/%{name}-menulst2cfg
+%{_bindir}/%{name}-mkfont
+%{_bindir}/%{name}-mkimage
+%{_bindir}/%{name}-mklayout
+%{_bindir}/%{name}-mkpasswd-pbkdf2
+%{_bindir}/%{name}-mkrelpath
+%{_bindir}/%{name}-mkrescue
+%{_bindir}/%{name}-mkstandalone
+%{_bindir}/%{name}-script-check
+%{_sbindir}/%{name}-bios-setup
+%{_sbindir}/%{name}-install
+%{_sbindir}/%{name}-mkconfig
+%{_sbindir}/%{name}-mknetdir
+%{_sbindir}/%{name}-ofpathname
+%{_sbindir}/%{name}-probe
+%{_sbindir}/%{name}-reboot
+%{_sbindir}/%{name}-set-default
+%{_sbindir}/%{name}-sparc64-setup
+%{_sbindir}/grub2-cfg-mod
+#%{_datadir}/%{name}
+%{_datadir}/grub
+%attr(0700,root,root) %dir %{_sysconfdir}/grub.d
+%{_sysconfdir}/grub.d/README
+%config %{_sysconfdir}/grub.d/??_*
+%{_sysconfdir}/%{name}.cfg
+#%attr(0644,root,root) %config %{_sysconfdir}/default/grub
+%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/default/grub
+%{_sysconfdir}/bash_completion.d/grub
+%dir /boot/%{name}
+%dir /boot/%{name}/locale
+# Actually, this is replaced by update-grub from scriptlets,
+# but it takes care of modified persistent part
+%config(noreplace) /boot/%{name}/grub.cfg
+%doc %{_docdir}/%{name}
+%{_infodir}/%{name}.info*
+%{_infodir}/grub-dev.info*
+%{_mandir}/man1/%{name}-editenv.1.xz
+%{_mandir}/man1/%{name}-fstest.1.xz
+%{_mandir}/man1/%{name}-kbdcomp.1.xz
+%{_mandir}/man1/%{name}-menulst2cfg.1.xz
+%{_mandir}/man1/%{name}-mkfont.1.xz
+%{_mandir}/man1/%{name}-mkimage.1.xz
+%{_mandir}/man1/%{name}-mklayout.1.xz
+%{_mandir}/man1/%{name}-mkpasswd-pbkdf2.1.xz
+%{_mandir}/man1/%{name}-mkrelpath.1.xz
+%{_mandir}/man1/%{name}-mkrescue.1.xz
+%{_mandir}/man1/%{name}-mkstandalone.1.xz
+%{_mandir}/man1/%{name}-script-check.1.xz
+%{_mandir}/man8/%{name}-bios-setup.8.xz
+%{_mandir}/man8/%{name}-install.8.xz
+%{_mandir}/man8/%{name}-mkconfig.8.xz
+%{_mandir}/man8/%{name}-mknetdir.8.xz
+%{_mandir}/man8/%{name}-ofpathname.8.xz
+%{_mandir}/man8/%{name}-probe.8.xz
+%{_mandir}/man8/%{name}-reboot.8.xz
+%{_mandir}/man8/%{name}-set-default.8.xz
+%{_mandir}/man8/%{name}-sparc64-setup.8.xz
+# RPM filetriggers
+%{_filetriggers_dir}/%{name}.*
+%dir /boot/%{name}/fonts
+/boot/%{name}/fonts/unicode.pf2
+
+%post
+exec >/dev/null 2>&1
+# Create device.map or reuse one from GRUB Legacy
+cp -u /boot/grub/device.map /boot/%{name}/device.map 2>/dev/null ||
+	%{_sbindir}/%{name}-mkdevicemap
+# Determine the partition with /boot
+BOOT_PARTITION=$(df -h /boot |(read; awk '{print $1; exit}'|sed 's/[[:digit:]]*$//'))
+# (Re-)Generate core.img, but don't let it be installed in boot sector
+%{_sbindir}/%{name}-install $BOOT_PARTITION
+# Regenerate configure on install or update
+%{_sbindir}/update-grub2
+#bugfix: error message before loading of grub2 menu on boot
+cp -f /boot/grub2/locale/en@quot.mo /boot/grub2/locale/en.mo
+
+#delete non-needing doubling rpmsave and rpmnew files
+rm -f /etc/grub.d/*.rpmsave
+rm -f /etc/grub.d/*.rpmnew
+
+%preun
+exec >/dev/null
+if [ $1 = 0 ]; then
+    # XXX Ugly
+    rm -f /boot/%{name}/*.mod
+    rm -f /boot/%{name}/*.img
+    rm -f /boot/%{name}/*.lst
+    rm -f /boot/%{name}/*.o
+    rm -f /boot/%{name}/device.map
+fi
+
 #-----------------------------------------------------------------------
 
 %ifarch %{efi}
 %package efi
-Summary:        GRUB for EFI systems
-Group:          System/Kernel and hardware
-Suggests:       efibootmgr
+Summary:	GRUB for EFI systems
+Group:		System/Kernel and hardware
+Suggests:	efibootmgr
 
 %description efi
 The GRand Unified Bootloader (GRUB) is a highly configurable and customizable
-bootloader with modular architecture. 
+bootloader with modular architecture.
 
 It support rich variety of kernel formats, file systems, computer 
 architectures and hardware devices.  This subpackage provides support 
 for EFI systems.
+
+%files efi
+%attr(0755,root,root) %dir /boot/efi/EFI/rosa/grub2-efi
+%attr(0755,root,root) /boot/efi/EFI/rosa/grub2-efi/grub.efi
+%attr(0755,root,root) /boot/efi/EFI/rosa/grub2-efi/grubcd.efi
+%attr(0755,root,rott) %ghost %config(noreplace) /boot/efi/EFI/rosa/grub2-efi/grub.cfg
+/etc/bash_completion.d/grub-efi
+%{libdir32}/grub/%{_arch}-efi/
+%{_sbindir}/%{name}-efi*
+%{_bindir}/%{name}-efi*
+%{_mandir}/man1/%{name}-efi-*.1*
+%{_mandir}/man8/%{name}-efi-*.8*
+#%{_datadir}/grub
+#%{_sysconfdir}/grub.d
+%config(noreplace) %{_sysconfdir}/%{name}-efi.cfg
 %endif
 
 #-----------------------------------------------------------------------
@@ -172,21 +286,21 @@ export CONFIGURE_TOP="$PWD"
 %ifarch %{efi}
 mkdir -p efi
 pushd efi
-%configure                                              \
+%configure \
 %if %{with talpo}
-	CC=talpo                                        \
+	CC=talpo \
 	CFLAGS=-fplugin-arg-melt-option=talpo-arg-file:%{SOURCE3} \
 %else
-	CFLAGS=""                                       \
+	CFLAGS="" \
 %endif
-	TARGET_LDFLAGS=-static                          \
-	--with-platform=efi                             \
-	--program-transform-name=s,grub,%{name}-efi,    \
-	--libdir=%{libdir32}                            \
-	--libexecdir=%{libdir32}                        \
-	--with-grubdir=grub2                           \
-	--disable-werror                                \
-	--enable-grub-emu-usb							\
+	TARGET_LDFLAGS=-static \
+	--with-platform=efi \
+	--program-transform-name=s,grub,%{name}-efi, \
+	--libdir=%{libdir32} \
+	--libexecdir=%{libdir32} \
+	--with-grubdir=grub2 \
+	--disable-werror \
+	--enable-grub-emu-usb \
 	--enable-grub-mkfont
 %make all
 
@@ -212,29 +326,29 @@ popd
 
 mkdir -p pc
 cd pc
-%configure                                              \
+%configure \
 %if %{with talpo}
-	CC=talpo                                        \
+	CC=talpo \
 	CFLAGS=-fplugin-arg-melt-option=talpo-arg-file:%{SOURCE3} \
 %else
-	CFLAGS=""                                       \
+	CFLAGS="" \
 %endif
-	TARGET_LDFLAGS=-static                          \
-	--with-platform=pc                              \
+	TARGET_LDFLAGS=-static \
+	--with-platform=pc \
     %ifarch x86_64
-	--enable-efiemu                                 \
+	--enable-efiemu \
     %endif
-	--program-transform-name=s,grub,%{name},        \
-	--libdir=%{libdir32}                            \
-	--libexecdir=%{libdir32}                        \
-	--with-grubdir=grub2                            \
-	--disable-werror                                \
-	--enable-grub-emu-usb							\
+	--program-transform-name=s,grub,%{name}, \
+	--libdir=%{libdir32} \
+	--libexecdir=%{libdir32} \
+	--with-grubdir=grub2 \
+	--disable-werror \
+	--enable-grub-emu-usb \
 	--enable-grub-mkfont
 %make all
 
 make html pdf
-#-----------------------------------------------------------------------
+
 %install
 cp %{SOURCE10} .
 %ifarch %{efi}
@@ -338,131 +452,12 @@ install -m 755 %{SOURCE13} %{buildroot}%{_sysconfdir}/grub.d
 # <akdengi> install programm to change option in /etc/default/grub
 install -m 755 %{SOURCE14} %{buildroot}%{_sbindir}/grub2-cfg-mod
 
-
 %find_lang grub
 
 #drop all zero-length file
 #find %{buildroot} -size 0 -delete
 
 #Copy font to properly place
-%__mkdir_p %{buildroot}/boot/%{name}/fonts/
+mkdir -p %{buildroot}/boot/%{name}/fonts/
 cp -f %{buildroot}%{_datadir}/grub/unicode.pf2 %{buildroot}/boot/%{name}/fonts/
 
-%post
-exec >/dev/null 2>&1
-# Create device.map or reuse one from GRUB Legacy
-cp -u /boot/grub/device.map /boot/%{name}/device.map 2>/dev/null ||
-	%{_sbindir}/%{name}-mkdevicemap
-# Determine the partition with /boot
-BOOT_PARTITION=$(df -h /boot |(read; awk '{print $1; exit}'|sed 's/[[:digit:]]*$//'))
-# (Re-)Generate core.img, but don't let it be installed in boot sector
-%{_sbindir}/%{name}-install $BOOT_PARTITION
-# Regenerate configure on install or update
-%{_sbindir}/update-grub2
-#bugfix: error message before loading of grub2 menu on boot
-cp -f /boot/grub2/locale/en@quot.mo /boot/grub2/locale/en.mo
-
-#delete non-needing doubling rpmsave and rpmnew files
-rm -f /etc/grub.d/*.rpmsave
-rm -f /etc/grub.d/*.rpmnew
-
-%preun
-exec >/dev/null
-if [ $1 = 0 ]; then
-    # XXX Ugly
-    rm -f /boot/%{name}/*.mod
-    rm -f /boot/%{name}/*.img
-    rm -f /boot/%{name}/*.lst
-    rm -f /boot/%{name}/*.o
-    rm -f /boot/%{name}/device.map
-fi
-
-#-----------------------------------------------------------------------
-%files -f pc/grub.lang
-%defattr(-,root,root,-)
-#%{libdir32}/%{name}
-%{libdir32}/grub/*-%{platform}
-#%{_sbindir}/%{name}-*
-#%{_bindir}/%{name}-*
-%{_sbindir}/update-grub2
-%{_bindir}/%{name}-editenv
-%{_bindir}/%{name}-fstest
-%{_bindir}/%{name}-kbdcomp
-%{_bindir}/%{name}-menulst2cfg
-%{_bindir}/%{name}-mkfont
-%{_bindir}/%{name}-mkimage
-%{_bindir}/%{name}-mklayout
-%{_bindir}/%{name}-mkpasswd-pbkdf2
-%{_bindir}/%{name}-mkrelpath
-%{_bindir}/%{name}-mkrescue
-%{_bindir}/%{name}-mkstandalone
-%{_bindir}/%{name}-script-check
-%{_sbindir}/%{name}-bios-setup
-%{_sbindir}/%{name}-install
-%{_sbindir}/%{name}-mkconfig
-%{_sbindir}/%{name}-mknetdir
-%{_sbindir}/%{name}-ofpathname
-%{_sbindir}/%{name}-probe
-%{_sbindir}/%{name}-reboot
-%{_sbindir}/%{name}-set-default
-%{_sbindir}/%{name}-sparc64-setup
-%{_sbindir}/grub2-cfg-mod
-#%{_datadir}/%{name}
-%{_datadir}/grub
-%attr(0700,root,root) %dir %{_sysconfdir}/grub.d
-%{_sysconfdir}/grub.d/README
-%config %{_sysconfdir}/grub.d/??_*
-%{_sysconfdir}/%{name}.cfg
-#%attr(0644,root,root) %config %{_sysconfdir}/default/grub
-%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/default/grub
-%{_sysconfdir}/bash_completion.d/grub
-%dir /boot/%{name}
-%dir /boot/%{name}/locale
-# Actually, this is replaced by update-grub from scriptlets,
-# but it takes care of modified persistent part
-%config(noreplace) /boot/%{name}/grub.cfg
-%doc %{_docdir}/%{name}
-%{_infodir}/%{name}.info*
-%{_infodir}/grub-dev.info*
-%{_mandir}/man1/%{name}-editenv.1.xz
-%{_mandir}/man1/%{name}-fstest.1.xz
-%{_mandir}/man1/%{name}-kbdcomp.1.xz
-%{_mandir}/man1/%{name}-menulst2cfg.1.xz
-%{_mandir}/man1/%{name}-mkfont.1.xz
-%{_mandir}/man1/%{name}-mkimage.1.xz
-%{_mandir}/man1/%{name}-mklayout.1.xz
-%{_mandir}/man1/%{name}-mkpasswd-pbkdf2.1.xz
-%{_mandir}/man1/%{name}-mkrelpath.1.xz
-%{_mandir}/man1/%{name}-mkrescue.1.xz
-%{_mandir}/man1/%{name}-mkstandalone.1.xz
-%{_mandir}/man1/%{name}-script-check.1.xz
-%{_mandir}/man8/%{name}-bios-setup.8.xz
-%{_mandir}/man8/%{name}-install.8.xz
-%{_mandir}/man8/%{name}-mkconfig.8.xz
-%{_mandir}/man8/%{name}-mknetdir.8.xz
-%{_mandir}/man8/%{name}-ofpathname.8.xz
-%{_mandir}/man8/%{name}-probe.8.xz
-%{_mandir}/man8/%{name}-reboot.8.xz
-%{_mandir}/man8/%{name}-set-default.8.xz
-%{_mandir}/man8/%{name}-sparc64-setup.8.xz
-# RPM filetriggers
-%{_filetriggers_dir}/%{name}.*
-%dir /boot/%{name}/fonts
-/boot/%{name}/fonts/unicode.pf2
-
-
-%files efi 
-%defattr(-,root,root,-)
-%attr(0755,root,root) %dir /boot/efi/EFI/rosa/grub2-efi
-%attr(0755,root,root) /boot/efi/EFI/rosa/grub2-efi/grub.efi
-%attr(0755,root,root) /boot/efi/EFI/rosa/grub2-efi/grubcd.efi
-%attr(0755,root,rott) %ghost %config(noreplace) /boot/efi/EFI/rosa/grub2-efi/grub.cfg
-/etc/bash_completion.d/grub-efi
-%{libdir32}/grub/%{_arch}-efi/
-%{_sbindir}/%{name}-efi*
-%{_bindir}/%{name}-efi*
-%{_mandir}/man1/%{name}-efi-*.1*
-%{_mandir}/man8/%{name}-efi-*.8*
-#%{_datadir}/grub
-#%{_sysconfdir}/grub.d
-%config(noreplace) %{_sysconfdir}/%{name}-efi.cfg
