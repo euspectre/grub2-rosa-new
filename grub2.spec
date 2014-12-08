@@ -9,7 +9,7 @@
 Summary:	GNU GRUB is a Multiboot boot loader
 Name:		grub2
 Version:	2.00
-Release:	65
+Release:	66
 License:	GPLv3+
 Group:		System/Kernel and hardware
 Url:		http://www.gnu.org/software/grub/
@@ -320,6 +320,10 @@ COMMON_MODULES="
 "
 ./grub-mkimage -O %{grubefiarch} -p /EFI/rosa/%{name}-efi -o grub.efi -d grub-core ${COMMON_MODULES}
 ./grub-mkimage -O %{grubefiarch} -p /BOOT/EFI -o grubcd.efi -d grub-core ${COMMON_MODULES} iso9660
+
+%if %{defined auto_sign}
+    %auto_sign grub.efi grubcd.efi
+%endif
 
 popd
 %endif
