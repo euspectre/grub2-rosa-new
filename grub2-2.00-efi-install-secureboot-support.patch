@@ -1,7 +1,16 @@
 diff --git a/util/grub-install.in b/util/grub-install.in
-index e19f1cd..37e195b 100644
+index e19f1cd..16ff1f6 100644
 --- a/util/grub-install.in
 +++ b/util/grub-install.in
+@@ -463,7 +463,7 @@ if [ x"$grub_modinfo_platform" = xefi ]; then
+ 		i386)
+ 		    efi_file=BOOTIA32.EFI ;;
+ 		x86_64)
+-		    efi_file=BOOTX64.EFI ;;
++		    efi_file=BOOTx64.EFI ;;
+ 	    # GRUB does not yet support these architectures, but they're defined
+ 	    # by the specification so we include them here to ease future
+ 	    # expansion.
 @@ -821,7 +821,8 @@ elif [ x"${grub_modinfo_target_cpu}-${grub_modinfo_platform}" = xmips-arc ]; the
      gettext "You will have to set \`SystemPartition' and \`OSLoader' manually." 1>&2
      echo 1>&2
@@ -16,9 +25,9 @@ index e19f1cd..37e195b 100644
  	if test -z "$efidir_drive" || test -z "$efidir_disk"; then
  	    gettext_printf "Can't find GRUB drive for %s; unable to create EFI Boot Manager entry.\n" "$efidir" >&2
  	else
-+	    if ls /sys/firmware/efi/vars/SecureBoot* /boot/efi/EFI/$efi_distributor/BOOTX64.efi >/dev/null 2>&1 ; then
++	    if ls /sys/firmware/efi/vars/SecureBoot* /boot/efi/EFI/$efi_distributor/BOOTx64.efi >/dev/null 2>&1 ; then
 +		# SecureBoot can be turned on, and shim is present - using shim as bootloader.
-+		efi_file_boot=BOOTX64.efi
++		efi_file_boot=BOOTx64.efi
 +	    else
 +		# If no shim is present, usign grub2 directly.
 +		# If shim is present, but no SecureBoot detected, also using grub2 to avoid "insecure boot" warnings.

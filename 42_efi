@@ -6,7 +6,7 @@ if [ -d /sys/firmware/efi ]; then
 . "/usr/share/grub/grub-mkconfig_lib"
 
 #See for Windows EFI string in EFI BIOS
-WINDOWS_EFI=$(efibootmgr -v | grep WINDOWS | sed 's/.*HD/HD/;s/WINDOWS.*/WINDOWS/')
+WINDOWS_EFI=$(/usr/sbin/efibootmgr -v | grep WINDOWS | sed 's/.*HD/HD/;s/WINDOWS.*/WINDOWS/')
 if [ -z "$WINDOWS_EFI" ]; then
         exit 0
 fi
@@ -15,8 +15,8 @@ WIN_EFI_PATH_LINUX=$(echo $WIN_EFI_PATH | sed 's/\\/\//g')
 WIN_EFI_PARTUUID=$(echo $WINDOWS_EFI | sed 's/.*,//;s/).*//')
 
 #Determine EFI UUID
-WIN_EFI_DRIVE=$(blkid -s PARTUUID | grep -i $WIN_EFI_PARTUUID | awk '{print $1}' | sed 's/://')
-WIN_EFI_UUID=$(blkid -s UUID $WIN_EFI_DRIVE | sed 's/.*="//;s/".*//')
+WIN_EFI_DRIVE=$(/sbin/blkid -s PARTUUID | grep -i $WIN_EFI_PARTUUID | awk '{print $1}' | sed 's/://')
+WIN_EFI_UUID=$(/sbin/blkid -s UUID $WIN_EFI_DRIVE | sed 's/.*="//;s/".*//')
 
 cat << EOF
 menuentry "Microsoft Windows Vista/7/8 UEFI-GPT" {
