@@ -4,12 +4,16 @@
 
 %global efi %{ix86} x86_64
 
+# build documentation by default
+%bcond_without  doc
+%bcond_with     pdf
+
 %bcond_with talpo
 
 Summary:	GNU GRUB is a Multiboot boot loader
 Name:		grub2
 Version:	2.00
-Release:	65
+Release:	66
 License:	GPLv3+
 Group:		System/Kernel and hardware
 Url:		http://www.gnu.org/software/grub/
@@ -45,7 +49,6 @@ Patch15:	grub-2.00.30_os-prober.options.patch
 # Build with freetype 2.5.1 and higher
 Patch16:	grub-2.00-freetype-2.5.1.patch
 Patch18:	grub-2.00.fix.build.flex.patch
-
 
 # Fedora patches:
 # https://bugzilla.redhat.com/show_bug.cgi?id=857936
@@ -89,32 +92,33 @@ Patch508:	grub2-linuxefi_non_sb_fallback.patch
 Patch509:	grub2-2.00-btrfs-subvolumes-support.patch
 Patch510:	grub2-2.00-efi-install-secureboot-support.patch
 
+# For updating Makefile template after patch 12
+BuildRequires:	autogen
 BuildRequires:	bison
 BuildRequires:	flex
-BuildRequires:	ruby
 BuildRequires:	fonts-ttf-unifont >= 6.2
-BuildRequires:	freetype2-devel
-BuildRequires:	glibc-static-devel
 BuildRequires:	help2man
-BuildRequires:	liblzma-devel
-BuildRequires:	liblzo-devel
-BuildRequires:	libusb-devel
-BuildRequires:	ncurses-devel
-BuildRequires:	texinfo
-BuildRequires:	texlive-latex
-BuildRequires:	texlive-collection-texinfo
-BuildRequires:	texlive-epsf
-BuildRequires:	pkgconfig(devmapper)
-BuildRequires:	autogen
+BuildRequires:	ruby
 %if %{with talpo}
 BuildRequires:	talpo
 %endif
-# For updating Makefile template after patch 12
-BuildRequires:	autogen
+BuildRequires:	texinfo
+%if %{with pdf}
+BuildRequires:	texlive-collection-texinfo
+BuildRequires:	texlive-epsf
+BuildRequires:	texlive-latex
+%endif
+BuildRequires:	glibc-static-devel
+BuildRequires:	liblzo-devel
+BuildRequires:	pkgconfig(devmapper)
+BuildRequires:	pkgconfig(freetype2)
+BuildRequires:	pkgconfig(liblzma)
+BuildRequires:	pkgconfig(libusb)
+BuildRequires:	pkgconfig(ncurses)
 
-Requires:	xorriso
-Requires:	rosa-release-common
 Requires:	grub2-theme
+Requires:	rosa-release-common
+Requires:	xorriso
 Requires(post):	os-prober >= 1.63-5
 
 Provides:	bootloader
@@ -304,7 +308,12 @@ pushd efi
 	--enable-grub-mkfont
 %make all
 
-make html pdf
+%if %{with doc}
+make html
+%endif
+%if %{with pdf}
+make pdf
+%endif
 %ifarch %{ix86}
 %define grubefiarch i386-efi
 %else
@@ -354,7 +363,12 @@ cp %{SOURCE10} .
 %ifarch %{efi}
 cd efi
 %makeinstall_std
-%makeinstall_std -C docs install-pdf install-html
+%if %{with doc}
+%makeinstall_std -C docs install-html
+%endif
+%if %{with pdf}
+%makeinstall_std -C docs install-pdf
+%endif
 mv %{buildroot}%{_infodir}/grub.info %{buildroot}%{_infodir}/grub2.info
 #install -m644 COPYING INSTALL NEWS README THANKS TODO ChangeLog	\
 #	%{buildroot}%{_docdir}/%{name}
@@ -390,7 +404,12 @@ cd ..
 cd pc
 ######EFI
 %makeinstall_std
-%makeinstall_std -C docs install-pdf install-html
+%if %{with doc}
+%makeinstall_std -C docs install-html
+%endif
+%if %{with pdf}
+%makeinstall_std -C docs install-pdf
+%endif
 mv -f %{buildroot}%{_docdir}/grub %{buildroot}%{_docdir}/%{name}
 #install -m644 COPYING INSTALL NEWS README THANKS TODO ChangeLog	\
 #	%{buildroot}%{_docdir}/%{name}
