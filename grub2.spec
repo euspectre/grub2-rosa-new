@@ -356,7 +356,12 @@ cd pc
 	--enable-grub-mkfont
 %make all
 
-make html pdf
+%if %{with doc}
+make html
+%endif
+%if %{with pdf}
+make pdf
+%endif
 
 %install
 cp %{SOURCE10} .
