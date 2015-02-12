@@ -1,0 +1,90 @@
+diff --git a/util/grub-mkconfig.in b/util/grub-mkconfig.in
+index a8dd534..20aabc0 100644
+--- a/util/grub-mkconfig.in
++++ b/util/grub-mkconfig.in
+@@ -213,6 +213,7 @@ export GRUB_DEFAULT \
+   GRUB_THEME \
+   GRUB_GFXPAYLOAD_LINUX \
+   GRUB_DISABLE_OS_PROBER \
++  GRUB_OS_PROBER_LINKED \
+   GRUB_INIT_TUNE \
+   GRUB_SAVEDEFAULT \
+   GRUB_ENABLE_CRYPTODISK \
+diff --git a/util/grub.d/30_os-prober.in b/util/grub.d/30_os-prober.in
+index 8fce7c9..1c96a70 100644
+--- a/util/grub.d/30_os-prober.in
++++ b/util/grub.d/30_os-prober.in
+@@ -125,6 +125,8 @@ EOF
+ }
+ 
+ used_osprober_linux_ids=
++declare -A common_boot_distro_names
++declare -A common_boot_distro_entries
+ 
+ for OS in ${OSPROBED} ; do
+   DEVICE="`echo ${OS} | cut -d ':' -f 1`"
+@@ -193,6 +195,17 @@ EOF
+         LINITRD="`echo ${LINUX} | cut -d ':' -f 5`"
+         LPARAMS="`echo ${LINUX} | cut -d ':' -f 6- | tr '^' ' '`"
+ 
++	if [ "${LBOOT::6}" = "grub2-" ]; then
++	  # Special case:
++	  # /dev/sda5:grub2-/dev/sda5::/boot/grub2/grub.cfg
++	  # means that instead of extracting boot entries, a link to config file should be created.
++	  # LKERNEL is path to the target grub.cfg
++	  ENTRYLINK=true
++	  LBOOT="${LBOOT#grub2-}"
++	else
++	  ENTRYLINK=false
++	fi
++
+ 	if [ "${LROOT}" != "${LBOOT}" ]; then
+ 	  LKERNEL="${LKERNEL#/boot}"
+ 	  LINITRD="${LINITRD#/boot}"
+@@ -238,6 +251,37 @@ EOF
+ 			;;
+ 	esac
+ 
++	if [ "x$ENTRYLINK" = "xtrue" ]; then
++	  # Short title consists of the first one or two words of the full title, the second word is used only when it contains no digits.
++	  # Examples: ROSA Desktop Fresh R5 -> ROSA Desktop; Fedora 21 -> Fedora; SomeLinux X8 -> SomeLinux
++	  title_short="$(echo ${title} | perl -wpe 's/^(\S+(\s+[a-z_]+\b)?).*$/$1/is')"
++
++	  # The most part of the menuentry contents
++	  menuentry_body="--class ${CLASS} --class gnu-linux --class gnu --class os \$menuentry_id_option 'osprober-gnulinux-simple-link-$boot_device_id' {
++$(save_default_entry | sed -e "s/^/\t/"; add_options; printf '%s\n' "${prepare_boot_cache}")
++	configfile ${LKERNEL}
++}"
++
++	  if [ "${LROOT}" != "${LBOOT}" ]; then
++	    # If separate /boot, collect all entries with the same /boot and combine them into single entry:
++	    # they all would point to the same grub.cfg, so no need to duplicate them.
++	    # Using short titles (to fit them all into limited width) and specify the root partition for each system.
++	    # Actual output will be performed after os-prober cycle is finished.
++	    if [ -z "${common_boot_distro_names[${LBOOT}]}" ]; then
++	      common_boot_distro_names[${LBOOT}]="${LBOOT#/dev/}: ${title_short} (${LROOT#/dev/})"
++	      common_boot_distro_entries[${LBOOT}]="${menuentry_body}"
++	    else
++	      common_boot_distro_names[${LBOOT}]="${common_boot_distro_names[${LBOOT}]}, ${title_short} (${LROOT#/dev/})"
++	    fi
++	  else
++	    # If /boot is a directory within the root partition, just output the resulting entry using full title,
++	    # there are no other systems.
++	    echo "menuentry '$(echo "${LBOOT#/dev/}: ${title}" | grub_quote)' ${menuentry_body}"
++	  fi
++	  # In any case, skip the rest of the processing.
++	  continue
++	fi
++
+ 	VKERNEL=`echo $LKERNEL | sed -e 's,^\(/boot\)\?\(/vmlinuz-\|/vmlinux-\|/kernel-\),,'`
+ 	message_kernel="$(gettext_printf "Loading Linux %s ..." ${VKERNEL})"
+ 	message_initrd="$(gettext_printf "Loading initial ramdisk ...")"
+@@ -345,3 +389,8 @@ EOF
+     ;;
+   esac
+ done
++
++# Now output entries for systems with separate /boot.
++for LBOOT in "${!common_boot_distro_names[@]}"; do
++  echo "menuentry '$(echo "${common_boot_distro_names[${LBOOT}]}" | grub_quote)' ${common_boot_distro_entries[${LBOOT}]}"
++done

@@ -9,7 +9,7 @@
 Summary:	GNU GRUB is a Multiboot boot loader
 Name:		grub2
 Version:	2.00
-Release:	68
+Release:	69
 License:	GPLv3+
 Group:		System/Kernel and hardware
 Url:		http://www.gnu.org/software/grub/
@@ -89,6 +89,7 @@ Patch508:	grub2-linuxefi_non_sb_fallback.patch
 Patch509:	grub2-2.00-btrfs-subvolumes-support.patch
 Patch510:	grub2-2.00-efi-install-secureboot-support.patch
 Patch511:	grub2-2.00-avoid-mbr-id-overwrite.patch
+Patch512:	grub2-2.00-support-grub.cfg-links.patch
 
 BuildRequires:	bison
 BuildRequires:	flex
