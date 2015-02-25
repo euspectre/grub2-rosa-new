@@ -1,0 +1,13 @@
+diff --git a/util/grub-probe.c b/util/grub-probe.c
+index 6dd1073..2486075 100644
+--- a/util/grub-probe.c
++++ b/util/grub-probe.c
+@@ -736,7 +736,7 @@ static struct argp_option options[] = {
+    N_("given argument is a system device, not a path"), 0},
+   {"device-map",  'm', N_("FILE"), 0,
+    N_("use FILE as the device map [default=%s]"), 0},
+-  {"target",  't', "(fs|fs_uuid|fs_label|drive|device|partmap|abstraction|cryptodisk_uuid|msdos_parttype)", 0,
++  {"target",  't', "(fs|fs_uuid|fs_label|drive|device|partmap|abstraction| cryptodisk_uuid|msdos_parttype|hints_string|bios_hints|ieee1275_hints| baremetal_hints|efi_hints|arc_hints|compatibility_hint|zero_check|disk)", 0,
+    N_("print filesystem module, GRUB drive, system device, partition map module, abstraction module or cryptographic container UUID [default=fs]"), 0},
+   {"verbose",     'v', 0,      0, N_("print verbose messages."), 0},
+   { 0, 0, 0, 0, 0, 0 }

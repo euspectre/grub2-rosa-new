@@ -18,6 +18,8 @@ WIN_EFI_PARTUUID=$(echo $WINDOWS_EFI | sed 's/.*,//;s/).*//')
 WIN_EFI_DRIVE=$(/sbin/blkid -s PARTUUID | grep -i $WIN_EFI_PARTUUID | awk '{print $1}' | sed 's/://')
 WIN_EFI_UUID=$(/sbin/blkid -s UUID $WIN_EFI_DRIVE | sed 's/.*="//;s/".*//')
 
+ESP_SEARCH_HINTS=$(grub2-efi-probe --target hints_string /boot/efi)
+
 cat << EOF
 menuentry "Microsoft Windows Vista/7/8 UEFI-GPT" {
 EOF
@@ -27,7 +29,7 @@ cat << EOF
   insmod fat
   insmod search_fs_uuid
   insmod chain
-  search --fs-uuid --set=root --hint-bios=hd0,gpt1 --hint-efi=hd0,gpt1 --hint-baremetal=ahci0,gpt1 ${WIN_EFI_UUID}
+  search --fs-uuid --set=root ${ESP_SEARCH_HINTS} ${WIN_EFI_UUID}
   chainloader $WIN_EFI_PATH_LINUX
 }
 EOF
