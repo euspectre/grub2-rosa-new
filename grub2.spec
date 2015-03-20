@@ -121,7 +121,7 @@ BuildRequires:	pkgconfig(libusb)
 BuildRequires:	pkgconfig(ncurses)
 
 Requires:	grub2-theme
-Requires:	rosa-release-common
+Requires:	branding-configs-common
 Requires:	xorriso
 Requires(post):	os-prober >= 1.63-5
 
