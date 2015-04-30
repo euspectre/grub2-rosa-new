@@ -1,25 +1,52 @@
 #!/bin/sh
 
-#See for EFI present
-if [ -d /sys/firmware/efi ]; then
+# Do nothing if EFI is not present
+if [ ! -d /sys/firmware/efi ]; then
+	exit 0
+fi
 
 . "/usr/share/grub/grub-mkconfig_lib"
 
-#See for Windows EFI string in EFI BIOS
-WINDOWS_EFI=$(/usr/sbin/efibootmgr -v | grep -E -m 1 '(WINDOWS|Windows Boot Manager)' | sed 's/.*\(HD([^()]*)File([^()]*)\).*/\1/i')
-if [ -z "$WINDOWS_EFI" ]; then
+# Get complete list of boot manager data
+EFIBOOTMGR=$(/usr/sbin/efibootmgr -v)
+
+# Get all Windows entries
+WIN_ENTRIES=$(echo "$EFIBOOTMGR" | grep -E '(WINDOWS|Windows Boot Manager)')
+if [ -z "$WIN_ENTRIES" ]; then
         exit 0
 fi
-WIN_EFI_PATH=$(echo $WINDOWS_EFI | sed 's/.*File(\([^()]*\))/\1/i')
-WIN_EFI_PATH_LINUX=$(echo $WIN_EFI_PATH | sed 's/\\/\//g')
-WIN_EFI_PARTUUID=$(echo $WINDOWS_EFI | sed 's/HD([0-9a-f]\+,[0-9a-f]\+,[0-9a-f]\+,\([0-9a-f\-]\+\)).*/\1/i')
 
-#Determine EFI UUID
-WIN_EFI_DRIVE=$(/sbin/blkid -s PARTUUID | grep -i $WIN_EFI_PARTUUID | awk '{print $1}' | sed 's/://')
+# In case there are several Windows entries, get the earliest one in the BootOrder list
+# Append comma to the list for easier iteration
+BOOTORDER=$(echo "$EFIBOOTMGR" | grep 'BootOrder' | sed 's/BootOrder:\s*//; s/\r/,/')
+while [ ! -z "$BOOTORDER" -a -z "$WIN_ENTRY" ]; do
+	# Extract the next BootOrder element
+	NEXT=${BOOTORDER%%,*}
+	# ...and remove if from the list
+	BOOTORDER=${BOOTORDER#*,}
+	# Check if this entry is a Windows one
+	WIN_ENTRY=$(echo "$WIN_ENTRIES" | grep "Boot$NEXT")
+done
+
+# If not found, just get the first one
+if [ -z "$WIN_ENTRY" ]; then
+	WIN_ENTRY=$(echo "$WIN_ENTRIES" | head -n 1)
+fi
+
+# Leave only partition and file path
+WIN_ENTRY=$(echo "$WIN_ENTRY" | sed 's/.*\(HD([^()]*)File([^()]*)\).*/\1/i')
+# Extract file path and convert into Linux format
+WIN_EFI_FILE=$(echo "$WIN_ENTRY" | sed 's/.*File(\([^()]*\))/\1/i; s/\\/\//g')
+# Extract partition GPT UUID
+WIN_EFI_PARTUUID=$(echo "$WIN_ENTRY" | sed 's/HD([0-9a-f]\+,[0-9a-f]\+,[0-9a-f]\+,\([0-9a-f\-]\+\)).*/\1/i')
+# Get Linux device name for Windows EFI partition (like /dev/sda2)
+WIN_EFI_DRIVE=$(/sbin/blkid -s PARTUUID | grep -i $WIN_EFI_PARTUUID | sed 's/^\([^:]\+\):.*/\1/')
+# ...and file system UUID for it
 WIN_EFI_UUID=$(/sbin/blkid -s UUID $WIN_EFI_DRIVE | sed 's/.*="//;s/".*//')
+# Construct Grub2 search hints
+WIN_EFI_SEARCH_HINTS=$(grub2-efi-probe -d --target hints_string $WIN_EFI_DRIVE)
 
-ESP_SEARCH_HINTS=$(grub2-efi-probe --target hints_string /boot/efi)
-
+# Finally, construct the menuentry
 cat << EOF
 menuentry "Microsoft Windows Vista/7/8 UEFI-GPT" {
 EOF
@@ -29,9 +56,7 @@ cat << EOF
   insmod fat
   insmod search_fs_uuid
   insmod chain
-  search --fs-uuid --set=root ${ESP_SEARCH_HINTS} ${WIN_EFI_UUID}
-  chainloader $WIN_EFI_PATH_LINUX
+  search --fs-uuid --set=root ${WIN_EFI_SEARCH_HINTS} ${WIN_EFI_UUID}
+  chainloader $WIN_EFI_FILE
 }
 EOF
-
-fi
