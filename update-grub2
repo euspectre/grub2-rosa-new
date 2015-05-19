@@ -1,32 +1,9 @@
 #!/bin/sh
 
-# First check EFI support
-if [ -d /sys/firmware/efi ]; then
-	if which grub2-efi-probe >/dev/null 2>&1; then
-		grub_probe=grub2-efi-probe
-	else
-		grub_probe=grub2-probe
-	fi
-	if which grub2-efi-mkconfig >/dev/null 2>&1; then
-		grub_mkconfig=grub2-efi-mkconfig
-	else
-		grub_mkconfig=grub2-mkconfig
-	fi
-	if which grub2-efi-mkrelpath >/dev/null 2>&1; then
-		grub_mkrelpath=grub2-efi-mkrelpath
-	else
-		grub_mkrelpath=grub2-mkrelpath
-	fi
-	$grub_mkconfig -o /boot/grub2/grub.cfg
-	BOOT_UUID=`$grub_probe --target=fs_uuid /boot 2>/dev/null`
-	BOOT_HINT=`$grub_probe --target=compatibility_hint /boot 2>/dev/null`
-	PREFIX_DIR=`$grub_mkrelpath /boot/grub2`
-	cat <<EOF > /boot/efi/EFI/rosa/grub.cfg
-search.fs_uuid $BOOT_UUID root $BOOT_HINT
-set prefix=(\$root)$PREFIX_DIR
-configfile \$prefix/grub.cfg
-EOF
+# In EFI using the EFI version of mkconfig (if available)
+if [ -d /sys/firmware/efi ] && which grub2-efi-mkconfig >/dev/null 2>&1; then
+	grub_mkconfig=grub2-efi-mkconfig
 else
-	grub2-mkconfig -o /boot/grub2/grub.cfg
+	grub_mkconfig=grub2-mkconfig
 fi
-
+$grub_mkconfig -o /boot/grub2/grub.cfg
