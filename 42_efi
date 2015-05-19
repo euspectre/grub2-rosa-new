@@ -1,7 +1,7 @@
 #!/bin/sh
 
-# Do nothing if EFI is not present
-if [ ! -d /sys/firmware/efi ]; then
+# Do nothing if EFI is not present or if os-prober is disabled (user doesn't want any secondary systems)
+if [ ! -d /sys/firmware/efi -o "${GRUB_DISABLE_OS_PROBER}" = "true" ]; then
 	exit 0
 fi
 
