@@ -122,7 +122,6 @@ BuildRequires:	pkgconfig(libusb)
 BuildRequires:	pkgconfig(ncurses)
 
 Requires:	grub2-theme
-Requires:	branding-configs-common
 Requires:	xorriso
 Requires(post):	os-prober >= 1.63-5
 
