@@ -446,7 +446,7 @@ pushd %{buildroot}%{_filetriggers_dir} && {
 EOF
 	cat > %{name}.script << EOF
 #!/bin/sh
-%{_sbindir}/%{name}-mkconfig -o /boot/%{name}/grub.cfg
+%{_sbindir}/update-grub2
 EOF
 	chmod 0755 %{name}.script
 	popd
