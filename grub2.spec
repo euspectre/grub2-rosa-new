@@ -13,7 +13,7 @@
 Summary:	GNU GRUB is a Multiboot boot loader
 Name:		grub2
 Version:	2.00
-Release:	74
+Release:	75
 License:	GPLv3+
 Group:		System/Kernel and hardware
 Url:		http://www.gnu.org/software/grub/
@@ -96,6 +96,7 @@ Patch512:	grub2-2.00-support-grub.cfg-links.patch
 Patch513:	grub2-2.00-probe-targets-list.patch
 Patch514:	grub2-2.00-secureboot-chainloader.patch
 Patch515:	grub2-2.00-efi-install-grub-cfg.patch
+Patch516:	0516-Fix-security-issue-when-reading-username-and-passwor.patch
 
 # For updating Makefile template after patch 12
 BuildRequires:	autogen
