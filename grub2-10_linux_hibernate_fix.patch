@@ -15,7 +15,7 @@ index 7b8a8f4..c07e3b8 100644
 +  fi
 +
 +  if [ "x$SWAP_TYPE" = "xfile" ]; then
-+      RESUME_OFFSET=$(filefrag -v $SWAP_DEV| grep -E '^\s+0.*0' | awk '{print $3}')
++      RESUME_OFFSET=$(filefrag -v $SWAP_DEV| grep -E '^\s+0:.* 0\.\.' | awk -F '[ \t:.]+' '{print $5}')
 +      RESUME_DEV=$(/bin/df $SWAP_DEV | grep '/dev/\S*' -o)
 +      RESUME_STRING="resume=UUID=$(/sbin/blkid -s UUID $RESUME_DEV | sed 's/.*="//;s/".*//') resume_offset=$RESUME_OFFSET"
 +  fi

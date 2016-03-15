@@ -13,7 +13,7 @@
 Summary:	GNU GRUB is a Multiboot boot loader
 Name:		grub2
 Version:	2.00
-Release:	77
+Release:	78
 License:	GPLv3+
 Group:		System/Kernel and hardware
 Url:		http://www.gnu.org/software/grub/
@@ -125,6 +125,7 @@ BuildRequires:	pkgconfig(ncurses)
 Requires:	grub2-theme
 Requires:	xorriso
 Requires(post):	os-prober >= 1.63-5
+Requires:	e2fsprogs >= 1.42.13
 Suggests:	grub2-theme-rosa
 
 Provides:	bootloader
