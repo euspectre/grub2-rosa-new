@@ -1,0 +1,77 @@
+From 049dcfa03c2217f3af9f108d3f41229b8155c534 Mon Sep 17 00:00:00 2001
+From: Vladimir Serbinenko <phcoder@gmail.com>
+Date: Thu, 23 Jul 2015 23:15:32 +0000
+Subject: xfs: Fix handling of symlink with crc-enabled filesystem.
+
+---
+(limited to 'grub-core/fs/xfs.c')
+
+diff -urN grub-2.00/grub-core/fs/xfs.c grub-2.00-patched/grub-core/fs/xfs.c
+--- grub-2.00/grub-core/fs/xfs.c	2016-07-08 23:11:22.127268295 +1000
++++ grub-2.00-patched/grub-core/fs/xfs.c	2016-07-08 23:15:17.424272702 +1000
+@@ -587,11 +587,11 @@
+ grub_xfs_read_file (grub_fshelp_node_t node,
+ 		     void NESTED_FUNC_ATTR (*read_hook) (grub_disk_addr_t sector,
+ 					unsigned offset, unsigned length),
+-		     grub_off_t pos, grub_size_t len, char *buf)
++		     grub_off_t pos, grub_size_t len, char *buf, grub_uint32_t header_size)
+ {
+   return grub_fshelp_read_file (node->data->disk, node, read_hook,
+ 				pos, len, buf, grub_xfs_read_block,
+-				grub_be_to_cpu64 (node->inode.size),
++				grub_be_to_cpu64 (node->inode.size) + header_size,
+ 				node->data->sblock.log2_bsize
+ 				- GRUB_DISK_SECTOR_BITS, 0);
+ }
+@@ -600,7 +600,13 @@
+ static char *
+ grub_xfs_read_symlink (grub_fshelp_node_t node)
+ {
+-  int size = grub_be_to_cpu64 (node->inode.size);
++  grub_ssize_t size = grub_be_to_cpu64 (node->inode.size);
++
++  if (size < 0)
++    {
++      grub_error (GRUB_ERR_BAD_FS, "invalid symlink");
++      return 0;
++    }
+ 
+   switch (node->inode.format)
+     {
+@@ -611,12 +617,17 @@
+       {
+ 	char *symlink;
+ 	grub_ssize_t numread;
++	int off = 0;
++
++	if (node->data->hascrc)
++	  off = 56;
+ 
+ 	symlink = grub_malloc (size + 1);
+ 	if (!symlink)
+ 	  return 0;
+ 
+-	numread = grub_xfs_read_file (node, 0, 0, size, symlink);
++	node->inode.size = grub_be_to_cpu64 (size + off);
++	numread = grub_xfs_read_file (node, 0, 0, size, symlink, off);
+ 	if (numread != size)
+ 	  {
+ 	    grub_free (symlink);
+@@ -772,7 +783,7 @@
+ 
+ 	    numread = grub_xfs_read_file (dir, 0,
+ 					  blk << dirblk_log2,
+-					  dirblk_size, dirblock);
++					  dirblk_size, dirblock, 0);
+ 	    if (numread != dirblk_size)
+ 	      return 0;
+ 
+@@ -996,7 +1007,7 @@
+     (struct grub_xfs_data *) file->data;
+ 
+   return grub_xfs_read_file (&data->diropen, file->read_hook,
+-			      file->offset, len, buf);
++			      file->offset, len, buf, 0);
+ }
+ 
+ 

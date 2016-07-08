@@ -13,7 +13,7 @@
 Summary:	GNU GRUB is a Multiboot boot loader
 Name:		grub2
 Version:	2.00
-Release:	78
+Release:	79
 License:	GPLv3+
 Group:		System/Kernel and hardware
 Url:		http://www.gnu.org/software/grub/
@@ -97,6 +97,14 @@ Patch513:	grub2-2.00-probe-targets-list.patch
 Patch514:	grub2-2.00-secureboot-chainloader.patch
 Patch515:	grub2-2.00-efi-install-grub-cfg.patch
 Patch516:	0516-Fix-security-issue-when-reading-username-and-passwor.patch
+
+# Backported from upstream and re-worked for 2.00
+Patch600:	0001-xfs-Fix-termination-loop-for-directory-iteration.patch
+Patch601:	0002-xfs-Convert-inode-numbers-to-cpu-endianity-immediate.patch
+Patch602:	0003-xfs-Add-helpers-for-inode-size.patch
+Patch603:	0004-xfs-V5-filesystem-format-support.patch
+Patch604:	0005-xfs-silence-Coverity-overflow-warning.patch
+Patch605:	0006-fix-handling-of-symlink.patch
 
 # For updating Makefile template after patch 12
 BuildRequires:	autogen
