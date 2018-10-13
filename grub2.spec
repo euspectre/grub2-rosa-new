@@ -4,118 +4,109 @@
 
 %global efi %{ix86} x86_64
 
-# build documentation by default
-%bcond_without  doc
-%bcond_with     pdf
+# Do not build HTML and PDF documentation by default.
+%bcond_with	doc
+%bcond_with	pdf
 
-%bcond_with talpo
-
-Summary:	GNU GRUB is a Multiboot boot loader
+Summary:	GRUB is a boot loader
 Name:		grub2
-Version:	2.00
-Release:	79
+Version:	2.02
+Release:	1
 License:	GPLv3+
 Group:		System/Kernel and hardware
 Url:		http://www.gnu.org/software/grub/
-Source0:	grub-%{version}.tar.gz
-Source1:	90_persistent
+Source0:	ftp://ftp.gnu.org/gnu/grub/grub-%{version}.tar.xz
 Source2:	grub.default
-Source3:	grub.melt
-# www.4shared.com/archive/lFCl6wxL/grub_guidetar.html
-Source4:	grub_guide.tar.gz
 Source8:	grub2-po-update.tar.gz
 Source9:	update-grub2
-Source10:	README.urpmi
 Source11:	grub2.rpmlintrc
-Source12:	42_efi
-Source13:	43_rescue
-Source14:	grub2-cfg-mod
 
-Patch0:		grub2-locales.patch
-Patch1:		grub2-00_header.patch
-Patch2:		grub2-custom-color.patch
-Patch3:		grub2-move-terminal.patch
-Patch4:		grub2-read-cfg.patch
-Patch5:		grub2-symlink-is-garbage.patch
-Patch6:		grub2-name-corrections.patch
-Patch8:		grub2-theme-not_selected_item_box.patch
-Patch9:		grub-2.00.Linux.remove.patch
-Patch10:	grub2-mkfont-fix.patch
-Patch11:	grub2-2.00-class-via-os-prober.patch
-Patch12:	grub-2.00.safe.patch
-Patch13:	grub-2.00-unifont-path.patch
-Patch14:	grub-2.00-proportional-scale.patch
-Patch15:	grub-2.00.30_os-prober.options.patch
-# Build with freetype 2.5.1 and higher
-Patch16:	grub-2.00-freetype-2.5.1.patch
-Patch18:	grub-2.00.fix.build.flex.patch
+# Upstream patches. Keep them first to simplify future rebases.
+Patch1:		01-strtoull-Fix-behaviour-on-chars-between-9-and-a.patch
+Patch2:		02-Allow-GRUB-to-mount-ext2-3-4-filesystems-that-have-t.patch
+Patch4:		04-crypto-Fix-use-after-free.patch
+Patch5:		05-Fix-a-segfault-in-lsefi.patch
+Patch6:		06-udf-Fix-reading-label-lvd.ident-is-dstring.patch
+Patch7:		07-xfs-Don-t-attempt-to-iterate-over-empty-directory.patch
+Patch8:		08-Make-grub-install-check-for-errors-from-efibootmgr.patch
+Patch9:		09-x86-64-Treat-R_X86_64_PLT32-as-R_X86_64_PC32.patch
+Patch10:	10-Fix-packed-not-aligned-error-on-GCC-8.patch
+Patch11:	11-fs-Add-F2FS-support.patch
+Patch12:	12-grub-probe-Don-t-skip-dev-mapper-dm-devices.patch
+Patch13:	13-xfs-Accept-filesystem-with-sparse-inodes.patch
+Patch14:	14-efi-console-Fix-the-enter-key-not-working-on-x86-tab.patch
+Patch15:	15-i386-linux-Add-support-for-ext_lfb_base.patch
+Patch16:	16-ahci-Increase-time-out-from-10-s-to-32-s.patch
+Patch17:	17-tsc-Change-default-tsc-calibration-method-to-pmtimer.patch
+Patch18:	18-yylex-Explicilty-cast-fprintf-to-void.patch
+Patch19:	19-bufio-Round-up-block-size-to-power-of-2.patch
+Patch22:	22-python-Use-AM_PATH_PYTHON-to-determine-interpreter-f.patch
+Patch23:	23-osdep-linux-Convert-partition-start-to-disk-sector-l.patch
+Patch24:	24-msdos-Fix-overflow-in-converting-partition-start-and.patch
 
-# Fedora patches:
-# https://bugzilla.redhat.com/show_bug.cgi?id=857936
-Patch100:	grub2-2.00-fda-add-fw_path-search_v2.patch
-# Add support for entering the firmware setup screen.
-Patch101:	grub2-2.00-fda-Add-fwsetup.patch
-# Don't decrease efi memory map size
-Patch102:	grub2-2.00-fda-dont-decrease-mmap-size.patch
-# IBM client architecture (CAS) reboot support
-Patch103:	grub2-2.00-fda-cas-reboot-support.patch
-# Read chunks in smaller blocks
-Patch104:	grub2-2.00-fda-efidisk-ahci-workaround.patch
-# Fix crash on http: https://bugzilla.redhat.com/show_bug.cgi?id=860834
-Patch105:	grub2-2.00-fda-fix-http-crash.patch
-# Issue separate DNS queries for ipv4 and ipv6
-Patch106:	grub2-2.00-fda-Issue-separate-DNS-queries-for-ipv4-and-ipv6.patch
-# Don't allow insmod when secure boot is enabled
-Patch107:	grub2-2.00-fda-no-insmod-on-sb.patch
-# Add support for crappy cd craparino
-Patch108:	grub2-2.00-fda-cdpath.patch
-# Add support for linuxefi
-Patch109:	grub2-2.00-fda-linuxefi.patch
-# Fix parallel build
-Patch110:	grub2-2.00-parallel-build.patch
+# Patches from RHEL, Fedora and Ubuntu
+Patch501:	501-Don-t-say-GNU-Linux-in-generated-menus.patch
+Patch502:	502-fix-http-crash.patch
+Patch503:	503-no-insmod-on-sb.patch
+Patch520:	520-Add-support-for-linuxefi.patch
+Patch521:	521-Use-linuxefi-and-initrdefi-where-appropriate.patch
+Patch522:	522-Add-support-for-UEFI-operating-systems-returned-by-o.patch
+Patch523:	523-Honor-a-symlink-when-generating-configuration-by-gru.patch
+Patch524:	524-Fix-race-in-EFI-validation.patch
+Patch525:	525-Use-device-part-of-chainloader-target-if-present.patch
+Patch526:	526-Add-secureboot-support-on-efi-chainloader.patch
+Patch527:	527-Make-any-of-the-loaders-that-link-in-efi-mode-honor-.patch
+Patch528:	528-Rework-linux-command.patch
+Patch529:	529-Rework-linux16-command.patch
+Patch530:	530-Re-work-some-intricacies-of-PE-loading.patch
+# Part of "Load arm with SB enabled" which affects x86 as well and is needed
+# for subsequent patches.
+Patch531:	531-Move-grub_efi_linux_boot-into-a-separate-file.patch
+Patch532:	532-Rework-even-more-of-efi-chainload-so-non-sb-cases-wo.patch
+Patch533:	533-linuxefi-fix-double-free-on-verification-failure.patch
+Patch534:	534-efi-chainloader-fix-wrong-sanity-check-in-relocate_c.patch
+Patch535:	535-efi-chainloader-truncate-overlong-relocation-section.patch
+Patch536:	536-linuxefi-minor-cleanups.patch
+Patch537:	537-Handle-multi-arch-64-on-32-boot-in-linuxefi-loader.patch
+Patch538:	538-Clean-up-some-errors-in-the-linuxefi-loader.patch
+Patch539:	539-Fix-one-more-coverity-complaint.patch
+Patch560:	560-Don-t-write-messages-to-the-screen.patch
+Patch561:	561-Don-t-print-GNU-GRUB-header.patch
+Patch562:	562-Don-t-add-to-highlighted-row.patch
+Patch563:	563-Message-string-cleanups.patch
+Patch564:	564-Fix-border-spacing-now-that-we-aren-t-displaying-it.patch
+Patch565:	565-Use-the-correct-indentation-for-the-term-help-text.patch
+Patch566:	566-Indent-menu-entries.patch
+Patch567:	567-Fix-margins.patch
+Patch568:	568-Use-2-instead-of-1-for-our-right-hand-margin-so-line.patch
+Patch569:	569-Don-t-draw-a-border-around-the-menu.patch
+Patch570:	570-Use-the-standard-margin-for-the-timeout-string.patch
 
-#Mageia patches
-# Fix autoreconf warnings
-Patch200:	grub2-2.00-mga-fix_AM_PROG_MKDIR_P-configure.ac.patch
+# Patches from Virtuozzo/VZLinux (some are reworked and updated variants
+# of the patches used in ROSA before)
+Patch1002:	vl-1002-gfx-terminal-background.patch
+Patch1003:	vl-1003-gfx-cut-long-titles-using-ellipsis.patch
+Patch1004:	vl-1004-Support-showing-UEFI-logo-when-booting-in-UEFI.patch
 
-# ROSA quick fix. Need rediff previous patch
-Patch500:	grub2-10_linux_hibernate_fix.patch
+# ROSA-specific patches
+Patch2001:	grub2-read-cfg.patch
+Patch2002:	grub2-unifont-path.patch
+Patch2003:	grub2-improved-boot-menu.patch
+Patch2004:	grub2-30_os-prober-loading-messages.patch
+Patch2005:	grub2-Install-signed-images-if-UEFI-Secure-Boot-is-enabled.patch
+Patch2006:	grub2-support-grub.cfg-links.patch
+Patch2007:	grub2-10_linux_hibernate_fix.patch
+Patch2008:	grub2-make-sure-configure-finds-DejaVu-fonts.patch
 
-Patch501:	grub2-2.00-gnulib-compatibility.patch
-Patch502:	grub2-2.00-os-prober-efi-support.patch
-Patch503:	grub2-2.00-improved-boot-menu.patch
-Patch504:	grub2-2.00-cut-long-menu-titles.patch
-Patch505:	grub-2.00.texi.diff
-Patch506:	grub-2.00.autoreconf.patch
-Patch507:	grub2-2.00.30_os-prober-loading-messages.patch
-Patch508:	grub2-linuxefi_non_sb_fallback.patch
-Patch509:	grub2-2.00-btrfs-subvolumes-support.patch
-Patch510:	grub2-2.00-efi-install-secureboot-support.patch
-Patch511:	grub2-2.00-avoid-mbr-id-overwrite.patch
-Patch512:	grub2-2.00-support-grub.cfg-links.patch
-Patch513:	grub2-2.00-probe-targets-list.patch
-Patch514:	grub2-2.00-secureboot-chainloader.patch
-Patch515:	grub2-2.00-efi-install-grub-cfg.patch
-Patch516:	0516-Fix-security-issue-when-reading-username-and-passwor.patch
-
-# Backported from upstream and re-worked for 2.00
-Patch600:	0001-xfs-Fix-termination-loop-for-directory-iteration.patch
-Patch601:	0002-xfs-Convert-inode-numbers-to-cpu-endianity-immediate.patch
-Patch602:	0003-xfs-Add-helpers-for-inode-size.patch
-Patch603:	0004-xfs-V5-filesystem-format-support.patch
-Patch604:	0005-xfs-silence-Coverity-overflow-warning.patch
-Patch605:	0006-fix-handling-of-symlink.patch
-
-# For updating Makefile template after patch 12
 BuildRequires:	autogen
+BuildRequires:	automake
 BuildRequires:	bison
+BuildRequires:	binutils
 BuildRequires:	flex
 BuildRequires:	fonts-ttf-unifont >= 6.2
+# DejaVu fonts can be used by some themes.
+BuildRequires:	fonts-ttf-dejavu
 BuildRequires:	help2man
-BuildRequires:	ruby
-%if %{with talpo}
-BuildRequires:	talpo
-%endif
 BuildRequires:	texinfo
 %if %{with pdf}
 BuildRequires:	texlive-collection-texinfo
@@ -124,74 +115,71 @@ BuildRequires:	texlive-latex
 %endif
 BuildRequires:	glibc-static-devel
 BuildRequires:	liblzo-devel
+BuildRequires:	bzip2-devel
 BuildRequires:	pkgconfig(devmapper)
 BuildRequires:	pkgconfig(freetype2)
 BuildRequires:	pkgconfig(liblzma)
 BuildRequires:	pkgconfig(libusb)
 BuildRequires:	pkgconfig(ncurses)
+BuildRequires:	pkgconfig(fuse)
 
 Requires:	grub2-theme
 Requires:	xorriso
-Requires(post):	os-prober >= 1.63-5
+Requires(post):	os-prober >= 1.74
 Requires:	e2fsprogs >= 1.42.13
+# Some of the scripts from /etc/grub.d/ may use perl.
+Requires:	perl
 Suggests:	grub2-theme-rosa
 
 Provides:	bootloader
 Provides:	grub2bootloader
 
 %description
-GNU GRUB is a Multiboot boot loader. It was derived from GRUB, the
-GRand Unified Bootloader, which was originally designed and implemented
-by Erich Stefan Boleyn.
-
-Briefly, a boot loader is the first software program that runs when a
-computer starts. It is responsible for loading and transferring control
-to the operating system kernel software (such as the Hurd or Linux).
-The kernel, in turn, initializes the rest of the operating system (e.g. GNU).
+GRUB is a highly configurable and customizable boot loader with modular
+architecture.  It supports a rich variety of kernel formats, file systems,
+computer architectures and hardware devices.
 
 %files -f pc/grub.lang
-#%{libdir32}/%{name}
 %{libdir32}/grub/*-%{platform}
-#%{_sbindir}/%{name}-*
-#%{_bindir}/%{name}-*
 %{_sbindir}/update-grub2
 %{_bindir}/%{name}-editenv
+%{_bindir}/%{name}-file
 %{_bindir}/%{name}-fstest
+%{_bindir}/%{name}-glue-efi
 %{_bindir}/%{name}-kbdcomp
 %{_bindir}/%{name}-menulst2cfg
 %{_bindir}/%{name}-mkfont
 %{_bindir}/%{name}-mkimage
 %{_bindir}/%{name}-mklayout
+%{_bindir}/%{name}-mknetdir
 %{_bindir}/%{name}-mkpasswd-pbkdf2
 %{_bindir}/%{name}-mkrelpath
 %{_bindir}/%{name}-mkrescue
 %{_bindir}/%{name}-mkstandalone
+%{_bindir}/%{name}-mount
+%{_bindir}/%{name}-render-label
 %{_bindir}/%{name}-script-check
+%{_bindir}/%{name}-syslinux2cfg
 %{_sbindir}/%{name}-bios-setup
 %{_sbindir}/%{name}-install
+%{_sbindir}/%{name}-macbless
 %{_sbindir}/%{name}-mkconfig
-%{_sbindir}/%{name}-mknetdir
 %{_sbindir}/%{name}-ofpathname
 %{_sbindir}/%{name}-probe
 %{_sbindir}/%{name}-reboot
 %{_sbindir}/%{name}-set-default
 %{_sbindir}/%{name}-sparc64-setup
-%{_sbindir}/grub2-cfg-mod
-#%{_datadir}/%{name}
 %{_datadir}/grub
 %attr(0700,root,root) %dir %{_sysconfdir}/grub.d
 %{_sysconfdir}/grub.d/README
 %config %{_sysconfdir}/grub.d/??_*
-%{_sysconfdir}/%{name}.cfg
-#%attr(0644,root,root) %config %{_sysconfdir}/default/grub
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/default/grub
 %{_sysconfdir}/bash_completion.d/grub
 %dir /boot/%{name}
 %dir /boot/%{name}/locale
-# Actually, this is replaced by update-grub from scriptlets,
-# but it takes care of modified persistent part
-%config(noreplace) /boot/%{name}/grub.cfg
+%if %{with doc}
 %doc %{_docdir}/%{name}
+%endif
 %{_infodir}/%{name}.info*
 %{_infodir}/grub-dev.info*
 %{_mandir}/*/%{name}-*
@@ -215,10 +203,6 @@ BOOT_PARTITION=$(df -h /boot |(read; awk '{print $1; exit}'|sed 's/[[:digit:]]*$
 #bugfix: error message before loading of grub2 menu on boot
 cp -f /boot/grub2/locale/en@quot.mo /boot/grub2/locale/en.mo
 
-#delete non-needing doubling rpmsave and rpmnew files
-rm -f /etc/grub.d/*.rpmsave
-rm -f /etc/grub.d/*.rpmnew
-
 %preun
 exec >/dev/null
 if [ $1 = 0 ]; then
@@ -233,32 +217,35 @@ fi
 #-----------------------------------------------------------------------
 
 %ifarch %{efi}
-%package efi
+%package efi-common
 Summary:	GRUB for EFI systems
 Group:		System/Kernel and hardware
 Suggests:	efibootmgr
+# TODO: require efibootmgr >= 16: needed to support dual-boot and such.
 
-%description efi
+%description efi-common
 The GRand Unified Bootloader (GRUB) is a highly configurable and customizable
 bootloader with modular architecture.
 
 It support rich variety of kernel formats, file systems, computer 
-architectures and hardware devices.  This subpackage provides support 
-for EFI systems.
+architectures and hardware devices.
 
-%files efi
-%attr(0755,root,root) %dir /boot/efi/EFI/rosa/grub2-efi
-%attr(0755,root,root) /boot/efi/EFI/rosa/grub2-efi/grub.efi
-%attr(0755,root,root) /boot/efi/EFI/rosa/grub2-efi/grubcd.efi
-%attr(0755,root,rott) %ghost %config(noreplace) /boot/efi/EFI/rosa/grub2-efi/grub.cfg
+This package contains provides tools and settings needed to support EFI
+systems but does not install GRUB binaries into /boot/efi/EFI/rosa/. This is
+because signed binaries from "grub-efi" package should go there.
+
+This package, in turn, contains unsigned GRUB binaries, in
+%{_datadir}/grub2-efi/. If a user wants to use them they need to copy these
+images into /boot/efi/EFI/rosa/ manually, sign them if required, etc.
+
+%files efi-common
 /etc/bash_completion.d/grub-efi
 %{libdir32}/grub/%{_arch}-efi/
 %{_sbindir}/%{name}-efi*
 %{_bindir}/%{name}-efi*
 %{_mandir}/*/%{name}-efi-*
-#%{_datadir}/grub
-#%{_sysconfdir}/grub.d
-%config(noreplace) %{_sysconfdir}/%{name}-efi.cfg
+%dir %{_datadir}/%{name}-efi
+%{_datadir}/%{name}-efi/*.efi
 %endif
 
 #-----------------------------------------------------------------------
@@ -266,32 +253,23 @@ for EFI systems.
 %prep
 %setup -q -n grub-%{version}
 %apply_patches
-perl -pi -e 's/(\@image\{font_char_metrics,,,,)\.(png\})/$1$2/;' \
-        docs/grub-dev.texi
 
-sed -ri -e 's/-g"/"/g' -e "s/-Werror//g" configure.ac
+sed -ri -e 's/-Werror//g' configure.ac
+sed -ri -e 's/-Werror //g' grub-core/Makefile.am
 
-perl -pi -e 's/-Werror//;' grub-core/Makefile.am
-export GRUB_CONTRIB="$PWD/grub-extras"
-aclocal --force -Im4 -I/usr/share/aclocal --install
-./autogen.sh
+autoreconf -fvi
 
 tar -xf %{SOURCE8}
 pushd po-update; sh ./update.sh; popd
-cd ..
 
 %build
+
 export CONFIGURE_TOP="$PWD"
 %ifarch %{efi}
 mkdir -p efi
 pushd efi
-%configure \
-%if %{with talpo}
-	CC=talpo \
-	CFLAGS=-fplugin-arg-melt-option=talpo-arg-file:%{SOURCE3} \
-%else
+%configure2_5x \
 	CFLAGS="" \
-%endif
 	TARGET_LDFLAGS=-static \
 	--with-platform=efi \
 	--program-transform-name=s,grub,%{name}-efi, \
@@ -299,7 +277,6 @@ pushd efi
 	--libexecdir=%{libdir32} \
 	--with-grubdir=grub2 \
 	--disable-werror \
-	--enable-grub-emu-usb \
 	--enable-grub-mkfont
 %make all
 
@@ -316,31 +293,26 @@ make pdf
 %endif
 
 COMMON_MODULES="
-	appleldr boot chain configfile echo efi_gop efi_uga halt linux linuxefi loadbios loadenv minicmd normal reboot search test
-	all_video font gfxmenu gfxterm png
-	part_apple part_gpt part_msdos
-	btrfs ext2 fat hfsplus reiserfs xfs
-	lvm mdraid09 mdraid1x
+	all_video appleldr boot btrfs cat chain configfile echo
+	efifwsetup efi_gop efi_uga ext2 fat font gettext
+	gfxmenu gfxterm gfxterm_background
+	gzio halt hfsplus jpeg keystatus linux linuxefi loadbios loadenv
+	loopback lsefi  lsefimmap lsefisystab lssal lvm mdraid09 mdraid1x
+	memdisk minicmd normal part_apple part_gpt part_msdos png
+	raid5rec raid6rec reboot reiserfs search
+	search_fs_file search_fs_uuid search_label sleep squash4 test
+	true video xfs
 "
 ./grub-mkimage -O %{grubefiarch} -p /EFI/rosa/%{name}-efi -o grub.efi -d grub-core ${COMMON_MODULES}
 ./grub-mkimage -O %{grubefiarch} -p /BOOT/EFI -o grubcd.efi -d grub-core ${COMMON_MODULES} iso9660
-
-%if %{defined auto_sign}
-    %auto_sign grub.efi grubcd.efi
-%endif
 
 popd
 %endif
 
 mkdir -p pc
-cd pc
-%configure \
-%if %{with talpo}
-	CC=talpo \
-	CFLAGS=-fplugin-arg-melt-option=talpo-arg-file:%{SOURCE3} \
-%else
+pushd pc
+%configure2_5x \
 	CFLAGS="" \
-%endif
 	TARGET_LDFLAGS=-static \
 	--with-platform=pc \
     %ifarch x86_64
@@ -351,7 +323,6 @@ cd pc
 	--libexecdir=%{libdir32} \
 	--with-grubdir=grub2 \
 	--disable-werror \
-	--enable-grub-emu-usb \
 	--enable-grub-mkfont
 %make all
 
@@ -362,8 +333,9 @@ make html
 make pdf
 %endif
 
+popd
+
 %install
-cp %{SOURCE10} .
 %ifarch %{efi}
 cd efi
 %makeinstall_std
@@ -374,19 +346,7 @@ cd efi
 %makeinstall_std -C docs install-pdf
 %endif
 mv %{buildroot}%{_infodir}/grub.info %{buildroot}%{_infodir}/grub2.info
-#install -m644 COPYING INSTALL NEWS README THANKS TODO ChangeLog	\
-#	%{buildroot}%{_docdir}/%{name}
 mv %{buildroot}/etc/bash_completion.d/grub %{buildroot}/etc/bash_completion.d/grub-efi
-
-
-# Script that makes part of grub.cfg persist across updates
-install -m 755 %{SOURCE1} %{buildroot}%{_sysconfdir}/grub.d/
-
-# Ghost config file
- install -m 755 -d %{buildroot}/boot/efi/EFI/rosa/
- install -d %{buildroot}/boot/efi/EFI/rosa/%{name}-efi
- touch %{buildroot}/boot/efi/EFI/rosa/%{name}-efi/grub.cfg
- ln -s ../boot/efi/EFI/rosa/%{name}-efi/grub.cfg %{buildroot}%{_sysconfdir}/%{name}-efi.cfg
 
 # Install ELF files modules and images were created from into
 # the shadow root, where debuginfo generator will grab them from
@@ -401,8 +361,11 @@ do
         TGT=$(echo $MODULE |sed "s,%{buildroot},.debugroot,")
 #        install -m 755 -D $BASE$EXT $TGT
 done
- install -m 755 grub.efi %{buildroot}/boot/efi/EFI/rosa/%{name}-efi/grub.efi
- install -m 755 grubcd.efi %{buildroot}/boot/efi/EFI/rosa/%{name}-efi/grubcd.efi
+
+install -d %{buildroot}/%{_datadir}/%{name}-efi/
+install -m 755 grub.efi %{buildroot}%{_datadir}/%{name}-efi/
+install -m 755 grubcd.efi %{buildroot}%{_datadir}/%{name}-efi/
+
 cd ..
 %endif
 cd pc
@@ -410,25 +373,17 @@ cd pc
 %makeinstall_std
 %if %{with doc}
 %makeinstall_std -C docs install-html
+mv -f %{buildroot}%{_docdir}/grub %{buildroot}%{_docdir}/%{name}
 %endif
 %if %{with pdf}
 %makeinstall_std -C docs install-pdf
 %endif
-mv -f %{buildroot}%{_docdir}/grub %{buildroot}%{_docdir}/%{name}
-#install -m644 COPYING INSTALL NEWS README THANKS TODO ChangeLog	\
-#	%{buildroot}%{_docdir}/%{name}
 
 # (bor) grub.info is harcoded in sources
 mv %{buildroot}%{_infodir}/grub.info %{buildroot}%{_infodir}/grub2.info
 
-# Script that makes part of grub.cfg persist across updates
-install -m 755 %{SOURCE1} %{buildroot}%{_sysconfdir}/grub.d/
-
-# Ghost config file
 install -d %{buildroot}/boot/%{name}
 install -d %{buildroot}/boot/%{name}/locale
-touch %{buildroot}/boot/%{name}/grub.cfg
-ln -s ../boot/%{name}/grub.cfg %{buildroot}%{_sysconfdir}/%{name}.cfg
 
 # Install ELF files modules and images were created from into
 # the shadow root, where debuginfo generator will grab them from
@@ -441,7 +396,6 @@ do
         # have both boot.img and boot.mod ...
         EXT=$(echo $MODULE |grep -q '.mod' && echo '.elf' || echo '.exec')
         TGT=$(echo $MODULE |sed "s,%{buildroot},.debugroot,")
-#        install -m 755 -D $BASE$EXT $TGT
 done
 # Defaults
 install -m 644 -D %{SOURCE2} %{buildroot}%{_sysconfdir}/default/grub
@@ -463,24 +417,8 @@ EOF
 	popd
 }
 
-#mv -f %{buildroot}/%{libdir32}/grub %{buildroot}/%{libdir32}/%{name}
-#mv -f %{buildroot}/%{_datadir}/grub %{buildroot}/%{_datadir}/%{name}
-
-# Windows EFI entry
-install -m 755 %{SOURCE12} %{buildroot}%{_sysconfdir}/grub.d
-
-# repair section
-install -m 755 %{SOURCE13} %{buildroot}%{_sysconfdir}/grub.d
-
-# <akdengi> install programm to change option in /etc/default/grub
-install -m 755 %{SOURCE14} %{buildroot}%{_sbindir}/grub2-cfg-mod
-
 %find_lang grub
-
-#drop all zero-length file
-#find %{buildroot} -size 0 -delete
 
 #Copy font to properly place
 mkdir -p %{buildroot}/boot/%{name}/fonts/
 cp -f %{buildroot}%{_datadir}/grub/unicode.pf2 %{buildroot}/boot/%{name}/fonts/
-

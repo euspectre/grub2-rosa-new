@@ -1,0 +1,68 @@
+From 8ada906031d9bd86547db82647f91cdf7db54fbf Mon Sep 17 00:00:00 2001
+From: Michael Chang <mchang@suse.com>
+Date: Thu, 13 Sep 2018 16:08:20 +0800
+Subject: [PATCH 5/5] msdos: Fix overflow in converting partition start and
+ length into 512B blocks
+
+When booting from NVME SSD with 4k sector size, it fails with the message.
+
+error: attempt to read or write outside of partition.
+
+This patch fixes the problem by fixing overflow in converting partition start
+and length into 512B blocks.
+
+Signed-off-by: Michael Chang <mchang@suse.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/partmap/msdos.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/grub-core/partmap/msdos.c b/grub-core/partmap/msdos.c
+index 6d4b455a1..7b8e45076 100644
+--- a/grub-core/partmap/msdos.c
++++ b/grub-core/partmap/msdos.c
+@@ -175,9 +175,9 @@ grub_partition_msdos_iterate (grub_disk_t disk,
+ 	  e = mbr.entries + p.index;
+ 
+ 	  p.start = p.offset
+-	    + (grub_le_to_cpu32 (e->start)
++	    + ((grub_disk_addr_t)grub_le_to_cpu32 (e->start)
+ 	       << (disk->log_sector_size - GRUB_DISK_SECTOR_BITS)) - delta;
+-	  p.len = grub_le_to_cpu32 (e->length)
++	  p.len = (grub_uint64_t)grub_le_to_cpu32 (e->length)
+ 	    << (disk->log_sector_size - GRUB_DISK_SECTOR_BITS);
+ 	  p.msdostype = e->type;
+ 
+@@ -210,7 +210,7 @@ grub_partition_msdos_iterate (grub_disk_t disk,
+ 	  if (grub_msdos_partition_is_extended (e->type))
+ 	    {
+ 	      p.offset = ext_offset
+-		+ (grub_le_to_cpu32 (e->start)
++		+ ((grub_disk_addr_t)grub_le_to_cpu32 (e->start)
+ 		   << (disk->log_sector_size - GRUB_DISK_SECTOR_BITS));
+ 	      if (! ext_offset)
+ 		ext_offset = p.offset;
+@@ -294,9 +294,9 @@ pc_partition_map_embed (struct grub_disk *disk, unsigned int *nsectors,
+ 
+ 	  if (!grub_msdos_partition_is_empty (e->type)
+ 	      && end > offset
+-	      + (grub_le_to_cpu32 (e->start)
++	      + ((grub_disk_addr_t)grub_le_to_cpu32 (e->start)
+ 		 << (disk->log_sector_size - GRUB_DISK_SECTOR_BITS)))
+-	    end = offset + (grub_le_to_cpu32 (e->start)
++	    end = offset + ((grub_disk_addr_t)grub_le_to_cpu32 (e->start)
+ 			    << (disk->log_sector_size - GRUB_DISK_SECTOR_BITS));
+ 
+ 	  /* If this is a GPT partition, this MBR is just a dummy.  */
+@@ -312,7 +312,7 @@ pc_partition_map_embed (struct grub_disk *disk, unsigned int *nsectors,
+ 	  if (grub_msdos_partition_is_extended (e->type))
+ 	    {
+ 	      offset = ext_offset 
+-		+ (grub_le_to_cpu32 (e->start) 
++		+ ((grub_disk_addr_t)grub_le_to_cpu32 (e->start)
+ 		   << (disk->log_sector_size - GRUB_DISK_SECTOR_BITS));
+ 	      if (! ext_offset)
+ 		ext_offset = offset;
+-- 
+2.17.1
+

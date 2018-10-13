@@ -1,0 +1,16 @@
+GRUB may still require the fonts from 'fonts-ttf-unifont' package, so let us
+may sure it finds them.
+
+diff --git a/configure.ac b/configure.ac
+index edd184154..66a804650 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1644,7 +1644,7 @@ AC_SUBST([DJVU_FONT_SOURCE])
+ FONT_SOURCE=
+ 
+ for ext in pcf pcf.gz bdf bdf.gz ttf ttf.gz; do
+-  for dir in . /usr/src /usr/share/fonts/X11/misc /usr/share/fonts/unifont /usr/share/fonts/uni /usr/share/fonts/truetype/unifont /usr/share/fonts/misc; do
++  for dir in . /usr/src /usr/share/fonts/X11/misc /usr/share/fonts/unifont /usr/share/fonts/uni /usr/share/fonts/truetype/unifont /usr/share/fonts/misc /usr/share/fonts/TTF/unifont; do
+     if test -f "$dir/unifont.$ext"; then
+       md5="$(md5sum "$dir/unifont.$ext"|awk '{ print $1; }')"
+       # PCF and BDF from version 6.3 isn't hanled properly by libfreetype.

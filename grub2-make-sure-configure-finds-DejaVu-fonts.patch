@@ -1,0 +1,23 @@
+From: Evgenii Shatokhin <eshatokhin@virtuozzo.com>
+Date: Tue, 9 Oct 2018 23:02:00 +0300
+Subject: Make sure configure finds DejaVu fonts if needed
+
+'configure' currently looks for the DejaVuSans font (required by some
+themes) in several locations but not in /usr/share/fonts/TTF/dejavu/
+where the font is kept in ROSA. Fix that.
+
+Signed-off-by: Evgenii Shatokhin <eshatokhin@virtuozzo.com>
+---
+diff --git a/configure.ac b/configure.ac
+index eb11d4188..d05ee73f5 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1611,7 +1611,7 @@ fi
+ 
+ if test x"$starfield_excuse" = x; then
+    for ext in pcf pcf.gz bdf bdf.gz ttf ttf.gz; do
+-     for dir in . /usr/src /usr/share/fonts/X11/misc /usr/share/fonts/truetype/ttf-dejavu /usr/share/fonts/dejavu /usr/share/fonts/truetype; do
++     for dir in . /usr/src /usr/share/fonts/X11/misc /usr/share/fonts/truetype/ttf-dejavu /usr/share/fonts/dejavu /usr/share/fonts/TTF/dejavu /usr/share/fonts/truetype; do
+         if test -f "$dir/DejaVuSans.$ext"; then
+           DJVU_FONT_SOURCE="$dir/DejaVuSans.$ext"
+           break 2

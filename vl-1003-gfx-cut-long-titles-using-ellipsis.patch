@@ -1,0 +1,76 @@
+From 016b8ba052f77cb62fef4eeb4ca4272ee3053c2c Mon Sep 17 00:00:00 2001
+From: Konstantin Vlasov <kvlasov@odin.com>
+Date: Fri, 6 Nov 2015 17:35:47 +0300
+Subject: [PATCH 3/3] Themes: Cut long boot menu titles using ellipsis.
+
+---
+ grub-core/gfxmenu/gui_list.c | 42 +++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 41 insertions(+), 1 deletion(-)
+
+diff --git a/grub-core/gfxmenu/gui_list.c b/grub-core/gfxmenu/gui_list.c
+index 5d26811..88b23b8 100644
+--- a/grub-core/gfxmenu/gui_list.c
++++ b/grub-core/gfxmenu/gui_list.c
+@@ -311,6 +311,43 @@ draw_scrollbar (list_impl_t self,
+   thumb->draw (thumb, thumbx, thumby);
+ }
+ 
++/* Cuts several last characters replacing them with ellipsis, so that total
++   string length fit required width. */
++static void
++cut_string_to_width (grub_font_t font, char *str, int width)
++{
++  char *char_cut;
++  int len;
++
++  if ((str == NULL) || (*str == '\0'))
++    return;
++  if (grub_font_get_string_width(font, str) <= width)
++    return;
++
++  len = grub_strlen(str);
++  if (len < 4)
++    return;
++
++  /* Start with replacing the last 3 characters with ellispis.
++     In UTF-8 it takes 3 bytes, so we have no buffer overflow. */
++  char_cut = str + len - 3;
++  while (char_cut > str)
++    {
++      if ((*char_cut & 0xc0) == 0x80)
++        {
++          /* Skip non-first bytes from UTF-8 code sequences. */
++          --char_cut;
++          continue;
++        }
++      /* UTF-8 representation of U+2026 (Horizontal Ellipsis) is E2 80 A6. */
++      grub_strcpy(char_cut, "\xe2\x80\xa6");
++      if (grub_font_get_string_width(font, str) <= width)
++        return;
++      /* If still does not fit, cut one more character and repeat. */
++      --char_cut;
++    }
++}
++
+ /* Draw the list of items.  */
+ static void
+ draw_menu (list_impl_t self, int num_shown_items)
+@@ -433,11 +470,14 @@ draw_menu (list_impl_t self, int num_shown_items)
+       sviewport.y = item_top + top_pad;
+       sviewport.width = viewport_width;
+       grub_gui_set_viewport (&sviewport, &svpsave);
+-      grub_font_draw_string (item_title,
++      char* item_title_cut = grub_strdup(item_title);
++      cut_string_to_width(font, item_title_cut, cwidth - 8);
++      grub_font_draw_string (item_title_cut,
+                              font,
+                              color,
+                              0,
+                              text_top_offset);
++      grub_free(item_title_cut);
+       grub_gui_restore_viewport (&svpsave);
+ 
+       item_top += text_box_height + item_vspace;
+-- 
+1.8.3.1
+

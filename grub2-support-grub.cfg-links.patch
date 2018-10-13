@@ -1,0 +1,101 @@
+Author: Konstantin Vlasov <konstantin.vlasov@rosalab.ru>
+Date:   Thu Feb 12 18:01:25 2015 +0300
+
+    Added option for inserting linked grub2 menuentries
+    
+    1. If GRUB_OS_PROBER_LINKED=true, instead of embedding os-probed menu entries, a link to the target grub.cfg is created.
+    2. Exception: If currently booted system uses separate /boot, and the probed system also uses the same separate /boot, then GRUB_OS_PROBER_LINKED value for this system is ignored, and standard menuentry is created. (Otherwise the resulting menuentry will not boot the target OS, but reload the current grub.cfg.)
+    3. If the probed system uses separate /boot (different from the currently used /boot), the entry name is formatted like that: "sda2: ROSA Desktop (sda5), Fedora (sda6)...", where "sda2" is the target /boot, sda5/sda6/etc. are respective root partitions, and distro names are the shortened versions of the original target OS names (one or two first words).
+    
+[eshatokhin@virtuozzo.com: rediffed for GRUB 2.02]
+
+diff --git a/util/grub-mkconfig.in b/util/grub-mkconfig.in
+index de9c7b5ec..781e1d089 100644
+--- a/util/grub-mkconfig.in
++++ b/util/grub-mkconfig.in
+@@ -222,6 +222,7 @@ export GRUB_DEFAULT \
+   GRUB_THEME \
+   GRUB_GFXPAYLOAD_LINUX \
+   GRUB_DISABLE_OS_PROBER \
++  GRUB_OS_PROBER_LINKED \
+   GRUB_INIT_TUNE \
+   GRUB_SAVEDEFAULT \
+   GRUB_ENABLE_CRYPTODISK \
+diff --git a/util/grub.d/30_os-prober.in b/util/grub.d/30_os-prober.in
+index d4da219e7..d577046f0 100644
+--- a/util/grub.d/30_os-prober.in
++++ b/util/grub.d/30_os-prober.in
+@@ -109,6 +109,8 @@ EOF
+ }
+ 
+ used_osprober_linux_ids=
++declare -A common_boot_distro_names
++declare -A common_boot_distro_entries
+ 
+ for OS in ${OSPROBED} ; do
+   DEVICE="`echo ${OS} | cut -d ':' -f 1`"
+@@ -212,6 +214,17 @@ EOF
+         LINITRD="`echo ${LINUX} | cut -d ':' -f 5`"
+         LPARAMS="`echo ${LINUX} | cut -d ':' -f 6- | tr '^' ' '`"
+ 
++	if [ "${LBOOT::6}" = "grub2-" ]; then
++	  # Special case:
++	  # /dev/sda5:grub2-/dev/sda5::/boot/grub2/grub.cfg
++	  # means that instead of extracting boot entries, a link to config file should be created.
++	  # LKERNEL is path to the target grub.cfg
++	  ENTRYLINK=true
++	  LBOOT="${LBOOT#grub2-}"
++	else
++	  ENTRYLINK=false
++	fi
++
+ 	if [ "${LROOT}" != "${LBOOT}" ]; then
+ 	  LKERNEL="${LKERNEL#/boot}"
+ 	  LINITRD="${LINITRD#/boot}"
+@@ -257,6 +270,37 @@ EOF
+ 			;;
+ 	esac
+ 
++	if [ "x$ENTRYLINK" = "xtrue" ]; then
++	  # Short title consists of the first one or two words of the full title, the second word is used only when it contains no digits.
++	  # Examples: ROSA Desktop Fresh R5 -> ROSA Desktop; Fedora 21 -> Fedora; SomeLinux X8 -> SomeLinux
++	  title_short="$(echo ${title} | perl -wpe 's/^(\S+(\s+[a-z_]+\b)?).*$/$1/is')"
++
++	  # The most part of the menuentry contents
++	  menuentry_body="--class ${CLASS} --class gnu-linux --class gnu --class os \$menuentry_id_option 'osprober-gnulinux-simple-link-$boot_device_id' {
++$(save_default_entry | sed -e "s/^/\t/"; add_options; printf '%s\n' "${prepare_boot_cache}")
++	configfile ${LKERNEL}
++}"
++
++	  if [ "${LROOT}" != "${LBOOT}" ]; then
++	    # If separate /boot, collect all entries with the same /boot and combine them into single entry:
++	    # they all would point to the same grub.cfg, so no need to duplicate them.
++	    # Using short titles (to fit them all into limited width) and specify the root partition for each system.
++	    # Actual output will be performed after os-prober cycle is finished.
++	    if [ -z "${common_boot_distro_names[${LBOOT}]}" ]; then
++	      common_boot_distro_names[${LBOOT}]="${LBOOT#/dev/}: ${title_short} (${LROOT#/dev/})"
++	      common_boot_distro_entries[${LBOOT}]="${menuentry_body}"
++	    else
++	      common_boot_distro_names[${LBOOT}]="${common_boot_distro_names[${LBOOT}]}, ${title_short} (${LROOT#/dev/})"
++	    fi
++	  else
++	    # If /boot is a directory within the root partition, just output the resulting entry using full title,
++	    # there are no other systems.
++	    echo "menuentry '$(echo "${LBOOT#/dev/}: ${title}" | grub_quote)' ${menuentry_body}"
++	  fi
++	  # In any case, skip the rest of the processing.
++	  continue
++	fi
++
+ 	VKERNEL=`echo $LKERNEL | sed -e 's,^\(/boot\)\?\(/vmlinuz-\|/vmlinux-\|/kernel-\),,'`
+ 	message_kernel="$(gettext_printf "Loading Linux %s ..." ${VKERNEL})"
+ 	message_initrd="$(gettext_printf "Loading initial ramdisk ...")"
+@@ -391,3 +435,8 @@ EOF
+       esac
+   esac
+ done
++
++# Now output entries for systems with separate /boot.
++for LBOOT in "${!common_boot_distro_names[@]}"; do
++  echo "menuentry '$(echo "${common_boot_distro_names[${LBOOT}]}" | grub_quote)' ${common_boot_distro_entries[${LBOOT}]}"
++done

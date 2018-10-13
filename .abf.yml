@@ -1,4 +1,3 @@
 sources:
-  grub-2.00.tar.gz: c6c950d980638942c27f80bc7907c02eb34677a8
+  grub-2.02.tar.xz: 3d7eb6eaab28b88cb969ba9ab24af959f4d1b178
   grub2-po-update.tar.gz: a070d4b6548821ebcf3e3354b268096fd9811fa9
-  grub_guide.tar.gz: f300e9f0c86512bb90f5e82fa65636fcb5d644a7

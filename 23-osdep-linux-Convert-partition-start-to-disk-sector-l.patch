@@ -1,0 +1,41 @@
+From 5b9308aff04594fd9f351949fdc2c7e6c2da1a2b Mon Sep 17 00:00:00 2001
+From: Mihai Moldovan <ionic@ionic.de>
+Date: Thu, 6 Sep 2018 16:16:39 +0200
+Subject: [PATCH 4/5] osdep/linux: Convert partition start to disk sector
+ length
+
+When reading data off a disk, sector values are based on the disk sector
+length.
+
+Within grub_util_fd_open_device(), the start of the partition was taken
+directly from grub's partition information structure, which uses the
+internal sector length (currently 512b), but never transformed to the
+disk's sector length.
+
+Subsequent calculations were all wrong for devices that have a diverging
+sector length and the functions eventually skipped to the wrong stream
+location, reading invalid data.
+
+Signed-off-by: Mihai Moldovan <ionic@ionic.de>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/osdep/linux/hostdisk.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/grub-core/osdep/linux/hostdisk.c b/grub-core/osdep/linux/hostdisk.c
+index 06179fca7..8b92f8528 100644
+--- a/grub-core/osdep/linux/hostdisk.c
++++ b/grub-core/osdep/linux/hostdisk.c
+@@ -374,7 +374,8 @@ grub_util_fd_open_device (const grub_disk_t disk, grub_disk_addr_t sector, int f
+     char dev[PATH_MAX];
+     grub_disk_addr_t part_start = 0;
+ 
+-    part_start = grub_partition_get_start (disk->partition);
++    part_start = grub_partition_get_start (disk->partition)
++                 >> (disk->log_sector_size - GRUB_DISK_SECTOR_BITS);
+ 
+     strncpy (dev, grub_util_biosdisk_get_osdev (disk), sizeof (dev) - 1);
+     dev[sizeof(dev) - 1] = '\0';
+-- 
+2.17.1
+

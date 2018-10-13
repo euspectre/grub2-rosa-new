@@ -1,0 +1,70 @@
+From 8b467844e11170077c8ca727c39d2bd36eeb5f08 Mon Sep 17 00:00:00 2001
+From: Adam Williamson <awilliam@redhat.com>
+Date: Wed, 4 Jul 2018 09:55:52 -0700
+Subject: [PATCH 3/5] python: Use AM_PATH_PYTHON to determine interpreter for
+ gentpl.py
+
+gentpl.py is python2/3-agnostic, but there's no way to cause it
+to be run with any interpreter other than 'python', it's just
+hard-coded into Makefile.common that way. Adjust that to use
+AM_PATH_PYTHON (provided by automake) to find an interpreter
+and run gentpl.py with that instead. This makes grub buildable
+when `python` does not exist (but rather `python3` or `python2`
+or `python2.7`, etc.) Minimum version is set to 2.6 as this is
+the first version with `__future__.print_function` available.
+
+Note, AM_PATH_PYTHON respects the PYTHON environment variable
+and will treat its value as the *only* candidate for a valid
+interpreter if it is set - when PYTHON is set, AM_PATH_PYTHON
+will not try to find any alternative interpreter, it will only
+check whether the interpreter set as the value of PYTHON meets
+the requirements and use it if so or fail if not. This means
+that when using grub's `autogen.sh`, as it too uses the value
+of the PYTHON environment variable (and if it is not set, just
+sets it to 'python') you cannot rely on AM_PATH_PYTHON
+interpreter discovery. If your desired Python interpreter is
+not just 'python', you must set the PYTHON environment variable,
+e.g. 'PYTHON=/usr/local/bin/python3 ./autogen.sh'. The specified
+interpreter will then be used both by autogen.sh itself and by
+the autotools-driven build scripts.
+
+Signed-off-by: Adam Williamson <awilliam@redhat.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ conf/Makefile.common | 4 ++--
+ configure.ac         | 1 +
+ 2 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/conf/Makefile.common b/conf/Makefile.common
+index 311da61c6..f761f7224 100644
+--- a/conf/Makefile.common
++++ b/conf/Makefile.common
+@@ -128,11 +128,11 @@ BUILT_SOURCES =
+ 
+ .PRECIOUS: $(top_srcdir)/Makefile.util.am
+ $(top_srcdir)/Makefile.util.am: $(top_srcdir)/gentpl.py $(top_srcdir)/Makefile.util.def $(top_srcdir)/Makefile.utilgcry.def
+-	python $^ > $@.new || (rm -f $@.new; exit 1)
++	$(PYTHON) $^ > $@.new || (rm -f $@.new; exit 1)
+ 	mv $@.new $@
+ 
+ .PRECIOUS: $(top_srcdir)/grub-core/Makefile.core.am
+ $(top_srcdir)/grub-core/Makefile.core.am: $(top_srcdir)/gentpl.py $(top_srcdir)/grub-core/Makefile.core.def $(top_srcdir)/grub-core/Makefile.gcry.def
+ 	if [ "x$$GRUB_CONTRIB" != x ]; then echo "You need to run ./autogen.sh manually." >&2; exit 1; fi
+-	python $^ > $@.new || (rm -f $@.new; exit 1)
++	$(PYTHON) $^ > $@.new || (rm -f $@.new; exit 1)
+ 	mv $@.new $@
+diff --git a/configure.ac b/configure.ac
+index 903f58eb7..5e63c4af3 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -341,6 +341,7 @@ gl_EARLY
+ AC_PROG_CXX
+ AM_PROG_CC_C_O
+ AM_PROG_AS
++AM_PATH_PYTHON([2.6])
+ 
+ # Must be GCC.
+ test "x$GCC" = xyes || AC_MSG_ERROR([GCC is required])
+-- 
+2.17.1
+

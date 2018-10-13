@@ -1,3 +1,5 @@
+Subject: Make grub.cfg world-readable if it contains no passwords
+
 diff -Naur grub-2.00//util/grub-mkconfig.in grub-new//util/grub-mkconfig.in
 --- grub-2.00//util/grub-mkconfig.in	2012-04-05 21:41:07.000000000 +0400
 +++ grub-new//util/grub-mkconfig.in	2012-07-23 18:27:18.577102974 +0400

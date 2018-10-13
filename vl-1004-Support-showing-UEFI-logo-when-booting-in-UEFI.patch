@@ -1,0 +1,29 @@
+From 63d7e2de007a8a1b2fc10746e72ec471e46f93d3 Mon Sep 17 00:00:00 2001
+From: Konstantin Vlasov <kvlasov@odin.com>
+Date: Mon, 9 Nov 2015 21:24:50 +0300
+Subject: [PATCH] Support showing UEFI logo when booting in UEFI
+
+---
+ grub-core/gfxmenu/gui_image.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/grub-core/gfxmenu/gui_image.c b/grub-core/gfxmenu/gui_image.c
+index 29784ed..380328c 100644
+--- a/grub-core/gfxmenu/gui_image.c
++++ b/grub-core/gfxmenu/gui_image.c
+@@ -76,6 +76,12 @@ image_paint (void *vself, const grub_video_rect_t *region)
+   if (!grub_video_have_common_points (region, &self->bounds))
+     return;
+ 
++#if !defined (GRUB_MACHINE_EFI)
++  /* Special case for UEFI logo: do not draw it in BIOS mode */
++  if (grub_strcmp (self->id, "__uefi__") == 0)
++    return;
++#endif
++
+   grub_gui_set_viewport (&self->bounds, &vpsave);
+   grub_video_blit_bitmap (self->bitmap, GRUB_VIDEO_BLIT_BLEND,
+                           0, 0, 0, 0,
+-- 
+1.8.3.1
+

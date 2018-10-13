@@ -1,0 +1,61 @@
+From d62cafcf357f9103d9aea6eb4702b862dc67659a Mon Sep 17 00:00:00 2001
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+Date: Thu, 9 Aug 2018 18:10:51 +0200
+Subject: [PATCH] ahci: Increase time-out from 10 s to 32 s
+
+This is a cryptographically signed message in MIME format.
+
+Date: Thu, 9 Aug 2018 07:27:35 +0200
+
+Currently, the GRUB payload for coreboot does not detect the Western
+Digital hard disk WDC WD20EARS-60M AB51 connected to the ASRock E350M1,
+as that takes over ten seconds to spin up.
+
+```
+disk/ahci.c:533: port 0, err: 0
+disk/ahci.c:539: port 0, err: 0
+disk/ahci.c:543: port 0, err: 0
+disk/ahci.c:549: port 0, offset: 120, tfd:80, CMD: 6016
+disk/ahci.c:552: port 0, err: 0
+disk/ahci.c:563: port 0, offset: 120, tfd:80, CMD: 6016
+disk/ahci.c:566: port: 0, err: 0
+disk/ahci.c:593: port 0 is busy
+disk/ahci.c:621: cleaning up failed devs
+```
+
+GRUB detects the drive, when either unloading the module *ahci*, and
+then loading it again, or when doing a warm reset.
+
+As the ten second time-out is too short, increase it to 32 seconds,
+used by SeaBIOS. which detects the drive successfully.
+
+The AHCI driver in libpayload uses 30 seconds, and that time-out was
+added in commit 354066e1 (libpayload: ahci: Increase timeout for
+signature reading) with the description below.
+
+> We can't read the drives signature before it's ready, i.e. spun up.
+> So set the timeout to the standard 30s. Also put a notice on the
+> console, so the user knows why the signature reading failed.
+
+Signed-off-by: Paul Menzel <pmenzel@molgen.mpg.de>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/disk/ahci.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/grub-core/disk/ahci.c b/grub-core/disk/ahci.c
+index f2f606423..0e6d56c24 100644
+--- a/grub-core/disk/ahci.c
++++ b/grub-core/disk/ahci.c
+@@ -576,7 +576,7 @@ grub_ahci_pciinit (grub_pci_device_t dev,
+ 	    grub_ahci_readwrite_real (dev, &parms2, 1, 1);*/
+       }
+ 
+-  endtime = grub_get_time_ms () + 10000;
++  endtime = grub_get_time_ms () + 32000;
+ 
+   while (grub_get_time_ms () < endtime)
+     {
+-- 
+2.17.1
+

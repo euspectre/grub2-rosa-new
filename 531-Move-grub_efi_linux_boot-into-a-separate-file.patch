@@ -1,0 +1,200 @@
+Move grub_efi_linux_boot() into a separate source file. This is needed
+for subsequent patches.
+
+This is a common part of the following patch from RHEL:
+
+  From edfc2b0952b1eacf95188e53167cc038e5ea0129 Mon Sep 17 00:00:00 2001
+  From: Peter Jones <pjones@redhat.com>
+  Date: Thu, 18 Sep 2014 11:26:14 -0400
+  Subject: [PATCH 122/250] Load arm with SB enabled.
+
+diff --git a/grub-core/Makefile.core.def b/grub-core/Makefile.core.def
+index 7f3d5a2bfe6..5ae70204cd2 100644
+--- a/grub-core/Makefile.core.def
++++ b/grub-core/Makefile.core.def
+@@ -1776,6 +1778,7 @@ module = {
+   name = linuxefi;
+   efi = loader/i386/efi/linux.c;
+   efi = lib/cmdline.c;
++  efi = loader/efi/linux.c;
+   enable = i386_efi;
+   enable = x86_64_efi;
+ };
+diff --git a/grub-core/loader/efi/linux.c b/grub-core/loader/efi/linux.c
+new file mode 100644
+index 00000000000..aea378adf5c
+--- /dev/null
++++ b/grub-core/loader/efi/linux.c
+@@ -0,0 +1,65 @@
++/*
++ *  GRUB  --  GRand Unified Bootloader
++ *  Copyright (C) 2014 Free Software Foundation, Inc.
++ *
++ *  GRUB is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 3 of the License, or
++ *  (at your option) any later version.
++ *
++ *  GRUB is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with GRUB.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include <grub/err.h>
++#include <grub/mm.h>
++#include <grub/types.h>
++#include <grub/cpu/linux.h>
++#include <grub/efi/efi.h>
++#include <grub/efi/pe32.h>
++#include <grub/efi/linux.h>
++
++#define SHIM_LOCK_GUID \
++ { 0x605dab50, 0xe046, 0x4300, {0xab, 0xb6, 0x3d, 0xd8, 0x10, 0xdd, 0x8b, 0x23} }
++
++struct grub_efi_shim_lock
++{
++  grub_efi_status_t (*verify) (void *buffer, grub_uint32_t size);
++};
++typedef struct grub_efi_shim_lock grub_efi_shim_lock_t;
++
++grub_efi_boolean_t
++grub_linuxefi_secure_validate (void *data, grub_uint32_t size)
++{
++  grub_efi_guid_t guid = SHIM_LOCK_GUID;
++  grub_efi_shim_lock_t *shim_lock;
++
++  shim_lock = grub_efi_locate_protocol(&guid, NULL);
++
++  if (!shim_lock)
++    return 1;
++
++  if (shim_lock->verify(data, size) == GRUB_EFI_SUCCESS)
++    return 1;
++
++  return 0;
++}
++
++typedef void (*handover_func) (void *, grub_efi_system_table_t *, void *);
++
++grub_err_t
++grub_efi_linux_boot (void *kernel_addr, grub_off_t offset,
++		     void *kernel_params)
++{
++  handover_func hf;
++
++  hf = (handover_func)((char *)kernel_addr + offset);
++  hf (grub_efi_image_handle, grub_efi_system_table, kernel_params);
++
++  return GRUB_ERR_BUG;
++}
+diff --git a/grub-core/loader/i386/efi/linux.c b/grub-core/loader/i386/efi/linux.c
+index b79e6320ba9..e5b778577f9 100644
+--- a/grub-core/loader/i386/efi/linux.c
++++ b/grub-core/loader/i386/efi/linux.c
+@@ -26,6 +26,7 @@
+ #include <grub/i18n.h>
+ #include <grub/lib/cmdline.h>
+ #include <grub/efi/efi.h>
++#include <grub/efi/linux.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+@@ -40,52 +41,18 @@ static char *linux_cmdline;
+ 
+ #define BYTES_TO_PAGES(bytes)   (((bytes) + 0xfff) >> 12)
+ 
+-#define SHIM_LOCK_GUID \
+-  { 0x605dab50, 0xe046, 0x4300, {0xab, 0xb6, 0x3d, 0xd8, 0x10, 0xdd, 0x8b, 0x23} }
+-
+-struct grub_efi_shim_lock
+-{
+-  grub_efi_status_t (*verify) (void *buffer, grub_uint32_t size);
+-};
+-typedef struct grub_efi_shim_lock grub_efi_shim_lock_t;
+-
+-static grub_efi_boolean_t
+-grub_linuxefi_secure_validate (void *data, grub_uint32_t size)
+-{
+-  grub_efi_guid_t guid = SHIM_LOCK_GUID;
+-  grub_efi_shim_lock_t *shim_lock;
+-
+-  shim_lock = grub_efi_locate_protocol(&guid, NULL);
+-
+-  if (!shim_lock)
+-    return 1;
+-
+-  if (shim_lock->verify(data, size) == GRUB_EFI_SUCCESS)
+-    return 1;
+-
+-  return 0;
+-}
+-
+-typedef void(*handover_func)(void *, grub_efi_system_table_t *, struct linux_kernel_params *);
+-
+ static grub_err_t
+ grub_linuxefi_boot (void)
+ {
+-  handover_func hf;
+   int offset = 0;
+ 
+ #ifdef __x86_64__
+   offset = 512;
+ #endif
+-
+-  hf = (handover_func)((char *)kernel_mem + handover_offset + offset);
+-
+   asm volatile ("cli");
+ 
+-  hf (grub_efi_image_handle, grub_efi_system_table, params);
+-
+-  /* Not reached */
+-  return GRUB_ERR_NONE;
++  return grub_efi_linux_boot ((char *)kernel_mem, handover_offset + offset,
++			      params);
+ }
+ 
+ static grub_err_t
+diff --git a/include/grub/efi/linux.h b/include/grub/efi/linux.h
+new file mode 100644
+index 00000000000..d9ede36773b
+--- /dev/null
++++ b/include/grub/efi/linux.h
+@@ -0,0 +1,31 @@
++/*
++ *  GRUB  --  GRand Unified Bootloader
++ *  Copyright (C) 2014  Free Software Foundation, Inc.
++ *
++ *  GRUB is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 3 of the License, or
++ *  (at your option) any later version.
++ *
++ *  GRUB is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with GRUB.  If not, see <http://www.gnu.org/licenses/>.
++ */
++#ifndef GRUB_EFI_LINUX_HEADER
++#define GRUB_EFI_LINUX_HEADER	1
++
++#include <grub/efi/api.h>
++#include <grub/err.h>
++#include <grub/symbol.h>
++
++grub_efi_boolean_t
++EXPORT_FUNC(grub_linuxefi_secure_validate) (void *data, grub_uint32_t size);
++grub_err_t
++EXPORT_FUNC(grub_efi_linux_boot) (void *kernel_address, grub_off_t offset,
++				  void *kernel_param);
++
++#endif /* ! GRUB_EFI_LINUX_HEADER */
+-- 
+2.17.1
+

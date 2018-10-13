@@ -1,0 +1,55 @@
+From: Konstantin Vlasov <konstantin.vlasov@rosalab.ru>
+Date:   Tue Aug 12 15:55:19 2014 +0400
+Subject: Show loading messages also for secondary systems
+
+[eshatokhin@virtuozzo.com: ported the patch to GRUB 2.02]
+
+diff --git a/util/grub.d/30_os-prober.in b/util/grub.d/30_os-prober.in
+index e3faf2c91..d4da219e7 100644
+--- a/util/grub.d/30_os-prober.in
++++ b/util/grub.d/30_os-prober.in
+@@ -257,6 +257,10 @@ EOF
+ 			;;
+ 	esac
+ 
++	VKERNEL=`echo $LKERNEL | sed -e 's,^\(/boot\)\?\(/vmlinuz-\|/vmlinux-\|/kernel-\),,'`
++	message_kernel="$(gettext_printf "Loading Linux %s ..." ${VKERNEL})"
++	message_initrd="$(gettext_printf "Loading initial ramdisk ...")"
++
+ 	if [ "x$is_top_level" = xtrue ] && [ "x${GRUB_DISABLE_SUBMENU}" != xy ]; then
+             cat << EOF
+ menuentry '$(echo "$title $onstr" | grub_quote)' $CLASS --class gnu-linux --class gnu --class os \$menuentry_id_option 'osprober-gnulinux-simple-$boot_device_id' {
+@@ -264,10 +268,12 @@ EOF
+ 	    save_default_entry | grub_add_tab
+ 	    printf '%s\n' "${prepare_boot_cache}"
+ 	    cat <<  EOF
++	echo '$message_kernel'
+ 	linux ${LKERNEL} ${LPARAMS}
+ EOF
+             if [ -n "${LINITRD}" ] ; then
+           cat << EOF
++	echo '$message_initrd'
+ 	initrd ${LINITRD}
+ EOF
+             fi
+@@ -287,7 +293,6 @@ EOF
+ 	    fi
+ 	fi
+ 	if [ "x$title_append_vkernel" = xtrue ]; then
+-		VKERNEL=`echo $LKERNEL | sed -e 's,^\(/boot\)\?\(/vmlinuz-\|/vmlinux-\|/kernel-\),,'`
+ 		title="${title} - Linux ${VKERNEL}"
+ 	fi
+ 
+@@ -297,10 +302,12 @@ EOF
+ 	save_default_entry | sed -e "s/^/$grub_tab$grub_tab/"
+ 	printf '%s\n' "${prepare_boot_cache}" | grub_add_tab
+ 	cat <<  EOF
++		echo '$message_kernel'
+ 		linux ${LKERNEL} ${LPARAMS}
+ EOF
+         if [ -n "${LINITRD}" ] ; then
+             cat << EOF
++		echo '$message_initrd'
+ 		initrd ${LINITRD}
+ EOF
+         fi
