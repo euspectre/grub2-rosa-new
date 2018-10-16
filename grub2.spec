@@ -303,7 +303,7 @@ COMMON_MODULES="
 	search_fs_file search_fs_uuid search_label sleep squash4 test
 	true video xfs
 "
-./grub-mkimage -O %{grubefiarch} -p /EFI/rosa/%{name}-efi -o grub.efi -d grub-core ${COMMON_MODULES}
+./grub-mkimage -O %{grubefiarch} -p /EFI/rosa -o grub.efi -d grub-core ${COMMON_MODULES}
 ./grub-mkimage -O %{grubefiarch} -p /BOOT/EFI -o grubcd.efi -d grub-core ${COMMON_MODULES} iso9660
 
 popd
