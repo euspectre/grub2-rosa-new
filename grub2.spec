@@ -180,6 +180,7 @@ computer architectures and hardware devices.
 %{_sysconfdir}/bash_completion.d/grub
 %dir /boot/%{name}
 %dir /boot/%{name}/locale
+%ghost %config(noreplace) /boot/%{name}/grub.cfg
 %if %{with doc}
 %doc %{_docdir}/%{name}
 %endif
@@ -404,6 +405,10 @@ mv %{buildroot}%{_infodir}/grub.info %{buildroot}%{_infodir}/grub2.info
 
 install -d %{buildroot}/boot/%{name}
 install -d %{buildroot}/boot/%{name}/locale
+
+# Create the ghost grub.cfg - just to make sure it is not deleted by
+# the updates of grub packages.
+touch %{buildroot}/boot/%{name}/grub.cfg
 
 # Install ELF files modules and images were created from into
 # the shadow root, where debuginfo generator will grab them from
