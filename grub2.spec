@@ -194,12 +194,6 @@ exec >/dev/null 2>&1
 # Create device.map or reuse one from GRUB Legacy
 cp -u /boot/grub/device.map /boot/%{name}/device.map 2>/dev/null ||
 	%{_sbindir}/%{name}-mkdevicemap
-# Determine the partition with /boot
-BOOT_PARTITION=$(df -h /boot |(read; awk '{print $1; exit}'|sed 's/[[:digit:]]*$//'))
-# (Re-)Generate core.img, but don't let it be installed in boot sector
-%{_sbindir}/%{name}-install $BOOT_PARTITION
-# Regenerate configure on install or update
-%{_sbindir}/update-grub2
 #bugfix: error message before loading of grub2 menu on boot
 cp -f /boot/grub2/locale/en@quot.mo /boot/grub2/locale/en.mo
 
@@ -214,6 +208,20 @@ if [ $1 = 0 ]; then
     rm -f /boot/%{name}/device.map
 fi
 
+%posttrans
+# grub2 package can be installed either standalone (on the systems with
+# legacy BIOS) and as a dependency for grub2-efi* (on UEFI systems).
+# In the latter case, that package is responsible for the installation
+# of the boot loader and for updating of /boot/grub2/grub.cfg.
+# grub2 package should not do it.
+if [ ! -d /sys/firmware/efi ]; then
+	# Determine the partition with /boot
+	BOOT_PARTITION=$(df -h /boot | (read; awk '{print $1; exit}'|sed 's/[[:digit:]]*$//'))
+	# (Re-)Generate core.img, but don't let it be installed in boot sector
+	%{_sbindir}/%{name}-install $BOOT_PARTITION
+	# Regenerate configure on install or update
+	%{_sbindir}/update-grub2
+fi
 #-----------------------------------------------------------------------
 
 %ifarch %{efi}
