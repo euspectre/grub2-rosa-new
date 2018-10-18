@@ -218,11 +218,10 @@ fi
 # of the boot loader and for updating of /boot/grub2/grub.cfg.
 # grub2 package should not do it.
 if [ ! -d /sys/firmware/efi ]; then
-	# Determine the partition with /boot
+	# Determine the device where /boot is located
 	BOOT_PARTITION=$(df -h /boot | (read; awk '{print $1; exit}'|sed 's/[[:digit:]]*$//'))
-	# (Re-)Generate core.img, but don't let it be installed in boot sector
 	%{_sbindir}/%{name}-install $BOOT_PARTITION
-	# Regenerate configure on install or update
+	# Regenerate grub.cfg on install or update.
 	%{_sbindir}/update-grub2
 fi
 #-----------------------------------------------------------------------
@@ -236,10 +235,10 @@ Group:		System/Kernel and hardware
 # Although grub2-efi-common does not install the bootloader (grub2-efi
 # should do that instead, for the signed GRUB image), let us pull in
 # efibootmgr anyway, just in case.
-# TODO: require efibootmgr >= 16: needed to support dual-boot and such.
 Requires:	efibootmgr
 # Even on UEFI, we need the common grub tools and convenience scripts.
 Requires:	%{name} = %{EVRD}
+Requires(post):	%{name} = %{EVRD}
 
 %description efi-common
 The GRand Unified Bootloader (GRUB) is a highly configurable and customizable
@@ -266,6 +265,9 @@ images into /boot/efi/EFI/rosa/ manually, sign them if required, etc.
 %{_datadir}/%{name}-efi/*.efi
 %endif
 
+%posttrans efi-common
+# Now that the EFI-specific tools are in place, re-create grub.cfg.
+%{_sbindir}/update-grub2
 #-----------------------------------------------------------------------
 
 %prep
