@@ -125,7 +125,10 @@ BuildRequires:	pkgconfig(fuse)
 
 Requires:	grub2-theme
 Requires:	xorriso
+# os-prober is used by update-grub2 and grub2*-mkconfig and is therefore
+# needed both at post install stage and generally.
 Requires(post):	os-prober >= 1.74
+Requires:	os-prober
 Requires:	e2fsprogs >= 1.42.13
 # Some of the scripts from /etc/grub.d/ may use perl.
 Requires:	perl
