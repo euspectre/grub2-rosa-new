@@ -228,8 +228,15 @@ fi
 %package efi-common
 Summary:	GRUB for EFI systems
 Group:		System/Kernel and hardware
-Suggests:	efibootmgr
+
+# efibootmgr is needed to install the bootloader on UEFI systems.
+# Although grub2-efi-common does not install the bootloader (grub2-efi
+# should do that instead, for the signed GRUB image), let us pull in
+# efibootmgr anyway, just in case.
 # TODO: require efibootmgr >= 16: needed to support dual-boot and such.
+Requires:	efibootmgr
+# Even on UEFI, we need the common grub tools and convenience scripts.
+Requires:	%{name} = %{EVRD}
 
 %description efi-common
 The GRand Unified Bootloader (GRUB) is a highly configurable and customizable
