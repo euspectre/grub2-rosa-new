@@ -1,0 +1,23 @@
+Use the full OS name even if GRUB_DISTRIBUTOR is set
+
+GRUB 2.00 from ROSA had a similar patch, let us use it for GRUB 2.02+ as
+well.
+
+Without it, the system will be named "ROSA" rather than
+"ROSA Desktop Fresh R10" in the boot menu.
+
+Signed-off-by: Evgenii Shatokhin <eshatokhin@virtuozzo.com>
+
+diff --git a/util/grub.d/10_linux.in b/util/grub.d/10_linux.in
+index 3570d2edc..f4a6de8cf 100644
+--- a/util/grub.d/10_linux.in
++++ b/util/grub.d/10_linux.in
+@@ -31,7 +31,7 @@ CLASS="--class gnu-linux --class gnu --class os"
+ if [ "x${GRUB_DISTRIBUTOR}" = "x" ] ; then
+   OS="$(sed 's, release .*$,,g' /etc/system-release)"
+ else
+-  OS="${GRUB_DISTRIBUTOR}"
++  OS="$(sed 's, release .*$,,g' /etc/system-release)"
+   CLASS="--class $(echo ${GRUB_DISTRIBUTOR} | tr 'A-Z' 'a-z' | cut -d' ' -f1|LC_ALL=C sed 's,[^[:alnum:]_],_,g') ${CLASS}"
+ fi
+ 

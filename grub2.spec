@@ -97,6 +97,7 @@ Patch2005:	grub2-Install-signed-images-if-UEFI-Secure-Boot-is-enabled.patch
 Patch2006:	grub2-support-grub.cfg-links.patch
 Patch2007:	grub2-10_linux_hibernate_fix.patch
 Patch2008:	grub2-make-sure-configure-finds-DejaVu-fonts.patch
+Patch2009:	grub2-Use-full-OS-name.patch
 
 BuildRequires:	autogen
 BuildRequires:	automake
