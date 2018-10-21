@@ -7,6 +7,14 @@ Writing messages to the screen before the menus or boot splash
 happens so quickly it looks like something is wrong and isn't
 very appealing.
 ---
+
+eshatokhin: keep the messages output from 10_linux ("Loading ..."),
+they make no harm and look OK. We cannot hide that message window yet
+(some subsystems may still output something there), and the empty window
+may confuse the users.
+
+Signed-off-by: Evgenii Shatokhin <eshatokhin@virtuozzo.com>
+---
  grub-core/gettext/gettext.c       | 25 +++++--------------------
  grub-core/kern/main.c             |  5 -----
  grub-core/boot/i386/pc/boot.S     |  3 ---
@@ -142,40 +150,6 @@ index 1ee4cf5b2e0..c8b87ed293c 100644
  	/* this sets up for the first run through "bootloop" */
  	movw	$LOCAL(firstlist), %di
  
-diff --git a/util/grub.d/10_linux.in b/util/grub.d/10_linux.in
-index 8ccf012f747..a3d9711d607 100644
---- a/util/grub.d/10_linux.in
-+++ b/util/grub.d/10_linux.in
-@@ -128,29 +128,22 @@ linux_entry ()
-     fi
-     printf '%s\n' "${prepare_boot_cache}" | sed "s/^/$submenu_indentation/"
-   fi
--  message="$(gettext_printf "Loading Linux %s ..." ${version})"
-   if [ -d /sys/firmware/efi ]; then
-     sed "s/^/$submenu_indentation/" << EOF
--	echo	'$(echo "$message" | grub_quote)'
- 	linuxefi ${rel_dirname}/${basename} root=${linux_root_device_thisversion} ro ${args}
- EOF
-   else
-     sed "s/^/$submenu_indentation/" << EOF
--	echo	'$(echo "$message" | grub_quote)'
- 	linux	${rel_dirname}/${basename} root=${linux_root_device_thisversion} ro ${args}
- EOF
-   fi
-   if test -n "${initrd}" ; then
--    # TRANSLATORS: ramdisk isn't identifier. Should be translated.
--    message="$(gettext_printf "Loading initial ramdisk ...")"
-     if [ -d /sys/firmware/efi ]; then
-       sed "s/^/$submenu_indentation/" << EOF
--	echo	'$(echo "$message" | grub_quote)'
- 	initrdefi ${rel_dirname}/${initrd}
- EOF
-     else
-       sed "s/^/$submenu_indentation/" << EOF
--	echo	'$message'
- 	initrd	${rel_dirname}/${initrd}
- EOF
-     fi
 -- 
 2.17.1
 

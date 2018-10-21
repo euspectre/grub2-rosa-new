@@ -4,10 +4,10 @@ from hibernate.
 [eshatokhin@virtuozzo.com: adapted the patch to GRUB 2.02]
 
 diff --git a/util/grub.d/10_linux.in b/util/grub.d/10_linux.in
-index 6bcde54b1..2828f9016 100644
+index 926dcd1c7..3570d2edc 100644
 --- a/util/grub.d/10_linux.in
 +++ b/util/grub.d/10_linux.in
-@@ -128,13 +128,27 @@ linux_entry ()
+@@ -128,16 +128,30 @@ linux_entry ()
      fi
      printf '%s\n' "${prepare_boot_cache}" | sed "s/^/$submenu_indentation/"
    fi
@@ -25,13 +25,16 @@ index 6bcde54b1..2828f9016 100644
 +      RESUME_STRING="resume=UUID=$(/sbin/blkid -s UUID $RESUME_DEV | sed 's/.*="//;s/".*//') resume_offset=$RESUME_OFFSET"
 +  fi
 +
+   message="$(gettext_printf "Loading Linux %s ..." ${version})"
    if [ -d /sys/firmware/efi ]; then
      sed "s/^/$submenu_indentation/" << EOF
+ 	echo	'$(echo "$message" | grub_quote)'
 -	linuxefi ${rel_dirname}/${basename} root=${linux_root_device_thisversion} ro ${args}
 +	linuxefi ${rel_dirname}/${basename} root=${linux_root_device_thisversion} ro ${args} ${RESUME_STRING}
  EOF
    else
      sed "s/^/$submenu_indentation/" << EOF
+ 	echo	'$(echo "$message" | grub_quote)'
 -	linux	${rel_dirname}/${basename} root=${linux_root_device_thisversion} ro ${args}
 +	linux	${rel_dirname}/${basename} root=${linux_root_device_thisversion} ro ${args} ${RESUME_STRING}
  EOF
