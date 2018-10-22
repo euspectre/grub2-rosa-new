@@ -1,13 +1,13 @@
 Make sure the system knows which swap partition or file to use to resume
 from hibernate.
 
-[eshatokhin@virtuozzo.com: adapted the patch to GRUB 2.02]
+[eshatokhin@virtuozzo.com: adapted the patch to GRUB 2.02: context change]
 
 diff --git a/util/grub.d/10_linux.in b/util/grub.d/10_linux.in
-index 926dcd1c7..3570d2edc 100644
+index dc248d1..e8b2b5b 100644
 --- a/util/grub.d/10_linux.in
 +++ b/util/grub.d/10_linux.in
-@@ -128,16 +128,30 @@ linux_entry ()
+@@ -128,10 +128,24 @@ linux_entry ()
      fi
      printf '%s\n' "${prepare_boot_cache}" | sed "s/^/$submenu_indentation/"
    fi
@@ -26,17 +26,10 @@ index 926dcd1c7..3570d2edc 100644
 +  fi
 +
    message="$(gettext_printf "Loading Linux %s ..." ${version})"
-   if [ -d /sys/firmware/efi ]; then
-     sed "s/^/$submenu_indentation/" << EOF
- 	echo	'$(echo "$message" | grub_quote)'
--	linuxefi ${rel_dirname}/${basename} root=${linux_root_device_thisversion} ro ${args}
-+	linuxefi ${rel_dirname}/${basename} root=${linux_root_device_thisversion} ro ${args} ${RESUME_STRING}
- EOF
-   else
-     sed "s/^/$submenu_indentation/" << EOF
+   sed "s/^/$submenu_indentation/" << EOF
  	echo	'$(echo "$message" | grub_quote)'
 -	linux	${rel_dirname}/${basename} root=${linux_root_device_thisversion} ro ${args}
 +	linux	${rel_dirname}/${basename} root=${linux_root_device_thisversion} ro ${args} ${RESUME_STRING}
  EOF
-   fi
    if test -n "${initrd}" ; then
+     # TRANSLATORS: ramdisk isn't identifier. Should be translated.

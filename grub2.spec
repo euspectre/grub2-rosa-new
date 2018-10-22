@@ -11,7 +11,7 @@
 Summary:	GRUB is a boot loader
 Name:		grub2
 Version:	2.02
-Release:	3
+Release:	4
 License:	GPLv3+
 Group:		System/Kernel and hardware
 Url:		http://www.gnu.org/software/grub/
@@ -49,7 +49,6 @@ Patch501:	501-Don-t-say-GNU-Linux-in-generated-menus.patch
 Patch502:	502-fix-http-crash.patch
 Patch503:	503-no-insmod-on-sb.patch
 Patch520:	520-Add-support-for-linuxefi.patch
-Patch521:	521-Use-linuxefi-and-initrdefi-where-appropriate.patch
 Patch522:	522-Add-support-for-UEFI-operating-systems-returned-by-o.patch
 Patch523:	523-Honor-a-symlink-when-generating-configuration-by-gru.patch
 Patch524:	524-Fix-race-in-EFI-validation.patch
@@ -81,6 +80,8 @@ Patch567:	567-Fix-margins.patch
 Patch568:	568-Use-2-instead-of-1-for-our-right-hand-margin-so-line.patch
 Patch569:	569-Don-t-draw-a-border-around-the-menu.patch
 Patch570:	570-Use-the-standard-margin-for-the-timeout-string.patch
+Patch571:	571-linuxefi-non-sb-fallback.patch
+Patch572:	572-linuxefi-re-enable-linux-cmd.patch
 
 # Patches from Virtuozzo/VZLinux (some are reworked and updated variants
 # of the patches used in ROSA before)
