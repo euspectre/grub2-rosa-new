@@ -1,0 +1,22 @@
+10_linux: ignore zram* devices when generating "resume=" clause
+
+zram devices are often added as a swap with the highest priority, so they
+will be picked for resume setting, which is not what the user wants.
+
+Let us filter out these devices then.
+
+Signed-off-by: Evgenii Shatokhin <eshatokhin@virtuozzo.com>
+
+diff --git a/util/grub.d/10_linux.in b/util/grub.d/10_linux.in
+index e8b2b5bd5..bac47d91f 100644
+--- a/util/grub.d/10_linux.in
++++ b/util/grub.d/10_linux.in
+@@ -129,7 +129,7 @@ linux_entry ()
+     printf '%s\n' "${prepare_boot_cache}" | sed "s/^/$submenu_indentation/"
+   fi
+ 
+-  PRIMARY_SWAP=$(/sbin/swapon --show="PRIO,NAME,TYPE" --noheading | sort -nr | head -n 1)
++  PRIMARY_SWAP=$(/sbin/swapon --show="PRIO,NAME,TYPE" --noheading | grep -v zram | sort -nr | head -n 1)
+   SWAP_TYPE=$(echo $PRIMARY_SWAP | awk '{print $3}')
+   SWAP_DEV=$(echo $PRIMARY_SWAP | awk '{print $2}')
+   if [ "x$SWAP_TYPE" = "xpartition" ]; then
