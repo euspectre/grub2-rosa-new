@@ -11,7 +11,7 @@
 Summary:	GRUB is a boot loader
 Name:		grub2
 Version:	2.02
-Release:	5
+Release:	6
 License:	GPLv3+
 Group:		System/Kernel and hardware
 Url:		http://www.gnu.org/software/grub/
@@ -43,6 +43,15 @@ Patch19:	19-bufio-Round-up-block-size-to-power-of-2.patch
 Patch22:	22-python-Use-AM_PATH_PYTHON-to-determine-interpreter-f.patch
 Patch23:	23-osdep-linux-Convert-partition-start-to-disk-sector-l.patch
 Patch24:	24-msdos-Fix-overflow-in-converting-partition-start-and.patch
+Patch31:	31-btrfs-Add-support-for-reading-a-filesystem-with-a-RA.patch
+Patch32:	32-btrfs-Add-helper-to-check-the-btrfs-header.patch
+Patch33:	33-btrfs-Move-the-error-logging-from-find_device-to-its.patch
+Patch34:	34-btrfs-Avoid-a-rescan-for-a-device-which-was-already-.patch
+Patch35:	35-btrfs-Move-logging-code-in-grub_btrfs_read_logical.patch
+Patch36:	36-btrfs-Refactor-the-code-that-read-from-disk.patch
+Patch37:	37-btrfs-Add-support-for-recovery-for-a-RAID-5-btrfs-pr.patch
+Patch38:	38-btrfs-Make-more-generic-the-code-for-RAID-6-rebuildi.patch
+Patch39:	39-btrfs-Add-RAID-6-recovery-for-a-btrfs-filesystem.patch
 
 # Patches from RHEL, Fedora and Ubuntu
 Patch501:	501-Don-t-say-GNU-Linux-in-generated-menus.patch

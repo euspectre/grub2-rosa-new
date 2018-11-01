@@ -1,0 +1,67 @@
+From c6f79aca8030689ab2087686654ac431db411fa3 Mon Sep 17 00:00:00 2001
+From: Goffredo Baroncelli <kreijack@inwind.it>
+Date: Mon, 22 Oct 2018 19:29:35 +0200
+Subject: [PATCH 5/9] btrfs: Move logging code in grub_btrfs_read_logical()
+
+A portion of the logging code is moved outside of internal for(;;). The part
+that is left inside is the one which depends on the internal for(;;) index.
+
+This is a preparatory patch. The next one will refactor the code inside
+the for(;;) into an another function.
+
+Signed-off-by: Goffredo Baroncelli <kreijack@inwind.it>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/fs/btrfs.c | 27 +++++++++++++++------------
+ 1 file changed, 15 insertions(+), 12 deletions(-)
+
+diff --git a/grub-core/fs/btrfs.c b/grub-core/fs/btrfs.c
+index ca0277bee..4e5292197 100644
+--- a/grub-core/fs/btrfs.c
++++ b/grub-core/fs/btrfs.c
+@@ -870,6 +870,18 @@ grub_btrfs_read_logical (struct grub_btrfs_data *data, grub_disk_addr_t addr,
+ 
+ 	for (j = 0; j < 2; j++)
+ 	  {
++	    grub_dprintf ("btrfs", "chunk 0x%" PRIxGRUB_UINT64_T
++			  "+0x%" PRIxGRUB_UINT64_T
++			  " (%d stripes (%d substripes) of %"
++			  PRIxGRUB_UINT64_T ")\n",
++			  grub_le_to_cpu64 (key->offset),
++			  grub_le_to_cpu64 (chunk->size),
++			  grub_le_to_cpu16 (chunk->nstripes),
++			  grub_le_to_cpu16 (chunk->nsubstripes),
++			  grub_le_to_cpu64 (chunk->stripe_length));
++	    grub_dprintf ("btrfs", "reading laddr 0x%" PRIxGRUB_UINT64_T "\n",
++			  addr);
++
+ 	    for (i = 0; i < redundancy; i++)
+ 	      {
+ 		struct grub_btrfs_chunk_stripe *stripe;
+@@ -882,20 +894,11 @@ grub_btrfs_read_logical (struct grub_btrfs_data *data, grub_disk_addr_t addr,
+ 
+ 		paddr = grub_le_to_cpu64 (stripe->offset) + stripe_offset;
+ 
+-		grub_dprintf ("btrfs", "chunk 0x%" PRIxGRUB_UINT64_T
+-			      "+0x%" PRIxGRUB_UINT64_T
+-			      " (%d stripes (%d substripes) of %"
+-			      PRIxGRUB_UINT64_T ") stripe %" PRIxGRUB_UINT64_T
++		grub_dprintf ("btrfs", "stripe %" PRIxGRUB_UINT64_T
+ 			      " maps to 0x%" PRIxGRUB_UINT64_T "\n",
+-			      grub_le_to_cpu64 (key->offset),
+-			      grub_le_to_cpu64 (chunk->size),
+-			      grub_le_to_cpu16 (chunk->nstripes),
+-			      grub_le_to_cpu16 (chunk->nsubstripes),
+-			      grub_le_to_cpu64 (chunk->stripe_length),
+ 			      stripen, stripe->offset);
+-		grub_dprintf ("btrfs", "reading paddr 0x%" PRIxGRUB_UINT64_T
+-			      " for laddr 0x%" PRIxGRUB_UINT64_T "\n", paddr,
+-			      addr);
++		grub_dprintf ("btrfs", "reading paddr 0x%" PRIxGRUB_UINT64_T "\n",
++			      paddr);
+ 
+ 		dev = find_device (data, stripe->device_id);
+ 		if (!dev)
+-- 
+2.17.1
+
