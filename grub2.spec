@@ -231,20 +231,32 @@ fi
 #-----------------------------------------------------------------------
 
 %ifarch %{efi}
-%package efi-common
+%package efi
 Summary:	GRUB for EFI systems
 Group:		System/Kernel and hardware
 
 # efibootmgr is needed to install the bootloader on UEFI systems.
-# Although grub2-efi-common does not install the bootloader (grub2-efi
+# Although grub2-efi does not install the bootloader (grub2-efi-signed
 # should do that instead, for the signed GRUB image), let us pull in
 # efibootmgr anyway, just in case.
 Requires:	efibootmgr
 # Even on UEFI, we need the common grub tools and convenience scripts.
 Requires:	%{name} = %{EVRD}
 Requires(post):	%{name} = %{EVRD}
+# The signed grub binaries are in a separate package for now. When automatic
+# signing of EFI binaries is working again, one may move the files into
+# grub2-efi again and get rid of grub2-efi-signed. Still, it can be
+# beneficial to keep grub2-efi-signed separate, for example, to be able
+# to fix the GRUB tools and update grub2-efi RPM without having to sign
+# the EFI images again.
+# In such conditions, " = %{EVRD}" below should be replaced with something
+# like " >= epoch:version-release of the last released grub2-efi-signed".
+Requires:	%{name}-efi-signed = %{EVRD}
 
-%description efi-common
+# TODO: is it needed to add 'Conflicts: grub2-efi < 2.02' here to avoid
+# file conflicts over /boot/efi/EFI/rosa/*?
+
+%description efi
 The GRand Unified Bootloader (GRUB) is a highly configurable and customizable
 bootloader with modular architecture.
 
@@ -253,13 +265,13 @@ architectures and hardware devices.
 
 This package contains provides tools and settings needed to support EFI
 systems but does not install GRUB binaries into /boot/efi/EFI/rosa/. This is
-because signed binaries from "grub-efi" package should go there.
+because signed binaries from "grub-efi-signed" package should go there.
 
 This package, in turn, contains unsigned GRUB binaries, in
 %{_datadir}/grub2-efi/. If a user wants to use them they need to copy these
 images into /boot/efi/EFI/rosa/ manually, sign them if required, etc.
 
-%files efi-common
+%files efi
 /etc/bash_completion.d/grub-efi
 %{libdir32}/grub/%{_arch}-efi/
 %{_sbindir}/%{name}-efi*
@@ -269,7 +281,7 @@ images into /boot/efi/EFI/rosa/ manually, sign them if required, etc.
 %{_datadir}/%{name}-efi/*.efi
 %endif
 
-%posttrans efi-common
+%posttrans efi
 # Now that the EFI-specific tools are in place, re-create grub.cfg.
 %{_sbindir}/update-grub2
 #-----------------------------------------------------------------------
