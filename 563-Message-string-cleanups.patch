@@ -4,6 +4,8 @@ Date: Fri, 7 Jun 2013 11:09:04 -0400
 Subject: [PATCH 092/250] Message string cleanups
 
 Make use of terminology consistent. Remove jargon.
+
+[eshatokhin@: Updated Russian strings accordingly]
 ---
  grub-core/normal/menu_text.c | 21 +++++++++------------
  1 file changed, 9 insertions(+), 12 deletions(-)
@@ -66,6 +68,73 @@ index a3d1f23f68f..64a83862f66 100644
    if (!msg_translated)
      {
        grub_print_error ();
+diff --git a/po/ru.po b/po/ru.po
+index 1de3db394..f47c16a85 100644
+--- a/po/ru.po
++++ b/po/ru.po
+@@ -2794,20 +2794,18 @@ msgstr "Перевести строку с текущими настройкам
+ 
+ #: grub-core/gfxmenu/gui_label.c:186 grub-core/normal/menu_text.c:184
+ msgid ""
+-"Press enter to boot the selected OS, `e' to edit the commands before booting "
+-"or `c' for a command-line. ESC to return previous menu."
++"Press 'e' to edit the selected item, or 'c' for a command prompt. "
++"Press Escape to return to the previous menu."
+ msgstr ""
+-"Нажмите «enter» для загрузки выбранной ОС, «e» для редактирования команд до "
+-"загрузки или «c» для получения командной строки. По ESC осуществляется "
+-"возврат в предыдущее меню."
++"Нажмите «e» для редактирования команд до загрузки или «c» для получения "
++"командной строки. По ESC осуществляется возврат в предыдущее меню."
+ 
+ #: grub-core/gfxmenu/gui_label.c:190 grub-core/normal/menu_text.c:192
+ msgid ""
+-"Press enter to boot the selected OS, `e' to edit the commands before booting "
+-"or `c' for a command-line."
++"Press 'e' to edit the selected item, or 'c' for a command prompt."
+ msgstr ""
+-"Нажмите «enter» для загрузки выбранной ОС, «e» для редактирования команд до "
+-"загрузки или «c» для получения командной строки."
++"Нажмите «e» для редактирования команд до загрузки или «c» для получения "
++"командной строки."
+ 
+ #: grub-core/gfxmenu/gui_label.c:194
+ msgid "enter: boot, `e': options, `c': cmd-line"
+@@ -2815,7 +2813,7 @@ msgstr "«enter»: загрузка, «e»: параметры, «c»: кома
+ 
+ #: grub-core/gfxmenu/gui_progress_bar.c:339 grub-core/normal/menu_text.c:446
+ #, c-format
+-msgid "The highlighted entry will be executed automatically in %ds."
++msgid "The selected entry will be started automatically in %ds."
+ msgstr "Выделенный пункт будет выполнен автоматически через %dс."
+ 
+ #. TRANSLATORS:  's' stands for seconds.
+@@ -4257,18 +4255,17 @@ msgstr "Загружается список команд"
+ 
+ #: grub-core/normal/menu_text.c:160
+ msgid ""
+-"Minimum Emacs-like screen editing is supported. TAB lists completions. Press "
+-"Ctrl-x or F10 to boot, Ctrl-c or F2 for a command-line or ESC to discard "
+-"edits and return to the GRUB menu."
++"Press Ctrl-x or F10 to start, Ctrl-c or F2 for a command prompt "
++"or Escape to discard edits and return to the menu. "
++"Pressing Tab lists possible completions."
+ msgstr ""
+-"Поддерживается несколько Emacs-подобных команд редактирования на экране. "
+-"Есть списки дополнений по TAB. Нажмите Ctrl-x или F10 для загрузки, Ctrl-c "
+-"или F2 для получения командной строки или ESC для отмены изменений и "
+-"возврата в меню GRUB."
++"Нажмите Ctrl-x или F10 для загрузки, Ctrl-c или F2 для получения "
++"командной строки или ESC для отмены изменений и возврата в меню GRUB. "
++"Поддерживается дополнение команд по нажатию TAB."
+ 
+ #: grub-core/normal/menu_text.c:170
+ #, c-format
+-msgid "Use the %C and %C keys to select which entry is highlighted."
++msgid "Use the %C and %C keys to change the selection."
+ msgstr "Используйте клавиши %C и %C для перемещения по пунктам."
+ 
+ #. TRANSLATORS: that's the list of binary unit prefixes.
 -- 
 2.17.1
 
