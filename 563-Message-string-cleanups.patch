@@ -5,7 +5,11 @@ Subject: [PATCH 092/250] Message string cleanups
 
 Make use of terminology consistent. Remove jargon.
 
-[eshatokhin@: Updated Russian strings accordingly]
+eshatokhin@:
+* Patched the timeout string in gfxmenu/gui_progress_bar.c as well.
+* Updated Russian strings accordingly.
+
+Signed-off-by: Evgenii Shatokhin <eshatokhin@virtuozzo.com>
 ---
  grub-core/normal/menu_text.c | 21 +++++++++------------
  1 file changed, 9 insertions(+), 12 deletions(-)
@@ -68,6 +72,20 @@ index a3d1f23f68f..64a83862f66 100644
    if (!msg_translated)
      {
        grub_print_error ();
+diff --git a/grub-core/gfxmenu/gui_progress_bar.c b/grub-core/gfxmenu/gui_progress_bar.c
+index b128f0866..180c83433 100644
+--- a/grub-core/gfxmenu/gui_progress_bar.c
++++ b/grub-core/gfxmenu/gui_progress_bar.c
+@@ -336,7 +336,7 @@ progress_bar_set_property (void *vself, const char *name, const char *value)
+       grub_free (self->template);
+       if (grub_strcmp (value, "@TIMEOUT_NOTIFICATION_LONG@") == 0)
+ 	value 
+-	  = _("The highlighted entry will be executed automatically in %ds.");
++	  = _("The selected entry will be started automatically in %ds.");
+       else if (grub_strcmp (value, "@TIMEOUT_NOTIFICATION_MIDDLE@") == 0)
+ 	/* TRANSLATORS:  's' stands for seconds.
+ 	   It's a standalone timeout notification.
+
 diff --git a/po/ru.po b/po/ru.po
 index 1de3db394..f47c16a85 100644
 --- a/po/ru.po
