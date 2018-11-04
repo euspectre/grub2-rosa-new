@@ -1,0 +1,42 @@
+Make sure GRUB recognizes and translates label strings from the theme
+
+Former grub2-locales.patch by Vladimir Testov <icedphoenix@rosalab.ru>
+
+This is kind of a hack for the ROSA GRUB theme. The theme adds a few labels,
+but GRUB is not aware that their text should be translated. This patch fixes
+the issue.
+
+Signed-off-by: Evgenii Shatokhin <eshatokhin@virtuozzo.com>
+
+diff --git a/grub-core/gfxmenu/gui_label.c b/grub-core/gfxmenu/gui_label.c
+index a4c817891..01277b8ca 100644
+--- a/grub-core/gfxmenu/gui_label.c
++++ b/grub-core/gfxmenu/gui_label.c
+@@ -25,6 +25,11 @@
+ #include <grub/i18n.h>
+ #include <grub/color.h>
+ 
++#define LABEL_ENTER "Boot entry     "
++#define LABEL_E     "Edit entry     "
++#define LABEL_C     "Console     "
++#define LABEL_ESC   "Back"
++
+ static const char *align_options[] =
+ {
+   "left",
+@@ -192,7 +197,14 @@ label_set_property (void *vself, const char *name, const char *value)
+ 	       "or `c' for a command-line.");
+ 	   else if (grub_strcmp (value, "@KEYMAP_SHORT@") == 0)
+ 	    value = _("enter: boot, `e': options, `c': cmd-line");
+-	   /* FIXME: Add more templates here if needed.  */
++	   else if (grub_strcmp (value, LABEL_ENTER) == 0)
++	    value = _(LABEL_ENTER);
++	   else if (grub_strcmp (value, LABEL_E) == 0)
++	    value = _(LABEL_E);
++	   else if (grub_strcmp (value, LABEL_C) == 0)
++	    value = _(LABEL_C);
++	   else if (grub_strcmp (value, LABEL_ESC) == 0)
++	    value = _(LABEL_ESC);
+ 	  self->template = grub_strdup (value);
+ 	  self->text = grub_xasprintf (value, self->value);
+ 	}

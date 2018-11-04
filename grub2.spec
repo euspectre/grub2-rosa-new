@@ -109,6 +109,7 @@ Patch2007:	grub2-10_linux_hibernate_fix.patch
 Patch2008:	grub2-make-sure-configure-finds-DejaVu-fonts.patch
 Patch2009:	grub2-Use-full-OS-name.patch
 Patch2010:	grub2-resume-ignore-zram.patch
+Patch2011:	grub2-translate-theme-label-strings.patch
 
 BuildRequires:	autogen
 BuildRequires:	automake
