@@ -11,7 +11,7 @@
 Summary:	GRUB is a boot loader
 Name:		grub2
 Version:	2.02
-Release:	8
+Release:	9
 License:	GPLv3+
 Group:		System/Kernel and hardware
 Url:		http://www.gnu.org/software/grub/
@@ -104,12 +104,13 @@ Patch2002:	grub2-unifont-path.patch
 Patch2003:	grub2-improved-boot-menu.patch
 Patch2004:	grub2-30_os-prober-loading-messages.patch
 Patch2005:	grub2-Install-signed-images-if-UEFI-Secure-Boot-is-enabled.patch
-Patch2006:	grub2-support-grub.cfg-links.patch
-Patch2007:	grub2-10_linux_hibernate_fix.patch
-Patch2008:	grub2-make-sure-configure-finds-DejaVu-fonts.patch
-Patch2009:	grub2-Use-full-OS-name.patch
-Patch2010:	grub2-resume-ignore-zram.patch
-Patch2011:	grub2-translate-theme-label-strings.patch
+Patch2006:	grub2-30_os-prober-common-commands.patch
+Patch2007:	grub2-support-grub.cfg-links.patch
+Patch2008:	grub2-10_linux_hibernate_fix.patch
+Patch2009:	grub2-make-sure-configure-finds-DejaVu-fonts.patch
+Patch2010:	grub2-Use-full-OS-name.patch
+Patch2011:	grub2-resume-ignore-zram.patch
+Patch2012:	grub2-translate-theme-label-strings.patch
 
 BuildRequires:	autogen
 BuildRequires:	automake

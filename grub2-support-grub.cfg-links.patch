@@ -62,7 +62,7 @@ index d4da219e7..d577046f0 100644
 +	  title_short="$(echo ${title} | perl -wpe 's/^(\S+(\s+[a-z_]+\b)?).*$/$1/is')"
 +
 +	  # The most part of the menuentry contents
-+	  menuentry_body="--class ${CLASS} --class gnu-linux --class gnu --class os \$menuentry_id_option 'osprober-gnulinux-simple-link-$boot_device_id' {
++	  menuentry_body="${CLASS} --class gnu-linux --class gnu --class os \$menuentry_id_option 'osprober-gnulinux-simple-link-$boot_device_id' {
 +$(save_default_entry | sed -e "s/^/\t/"; add_options; printf '%s\n' "${prepare_boot_cache}")
 +	configfile ${LKERNEL}
 +}"
