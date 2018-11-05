@@ -253,18 +253,19 @@ Requires:	efibootmgr
 # Even on UEFI, we need the common grub tools and convenience scripts.
 Requires:	%{name} = %{EVRD}
 Requires(post):	%{name} = %{EVRD}
-# The signed grub binaries are in a separate package for now. When automatic
-# signing of EFI binaries is working again, one may move the files into
-# grub2-efi again and get rid of grub2-efi-signed. Still, it can be
-# beneficial to keep grub2-efi-signed separate, for example, to be able
-# to fix the GRUB tools and update grub2-efi RPM without having to sign
-# the EFI images again.
-# In such conditions, " = %{EVRD}" below should be replaced with something
-# like " >= epoch:version-release of the last released grub2-efi-signed".
-Requires:	%{name}-efi-signed = %{EVRD}
-
-# TODO: is it needed to add 'Conflicts: grub2-efi < 2.02' here to avoid
-# file conflicts over /boot/efi/EFI/rosa/*?
+# The signed grub binaries are in a separate project, grub2-efi-signed,
+# for now. It can be beneficial to keep it separate, for example, to be able
+# to fix the GRUB tools or the scripts from /etc/grub.d/ and update
+# grub2-efi RPM without having to sign the EFI images again.
+#
+# This is why grub2-efi requires version >= some_minimal_version of
+# grub2-efi-signed rather than the same EVRD that it has.
+#
+# [IMPORTANT]
+# If you have prepared an update for grub2-efi-signed, please update the
+# required version of it below. This will make sure the correct signed
+# binaries will be installed when the user tries to update grub2-efi.
+Requires:	%{name}-efi-signed >= 2.02-8
 
 %description efi
 The GRand Unified Bootloader (GRUB) is a highly configurable and customizable
