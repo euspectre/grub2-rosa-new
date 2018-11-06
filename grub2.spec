@@ -11,7 +11,7 @@
 Summary:	GRUB is a boot loader
 Name:		grub2
 Version:	2.02
-Release:	9
+Release:	10
 License:	GPLv3+
 Group:		System/Kernel and hardware
 Url:		http://www.gnu.org/software/grub/
@@ -246,14 +246,17 @@ fi
 Summary:	GRUB for EFI systems
 Group:		System/Kernel and hardware
 
-# efibootmgr is needed to install the bootloader on UEFI systems.
-# Although grub2-efi does not install the bootloader (grub2-efi-signed
-# should do that instead, for the signed GRUB image), let us pull in
-# efibootmgr anyway, just in case.
-Requires:	efibootmgr
-# Even on UEFI, we need the common grub tools and convenience scripts.
+# Even on UEFI, we need the common grub tools, scripts and /boot/grub2/grub.cfg.
 Requires:	%{name} = %{EVRD}
 Requires(post):	%{name} = %{EVRD}
+
+# efibootmgr is needed to install the bootloader on UEFI systems.
+Requires(post):	efibootmgr >= 16
+Requires:	efibootmgr
+
+# Properly signed shim is needed for ROSA to work if SecureBoot is enabled.
+Requires:	shim >= 13
+
 # The signed grub binaries are in a separate project, grub2-efi-signed,
 # for now. It can be beneficial to keep it separate, for example, to be able
 # to fix the GRUB tools or the scripts from /etc/grub.d/ and update
@@ -264,9 +267,11 @@ Requires(post):	%{name} = %{EVRD}
 #
 # [IMPORTANT]
 # If you have prepared an update for grub2-efi-signed, please update the
-# required version of it below. This will make sure the correct signed
-# binaries will be installed when the user tries to update grub2-efi.
-Requires:	%{name}-efi-signed >= 2.02-8
+# required version of it below and rebuild grub2 packages too (with an
+# increased release number, of course). This will make sure the correct
+# signed binaries will be installed when the user tries to update grub2-efi.
+Requires(post):	%{name}-efi-signed >= 2.02-9
+Requires:	%{name}-efi-signed
 
 %description efi
 The GRand Unified Bootloader (GRUB) is a highly configurable and customizable
@@ -296,6 +301,12 @@ images into /boot/efi/EFI/rosa/ manually, sign them if required, etc.
 %posttrans efi
 # Now that the EFI-specific tools are in place, re-create grub.cfg.
 %{_sbindir}/update-grub2
+# If UEFI is available, install the bootloader. If it is not - it is up to
+# the user to do things right.
+if [ -d /sys/firmware/efi ]; then
+	BOOT_PARTITION=$(df -h /boot | (read; awk '{print $1; exit}'|sed 's/[[:digit:]]*$//'))
+	%{_sbindir}/%{name}-install $BOOT_PARTITION
+fi
 #-----------------------------------------------------------------------
 
 %prep
