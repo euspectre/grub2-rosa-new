@@ -11,7 +11,7 @@
 Summary:	GRUB is a boot loader
 Name:		grub2
 Version:	2.02
-Release:	12
+Release:	13
 License:	GPLv3+
 Group:		System/Kernel and hardware
 Url:		http://www.gnu.org/software/grub/
@@ -52,6 +52,7 @@ Patch36:	36-btrfs-Refactor-the-code-that-read-from-disk.patch
 Patch37:	37-btrfs-Add-support-for-recovery-for-a-RAID-5-btrfs-pr.patch
 Patch38:	38-btrfs-Make-more-generic-the-code-for-RAID-6-rebuildi.patch
 Patch39:	39-btrfs-Add-RAID-6-recovery-for-a-btrfs-filesystem.patch
+Patch40:	40-unix-platform-Initialize-variable-to-fix-grub-install.patch
 
 # Patches from RHEL, Fedora and Ubuntu
 Patch501:	501-Don-t-say-GNU-Linux-in-generated-menus.patch
