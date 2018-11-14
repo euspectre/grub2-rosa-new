@@ -297,7 +297,6 @@ images into /boot/efi/EFI/rosa/ manually, sign them if required, etc.
 %{_mandir}/*/%{name}-efi-*
 %dir %{_datadir}/%{name}-efi
 %{_datadir}/%{name}-efi/*.efi
-%endif
 
 %posttrans efi
 # Now that the EFI-specific tools are in place, re-create grub.cfg.
@@ -308,6 +307,7 @@ if [ -d /sys/firmware/efi ]; then
 	BOOT_PARTITION=$(df -h /boot | (read; awk '{print $1; exit}'|sed 's/[[:digit:]]*$//'))
 	%{_sbindir}/%{name}-install $BOOT_PARTITION
 fi
+%endif
 #-----------------------------------------------------------------------
 
 %prep
