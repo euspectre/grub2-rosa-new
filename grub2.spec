@@ -1,6 +1,5 @@
 %define libdir32 %{_exec_prefix}/lib
 %define platform pc
-%define efi 1
 
 %global efi %{ix86} x86_64
 
