@@ -322,7 +322,7 @@ cp %{SOURCE1} %{unifont}
 sed -ri -e 's/-Werror//g' configure.ac
 sed -ri -e 's/-Werror //g' grub-core/Makefile.am
 
-autoreconf -fvi
+./autogen.sh
 
 tar -xf %{SOURCE8}
 pushd po-update; sh ./update.sh; popd
