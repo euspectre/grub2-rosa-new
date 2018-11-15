@@ -4,6 +4,9 @@
 
 %global efi %{ix86} x86_64
 
+%define unifont unifont.pcf.gz
+%define unifont_version 11.0.02
+
 # Do not build HTML and PDF documentation by default.
 %bcond_with	doc
 %bcond_with	pdf
@@ -11,11 +14,12 @@
 Summary:	GRUB is a boot loader
 Name:		grub2
 Version:	2.02
-Release:	13
+Release:	14
 License:	GPLv3+
 Group:		System/Kernel and hardware
 Url:		http://www.gnu.org/software/grub/
 Source0:	ftp://ftp.gnu.org/gnu/grub/grub-%{version}.tar.xz
+Source1:	http://unifoundry.com/pub/unifont/unifont-%{unifont_version}/font-builds/unifont-%{unifont_version}.pcf.gz
 Source2:	grub.default
 Source8:	grub2-po-update.tar.gz
 Source9:	update-grub2
@@ -101,7 +105,6 @@ Patch1004:	vl-1004-Support-showing-UEFI-logo-when-booting-in-UEFI.patch
 
 # ROSA-specific patches
 Patch2001:	grub2-read-cfg.patch
-Patch2002:	grub2-unifont-path.patch
 Patch2003:	grub2-improved-boot-menu.patch
 Patch2004:	grub2-30_os-prober-loading-messages.patch
 Patch2005:	grub2-Install-signed-images-if-UEFI-Secure-Boot-is-enabled.patch
@@ -118,7 +121,6 @@ BuildRequires:	automake
 BuildRequires:	bison
 BuildRequires:	binutils
 BuildRequires:	flex
-BuildRequires:	fonts-ttf-unifont >= 6.2
 # DejaVu fonts can be used by some themes.
 BuildRequires:	fonts-ttf-dejavu
 BuildRequires:	help2man
@@ -314,6 +316,10 @@ fi
 %setup -q -n grub-%{version}
 %apply_patches
 
+# Make sure GRUB uses the particular font.
+# The top build directory is searched for it first by 'configure'.
+cp %{SOURCE1} %{unifont}
+
 sed -ri -e 's/-Werror//g' configure.ac
 sed -ri -e 's/-Werror //g' grub-core/Makefile.am
 
@@ -327,6 +333,7 @@ pushd po-update; sh ./update.sh; popd
 export CONFIGURE_TOP="$PWD"
 %ifarch %{efi}
 mkdir -p efi
+cp %{unifont} efi/
 pushd efi
 %configure2_5x \
 	CFLAGS="" \
@@ -370,6 +377,7 @@ popd
 %endif
 
 mkdir -p pc
+cp %{unifont} pc/
 pushd pc
 %configure2_5x \
 	CFLAGS="" \
