@@ -13,7 +13,7 @@
 Summary:	GRUB is a boot loader
 Name:		grub2
 Version:	2.02
-Release:	14
+Release:	15
 License:	GPLv3+
 Group:		System/Kernel and hardware
 Url:		http://www.gnu.org/software/grub/
@@ -68,8 +68,8 @@ Patch524:	524-Fix-race-in-EFI-validation.patch
 Patch525:	525-Use-device-part-of-chainloader-target-if-present.patch
 Patch526:	526-Add-secureboot-support-on-efi-chainloader.patch
 Patch527:	527-Make-any-of-the-loaders-that-link-in-efi-mode-honor-.patch
-Patch528:	528-Rework-linux-command.patch
-Patch529:	529-Rework-linux16-command.patch
+#Patch528:	528-Rework-linux-command.patch
+#Patch529:	529-Rework-linux16-command.patch
 Patch530:	530-Re-work-some-intricacies-of-PE-loading.patch
 # Part of "Load arm with SB enabled" which affects x86 as well and is needed
 # for subsequent patches.
