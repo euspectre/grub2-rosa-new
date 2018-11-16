@@ -13,7 +13,7 @@
 Summary:	GRUB is a boot loader
 Name:		grub2
 Version:	2.02
-Release:	15
+Release:	16
 License:	GPLv3+
 Group:		System/Kernel and hardware
 Url:		http://www.gnu.org/software/grub/
@@ -272,7 +272,7 @@ Requires:	shim >= 13
 # required version of it below and rebuild grub2 packages too (with an
 # increased release number, of course). This will make sure the correct
 # signed binaries will be installed when the user tries to update grub2-efi.
-Requires(post):	%{name}-efi-signed >= 2.02-12
+Requires(post):	%{name}-efi-signed >= 2.02-15
 Requires:	%{name}-efi-signed
 
 %description efi
