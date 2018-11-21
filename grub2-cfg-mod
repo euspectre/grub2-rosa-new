@@ -1,0 +1,74 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use File::Temp qw/tempfile/;
+use File::Basename;
+
+my %params_add = ();
+my %params_del = ();
+
+# Process command-line arguments
+my $mode;
+for my $arg (@ARGV) {
+	if (substr($arg, 0, 2) eq '--') {
+		# An option - save its value into $mode
+		$mode = substr($arg, 2);
+		if ($mode eq 'help') {
+			print "Usage: $0 [--add param1 ...] [--del param1 ...]\n";
+			exit(0);
+		}
+	}
+	else {
+		# A value - store it into the array defined by previously specified mode option
+		if ($mode eq 'add') {
+			$params_add{$arg} = 1;
+		}
+		elsif ($mode eq 'del') {
+			$params_del{$arg} = 1;
+		}
+	}
+}
+
+# Process the file
+my $src;
+my $src_name = '/etc/default/grub';
+open($src, '<', $src_name) or die "Failed to open $src_name for reading: $!";
+my ($dst, $dst_name) = tempfile(basename($src_name) . '.XXXXXX', 'DIR' => dirname($src_name));
+
+my $edited = 0;   # Whether the line was found and edited
+while (my $line = <$src>) {
+	if ($line =~ m/^\s*GRUB_CMDLINE_LINUX_DEFAULT\s*=\s*(.*)/) {
+		# The desired line was detected, modifying it
+		$edited = 1;
+		# Process the value by splitting it and then joining back
+		my $value = $1;
+		# Get rid of quotes around the current value
+		$value =~ s/^(['"])(.*)\1/$2/;
+		my $quote = $1;
+		# Split the list of parameters
+		my @params = split(m/\s+/, $value);
+		my @new_params = ();
+		foreach my $param (@params) {
+			# Save the parameter if it's not marked for deleting
+			push(@new_params, $param) if (!defined($params_del{$param}));
+			# If the parameter was marked for adding, remove it from the list (added already) 
+			delete($params_add{$param});
+		}
+		# And finally, combine the parameters back to the final string
+		$line = 'GRUB_CMDLINE_LINUX_DEFAULT=' . $quote . join(' ', @new_params, keys(%params_add)) . $quote . "\n";
+	}
+	# Print the obtained (and possibly modified) line into the new file
+	print $dst $line;
+}
+if (!$edited && (scalar(keys(%params_add)) > 0)) {
+	# Line was not found - create a new line with parameters marked for adding
+	print $dst "GRUB_CMDLINE_LINUX_DEFAULT='" . join(' ', keys(%params_add)) . "'\n";
+}
+close($src);
+close($dst);
+
+# Set permissions to the new file and replace the old file with it
+chmod(((stat($src_name))[2] & 07777), $dst_name);
+rename($dst_name, $src_name) or die "Failed to rename $dst_name to $src_name: $!";

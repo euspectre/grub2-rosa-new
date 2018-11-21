@@ -13,7 +13,7 @@
 Summary:	GRUB is a boot loader
 Name:		grub2
 Version:	2.02
-Release:	16
+Release:	17
 License:	GPLv3+
 Group:		System/Kernel and hardware
 Url:		http://www.gnu.org/software/grub/
@@ -23,6 +23,9 @@ Source2:	grub.default
 Source8:	grub2-po-update.tar.gz
 Source9:	update-grub2
 Source11:	grub2.rpmlintrc
+# grub2-cfg-mod is used by XFdrake and nvidia-current drivers to add or
+# remove 'nomodeset' and other boot options as needed.
+Source14:	grub2-cfg-mod
 
 # Upstream patches. Keep them first to simplify future rebases.
 Patch1:		01-strtoull-Fix-behaviour-on-chars-between-9-and-a.patch
@@ -188,6 +191,7 @@ computer architectures and hardware devices.
 %{_sbindir}/%{name}-reboot
 %{_sbindir}/%{name}-set-default
 %{_sbindir}/%{name}-sparc64-setup
+%{_sbindir}/%{name}-cfg-mod
 %{_datadir}/grub
 %attr(0700,root,root) %dir %{_sysconfdir}/grub.d
 %{_sysconfdir}/grub.d/README
@@ -487,6 +491,8 @@ EOF
 	chmod 0755 %{name}.script
 	popd
 }
+
+install -m 755 %{SOURCE14} %{buildroot}%{_sbindir}/grub2-cfg-mod
 
 %find_lang grub
 
