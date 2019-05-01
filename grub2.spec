@@ -98,6 +98,7 @@ Patch569:	569-Don-t-draw-a-border-around-the-menu.patch
 Patch570:	570-Use-the-standard-margin-for-the-timeout-string.patch
 Patch571:	571-linuxefi-non-sb-fallback.patch
 Patch572:	572-linuxefi-re-enable-linux-cmd.patch
+Patch573:	573-linuxefi_disable_sb_fallback.patch
 
 # Patches from Virtuozzo/VZLinux (some are reworked and updated variants
 # of the patches used in ROSA before)
